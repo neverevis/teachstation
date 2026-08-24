@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+	    <meta charset="UTF-8">
+		<link rel="stylesheet" th:href="@{/css/styles.css}">
+	    <title>Login - TeachStation</title>
+	</head>
+	<body>
+
+	    <main class="pagina-login">
+			<section class="apresentacao-login">
+	            <h1>TeachStation</h1>
+
+	            <p>
+	                Aprenda no seu ritmo.
+	            </p>
+	        </section>
+			
+	        <section class="login-container">
+	            <h2>Acesse sua conta</h2>
+				
+	            <form action="/login" method="POST">
+					
+	                <div class="campo-formulario">
+	                    <label for="username">E-mail:</label>
+	                    <input type="text" id="username" name="username" required>
+	                </div>
+	                <div class="campo-formulario">
+	                    <label for="password">Senha:</label>
+	                    <input type="password" id="password" name="password" required>
+	                </div>
+	                
+	                <button type="submit">Entrar</button>
+	                
+	            </form>
+				
+	            <p>Não tem uma conta? <a href="/signup">Cadastre-se</a></p>
+	        </section>
+	    </main>
+	 
+	</body>
+</html>
