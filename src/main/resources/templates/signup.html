@@ -1,71 +1,62 @@
 <!DOCTYPE html>
-
 <html lang="pt-BR">
-
 	<head>
 	    <meta charset="UTF-8">
 	    <link rel="stylesheet" th:href="@{/css/styles.css}">
 	    <title>Cadastro - TeachStation</title>
 	</head>
-
 	<body>
 	    <main class="pagina-login">
 	        <section class="apresentacao-login">
 	            <h1>TeachStation</h1>
 	            <p>Aprenda no seu ritmo.</p>
 	        </section>
-	
+
 	        <section class="login-container cadastro-container">
 				<div class="cabecalho-cadastro">
+
 				    <h2>Crie sua conta</h2>
 
 				    <p class="texto-cadastro">
 				        Preencha seus dados para começar.
 				    </p>
 				</div>
-	
+
 	            <form action="/signup" method="POST">
 	                <div class="campo-formulario">
 	                    <label for="nome">Nome:</label>
-	
 	                    <input type="text" id="nome" name="nome" required>
 	                </div>
-	
+
 	                <div class="campo-formulario">
 						<label for="email">E-mail:</label>
-	
 	                    <input type="email" id="email" name="email" required>
 					</div>
 					
 					<div class="campo-formulario">
 	                    <label for="data-nascimento">Data de nascimento:</label>
-
 	                    <input type="date" id="data-nascimento" name="data-nascimento" required>
 	                </div>
-					
+
 	                <div class="campo-formulario">
 						<label for="senha">Senha:</label>
-	
 	                    <input type="password" id="senha" name="senha" required>
 	                </div>
-	
+
 	                <div class="campo-formulario">
 	                    <label for="confirmar-senha">Confirmar senha:</label>
-	
 	                    <input type="password" id="confirmar-senha" name="confirmar-senha" required>
 	                </div>
-	
+
 	                <button type="submit">
 	                    Criar conta
 	                </button>
-	
 	            </form>
-	
 	            <p>
 	                Já possui uma conta?
+
 	                <a href="/login">Entrar</a>
 	            </p>
-	
 	        </section>
 	    </main>
 	</body>
