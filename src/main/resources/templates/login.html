@@ -1,10 +1,40 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
+    <meta charset="UTF-8">
+    <title>Login - TeachStation</title>
 </head>
 <body>
-	<h1>Login</h1>
+    <header>
+        <h1>TeachStation</h1>
+    </header>
+    <nav aria-label="nav">
+        <p><a href="/">Home</a> > Login</p>
+        <ul>
+            <li><a href="/signup">Cadastrar</a></li>
+        </ul>
+    </nav>
+    <main>
+        <section class="login-container">
+            <h2>Acesse sua conta</h2>
+            <form action="/login" method="POST">
+                <div>
+                    <label for="username">E-mail:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div>
+                    <label for="password">Senha:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <div>
+                    <button type="submit">Entrar</button>
+                </div>
+            </form>
+            <p>Não tem uma conta? <a href="/signup">Cadastre-se</a></p>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2026 TeachStation.</p>
+    </footer>
 </body>
 </html>
