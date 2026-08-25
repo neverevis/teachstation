@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Área de Estudo</title>
+</head>
+<body>
+	<h1>Escolha sua área de estudo:</h1>
+	
+	<!--A ideia é tudo virar cards centralizados, com português no meio e os outros dois trancados e cinzas, com mensagem tipo "comming soon", mas faça como achar melhor. -->
+	<div>
+			<!--Não existe então vê como vai deixar cinza, não clicável e pá -->
+	        <a th:href="@{studyarea/math}">
+	            <div>
+	                <img src="img/matemática.png" alt="Matemática">
+	                <h2>Matemática</h2>
+	                <p>Aprenda sobre...</p>
+	            </div>
+	        </a>
+			
+			<!-- Português que foi o escolhido para implementar, colorido e clicável -->
+	        <a th:href="@{/studyarea/portuguese}">
+	            <div>
+	                <img src="img/português.png" alt="Português">
+	                <h2>Português</h2>
+	                <p>Entenda como...</p>
+	            </div>
+	        </a>
+			
+			<!--Não existe então vê como vai deixar cinza, não clicável e pá -->
+	        <a th:href="@{/studyarea/geography}">
+	            <div>
+	                <img src="img/geografia.png" alt="Geografia">
+	                <h2>Geografia</h2>
+	                <p>Descubra a...</p>
+	            </div>
+	        </a>
+	    </div>
+		
+		<footer>
+		    <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+		    <p>Projeto desenvolvido para fins educacionais.</p>
+		</footer>
+</body>
+</html>
