@@ -5,7 +5,78 @@
 <title>Insert title here</title>
 </head>
 <body>
-	<h1>Dashboard</h1>
+	<!-- Lado Esquerdo: Menu e Seleções, a parte onde vai escolher quais dados deseja ver -->
+	    <aside>
+	        <h2>TechStation</h2>
+	        
+	        <form action="#" method="get">
+	            <label for="turma">Turma:</label>
+	            <select id="turma" name="turma">
+	                <option></option>
+	            </select>
+	        </form>
+
+	        <nav>
+	            <ul>
+	                <li><a href="#">Visão Geral</a></li>
+	                <li><a href="#">Alunos e Notas</a></li>
+	                <li><a href="#">Chamada / Frequência</a></li>
+	                <li><a href="#">Avisos e Tarefas</a></li>
+	                <li><a href="#">Configurações</a></li>
+	            </ul>
+	        </nav>
+
+	        <div>
+	            <a href="/login">Sair</a>
+	        </div>
+	    </aside>
+
+	    <hr>
+
+	    <!-- Lado Direito: Dados Principais, onde ficaram os dados, por enquanto não tem muito o que colocar  -->
+	    <main>
+	        <header>
+	            <span>Professor</span>
+	        </header>
+
+	        <section>
+	            <h3>Resumo da Turma</h3>
+	            <ul>
+	                <li>Total de Alunos: <span>0</span></li>
+	                <li>Média Geral: 7.8</li>
+	                <li>Frequência Média: 94%</li>
+	            </ul>
+	        </section>
+
+	        <section>
+	            <h3>Lista de Alunos</h3>
+	            <table border="1">
+	                <thead>
+	                    <tr>
+	                        <th>RA</th>
+	                        <th>Nome</th>
+	                        <th>Nivel</th>
+	                        <th>Ações / Detalhes</th>
+	                    </tr>
+	                </thead>
+	                <tbody>
+	                    <tr>
+	                        <td>RA21244124</td>
+	                        <td>Nome</td>
+	                        <td>Nivel</td>
+	                        <td>
+	                            <details>
+	                                <summary>Clique para ver detalhes</summary>
+	                                <p><strong>E-mail:</strong> <span>email@exemplo.com</span></p>
+	                                <p><strong>Telefone Responsável:</strong> <span>(16)99204-1245</span></p>
+	                                <p><strong>Idade:</strong> <span>16 anos</span></p>
+	                            </details>
+	                        </td>
+	                    </tr>
+	                </tbody>
+	            </table>
+	        </section>
+	    </main>
 	
 	<footer>
 	    <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
