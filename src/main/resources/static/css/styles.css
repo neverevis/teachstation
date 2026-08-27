@@ -12,6 +12,9 @@
     --cor-texto: #242424;
     --cor-texto-secundario: #666666;
 
+	--cor-fundo-avaliacao: #F8F7FC;
+	--cor-borda: #E5E7EB;
+	
     --degrade-principal: linear-gradient(135deg, var(--cor-azul), var(--cor-roxo));
 }
 
@@ -26,6 +29,9 @@
 
 body {
     margin: 0;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
     font-family: Arial, sans-serif;
     color: var(--cor-texto);
     background-color: var(--cor-azul-escuro);
@@ -108,25 +114,22 @@ body {
     color: var(--cor-texto);
 }
 
-.campo-formulario input {
+.campo-formulario input,
+.campo-formulario select {
     width: 100%;
-
     padding: 14px 16px;
-
-    border: 2px solid #E5E7EB;
+    border: 2px solid var(--cor-borda);
     border-radius: 10px;
-
     font-size: 16px;
-
     outline: none;
-
     transition: border-color 0.2s, box-shadow 0.2s;
 }
 
-.campo-formulario input:focus {
+.campo-formulario input:focus,
+.campo-formulario select:focus {
     border-color: var(--cor-roxo);
-
     box-shadow: 0 0 0 3px var(--cor-lilas);
+
 }
 
 .login-container button {
@@ -173,38 +176,13 @@ body {
     text-decoration: underline;
 }
 
+.linha-formulario {
+    display: flex;
+    gap: 16px;
+}
 
-
-/*
-	Responsividade Mobile
-*/
-
-@media (max-width: 768px) {
-
-    .pagina-login {
-        flex-direction: column;
-    }
-
-    .apresentacao-login {
-        width: 100%;
-        min-height: 220px;
-
-        padding: 30px;
-    }
-
-    .apresentacao-login h1 {
-        font-size: 32px;
-    }
-
-    .apresentacao-login p {
-        font-size: 17px;
-    }
-
-    .login-container {
-        width: 100%;
-
-        padding: 40px 24px;
-    }
+.linha-formulario .campo-formulario {
+    width: 50%;
 }
 
 /* Página de Cadastro */
@@ -234,4 +212,278 @@ body {
 
 .cadastro-container .campo-formulario {
     margin-bottom: 14px;
+}
+
+/* Página do Questionário */
+
+.pagina-avaliacao {
+    flex: 1;
+    background-color: var(--cor-fundo-avaliacao);
+}
+
+.cabecalho-avaliacao {
+	width: 100%;
+    display: flex;
+	justify-content: center;
+	align-items: center;
+	
+    padding: 20px 24px;
+    background: var(--degrade-principal);
+}
+
+.cabecalho-avaliacao h1 {
+    margin: 0;
+    font-size: 26px;
+	font-weight: 700;
+    color: var(--cor-branco);
+}
+
+.conteudo-avaliacao {
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 50px 24px;
+}
+
+.introducao-avaliacao {
+    margin-bottom: 30px;
+}
+
+.introducao-avaliacao h2 {
+    margin: 0 0 12px;
+    font-size: 32px;
+    color: var(--cor-azul-escuro);
+}
+
+.introducao-avaliacao p {
+    margin: 0;
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--cor-texto-secundario);
+}
+
+.informacoes-avaliacao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.informacao-questao,
+.informacao-tempo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    color: var(--cor-texto-secundario);
+}
+
+.barra-progresso {
+    width: 100%;
+    height: 12px;
+    background-color: var(--cor-borda);
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.progresso-atual {
+    width: 10%;
+    height: 100%;
+    background: var(--degrade-principal);
+    border-radius: 20px;
+}
+
+.area-progresso {
+    margin-bottom: 32px;
+}
+
+
+.card-questao {
+    padding: 40px;
+    background-color: var(--cor-branco);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.numero-questao {
+    display: inline-block;
+    margin-bottom: 16px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background-color: var(--cor-lilas);
+    color: var(--cor-azul-escuro);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.card-questao h3 {
+    margin: 0 0 28px;
+    font-size: 24px;
+    line-height: 1.4;
+    color: var(--cor-texto);
+}
+
+.alternativas {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.alternativa {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 2px solid var(--cor-borda);
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 18px;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.alternativa input {
+    width: 20px;
+    height: 20px;
+    accent-color: var(--cor-roxo);
+}
+
+.alternativa:hover {
+    border-color: var(--cor-roxo);
+    background-color: #FAF8FF;
+}
+
+.acoes-avaliacao {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 32px;
+}
+
+.botao-proxima {
+    padding: 14px 24px;
+    border: none;
+    border-radius: 10px;
+    background: var(--degrade-principal);
+    color: var(--cor-branco);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.botao-proxima:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.aviso-avaliacao {
+    margin-top: 28px;
+    text-align: center;
+    font-size: 16px;
+    line-height: 1.5;
+    color: var(--cor-texto-secundario);
+}
+
+/* Rodapé */
+
+.rodape {
+    padding: 24px;
+    background: var(--degrade-principal);
+    color: var(--cor-branco);
+    text-align: center;
+    font-size: 14px;
+}
+
+.rodape p {
+    margin: 4px 0;
+}
+
+/*
+	Responsividade Mobile
+*/
+
+@media (max-width: 768px) {
+
+    .pagina-login {
+        flex-direction: column;
+    }
+
+    .apresentacao-login {
+        width: 100%;
+        min-height: 220px;
+
+        padding: 30px;
+    }
+
+    .apresentacao-login h1 {
+        font-size: 32px;
+    }
+
+    .apresentacao-login p {
+        font-size: 17px;
+    }
+
+    .login-container {
+        width: 100%;
+        padding: 40px 24px;
+    }
+	
+	.linha-formulario {
+	    flex-direction: column;
+	    gap: 0;
+	}
+
+	.linha-formulario .campo-formulario {
+	    width: 100%;
+	}
+	
+	.pagina-avaliacao {
+	    min-height: 100vh;
+	}
+
+	.cabecalho-avaliacao {
+	    padding: 16px 24px;
+	}
+
+	.cabecalho-avaliacao h1 {
+	    font-size: 22px;
+	}
+	
+	.conteudo-avaliacao {
+	    padding: 40px 20px;
+	}
+
+	.introducao-avaliacao h2 {
+	    font-size: 26px;
+	}
+
+	.introducao-avaliacao p {
+	    font-size: 17px;
+	}
+
+	.informacoes-avaliacao {
+	    align-items: flex-start;
+	    flex-direction: column;
+	    gap: 10px;
+	}
+
+	.card-questao {
+	    padding: 24px;
+	}
+
+	.card-questao h3 {
+	    font-size: 21px;
+	}
+
+	.alternativa {
+	    padding: 16px;
+	    font-size: 17px;
+	}
+
+	.acoes-avaliacao {
+	    justify-content: stretch;
+	}
+
+	.botao-proxima {
+	    width: 100%;
+	}
 }

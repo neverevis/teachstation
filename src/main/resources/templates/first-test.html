@@ -1,32 +1,93 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <title>Avaliação Inicial - TeachStation</title>
-</head>
-<body>
-    <header>
-        <h1>TeachStation</h1>
-    </header>
-    <nav aria-label="nav">
-        <p><a href="/">Home</a> > Avaliação Inicial</p>
-        <ul>
-            <li><a href="/logout">Logout</a></li>
-        </ul>
-    </nav>
-    <main>
-        <section class="test-container">
-            <h2>Olá! Vamos nos conhecer melhor?</h2>
-            <p>Responda a este breve questionário para receber atividades personalizadas para o seu estágio de aprendizado.</p>
-            <div id="test-container">
-                <img src="/images/mockup_test.jpg" alt="Exemplo de interface do questionário - apenas para visualização">
-                <p><small>Exemplo de interface do questionário - apenas para visualização</small></p>
-            </div>
-        </section>
-    </main>
-	<footer>
-	    <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
-	    <p>Projeto desenvolvido para fins educacionais.</p>
-	</footer>
-</body>
+	<head>
+	    <meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" th:href="@{/css/styles.css}">
+	    <title>Avaliação Inicial - TeachStation</title>
+	</head>
+	<body>
+		<main class="pagina-avaliacao">
+			<header class="cabecalho-avaliacao">
+	            <h1>TeachStation</h1>
+	        </header>
+			
+			<section class="conteudo-avaliacao">
+	            <div class="introducao-avaliacao">
+	                <h2>Olá! Vamos nos conhecer melhor?</h2>
+	                <p>
+	                    Responda às questões com calma. Esta avaliação vai nos ajudar
+	                    a preparar atividades adequadas para o seu aprendizado.
+	                </p>
+	            </div>
+
+	            <div class="informacoes-avaliacao">
+	                <div class="informacao-questao">
+	                    <span>Questão</span>
+
+	                    <strong>1 de 10</strong>
+	                </div>
+
+	                <div class="informacao-tempo">
+	                    <span>⏱</span>
+
+	                    <strong>Faça no seu ritmo</strong>
+	                </div>
+	            </div>
+
+	            <div class="area-progresso">
+	                <div class="barra-progresso">
+	                    <div class="progresso-atual"></div>
+	                </div>
+	            </div>
+
+	            <article class="card-questao">
+	                <span class="numero-questao">
+	                    QUESTÃO 01
+	                </span>
+
+	                <h3>
+	                    Qual palavra está escrita corretamente?
+	                </h3>
+
+	                <div class="alternativas">
+	                    <label class="alternativa">
+	                        <input type="radio" name="questao-1">
+	                        <span>Exceção</span>
+	                    </label>
+
+	                    <label class="alternativa">
+	                        <input type="radio" name="questao-1">
+	                        <span>Excessão</span>
+	                    </label>
+
+	                    <label class="alternativa">
+	                        <input type="radio" name="questao-1">
+	                        <span>Exessão</span>
+	                    </label>
+
+	                    <label class="alternativa">
+	                        <input type="radio" name="questao-1">
+	                        <span>Eseção</span>
+	                    </label>
+	                </div>
+
+	                <div class="acoes-avaliacao">
+	                    <button type="button" class="botao-proxima">
+	                        Próxima questão →
+	                    </button>
+	                </div>
+	            </article>
+
+	            <p class="aviso-avaliacao">
+	                Não se preocupe em acertar tudo. Responda da melhor forma que conseguir.
+	            </p>
+	        </section>
+		</main>
+		
+		<footer class="rodape">
+	        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+	        <p>Projeto desenvolvido para fins educacionais.</p>
+	    </footer>
+	</body>
 </html>
