@@ -1,27 +1,37 @@
 <!DOCTYPE html>
 <html>
-<head>
-<meta charset="UTF-8">
-<title>Área de Estudo de Português</title>
-</head>
+	<head>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" th:href="@{/css/styles.css}">
+		<link rel="stylesheet" th:href="@{/css/study-map.css}">		
+		<title>Língua Portuguesa - Fases</title>
+	</head>
 <body>
 	
-	
+	<div class="map-background"></div>
 	<div>
 		<h1>Exercícios de Português</h1>
 			 
 		<a th:href="@{/studyarea/portuguese/level1}">
-			<div>
-				<button type="" alt="Level 1">Level 1</button>
+			<div id="btn1" class="map-button">			
 			</div>
 		</a>
 	
 		<a th:href="@{/studyarea/portuguese/level2}">
-			<div>
-				<button type="" alt="Level 2">Level 2</button>
+			<div id="btn2" class="map-button">			
 			</div>
 		</a>
 		
+		<a th:href="@{/studyarea/portuguese/level3}">
+			<div id="btn3" class="map-button">			
+			</div>
+		</a>
+		
+		<div class="game-card">
+			<div class="game-card-cover"></div>
+			<p>iniciar</p>
+			<a href="#">INICIAR</a>
+		</div>
 	</div>
 
 	
@@ -29,5 +39,16 @@
 	    <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
 	    <p>Projeto desenvolvido para fins educacionais.</p>
 	</footer>
+	<script th:src="@{/js/map.js}"></script>
+	<script>
+		let botao1 = document.getElementById("btn1");
+		let botao2 = document.getElementById("btn2");
+		let botao3 = document.getElementById("btn3");
+		
+		let gameObject1 = new GameObject(botao1, new Vector2(550, 350));
+		let gameObject2 = new GameObject(botao2, new Vector2(616, 377));
+		let gameObject3 = new GameObject(botao3, new Vector2(885, 377));
+		
+	</script>
 </body>
 </html>
