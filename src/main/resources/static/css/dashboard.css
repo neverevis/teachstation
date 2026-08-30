@@ -1,0 +1,443 @@
+/*
+	Paleta de cores do Painel do Professor
+*/
+
+:root {
+    --cor-azul: #591EE7;
+    --cor-roxo: #8646DA;
+    --cor-lilas: #C9B6F8;
+    --cor-azul-escuro: #2D0A82;
+
+    --cor-branco: #FFFFFF;
+    --cor-texto: #242424;
+    --cor-texto-secundario: #666666;
+
+    --cor-fundo-avaliacao: #F8F7FC;
+    --cor-borda: #E5E7EB;
+}
+
+/*
+	estrutura da página
+*/
+
+.pagina-painel {
+    flex: 1;
+    width: 100%;
+
+    display: flex;
+
+    background-color: var(--cor-branco);
+}
+
+/*
+	barra lateral
+*/
+
+.barra-lateral {
+    width: 260px;
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    padding: 32px 24px;
+
+    color: var(--cor-branco);
+
+    background-color: var(--cor-azul-escuro);
+}
+
+.marca-barra-lateral h2 {
+    margin: 0 0 32px;
+
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.selecao-turma {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 32px;
+}
+
+.selecao-turma label {
+    margin-bottom: 8px;
+
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    opacity: 0.85;
+}
+
+.selecao-turma select {
+    width: 100%;
+    padding: 10px 12px;
+
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-radius: 10px;
+
+    color: var(--cor-branco);
+    background-color: rgba(255, 255, 255, 0.12);
+
+    font-size: 15px;
+    outline: none;
+}
+
+.selecao-turma select option {
+    color: var(--cor-texto);
+}
+
+.navegacao-lateral {
+    flex: 1;
+}
+
+.navegacao-lateral ul {
+    margin: 0;
+    padding: 0;
+
+    list-style: none;
+
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.navegacao-lateral a {
+    display: block;
+
+    padding: 12px 14px;
+
+    border-radius: 6px;
+
+    color: var(--cor-branco);
+    text-decoration: none;
+
+    font-size: 15px;
+}
+
+.navegacao-lateral a:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.navegacao-lateral a.link-ativo {
+    background-color: var(--cor-roxo);
+    font-weight: 700;
+}
+
+.sair-barra-lateral {
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+}
+
+.sair-barra-lateral a {
+    color: var(--cor-branco);
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    opacity: 0.9;
+}
+
+.sair-barra-lateral a:hover {
+    opacity: 1;
+    text-decoration: underline;
+}
+
+/*
+	conteudo principal
+*/
+
+.conteudo-painel {
+    flex: 1;
+    min-width: 0;
+
+    padding: 40px 48px;
+}
+
+.cabecalho-painel {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+
+    margin-bottom: 32px;
+}
+
+.cabecalho-painel h1 {
+    margin: 0 0 8px;
+
+    font-size: 28px;
+
+    color: var(--cor-azul-escuro);
+}
+
+.cabecalho-painel p {
+    margin: 0;
+
+    color: var(--cor-texto-secundario);
+    font-size: 15px;
+}
+
+.perfil-professor {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    font-weight: 600;
+    color: var(--cor-texto);
+}
+
+.avatar-professor {
+    width: 40px;
+    height: 40px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    border-radius: 50%;
+
+    background-color: var(--cor-roxo);
+    color: var(--cor-branco);
+
+    font-weight: 700;
+}
+
+/*
+	cards
+*/
+
+.resumo-turma {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+
+    margin-bottom: 40px;
+}
+
+.card-resumo {
+    padding: 24px;
+
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    background-color: var(--cor-branco);
+    border: 1px solid var(--cor-borda);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+}
+
+.rotulo-card {
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+
+    color: var(--cor-texto-secundario);
+}
+
+.valor-card {
+    font-size: 32px;
+    font-weight: 700;
+
+    color: var(--cor-azul-escuro);
+}
+
+/*
+	lista de alunos
+*/
+
+.lista-alunos-secao {
+    background-color: var(--cor-branco);
+    border: 1px solid var(--cor-borda);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+
+    overflow: hidden;
+}
+
+.cabecalho-secao {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+
+    padding: 24px;
+    border-bottom: 1px solid var(--cor-borda);
+}
+
+.cabecalho-secao h3 {
+    margin: 0;
+    font-size: 20px;
+    color: var(--cor-azul-escuro);
+}
+
+.busca-aluno {
+    width: 260px;
+    padding: 10px 14px;
+
+    border: 2px solid var(--cor-borda);
+    border-radius: 10px;
+
+    font-size: 14px;
+    outline: none;
+
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.busca-aluno:focus {
+    border-color: var(--cor-roxo);
+    box-shadow: 0 0 0 3px var(--cor-lilas);
+}
+
+.tabela-alunos-wrapper {
+    overflow-x: auto;
+}
+
+.tabela-alunos {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.tabela-alunos th,
+.tabela-alunos td {
+    padding: 16px 24px;
+    text-align: left;
+    font-size: 15px;
+}
+
+.tabela-alunos thead th {
+    background-color: var(--cor-fundo-avaliacao);
+    color: var(--cor-azul-escuro);
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.tabela-alunos tbody tr {
+    border-top: 1px solid var(--cor-borda);
+}
+
+.tabela-alunos tbody tr:hover {
+    background-color: #FAF8FF;
+}
+
+.nivel-aluno {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.etiqueta-nivel {
+    align-self: flex-start;
+
+    padding: 4px 10px;
+
+    border-radius: 20px;
+
+    background-color: var(--cor-lilas);
+    color: var(--cor-azul-escuro);
+
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.barra-nivel {
+    width: 120px;
+    height: 8px;
+
+    border-radius: 20px;
+    background-color: var(--cor-borda);
+
+    overflow: hidden;
+}
+
+.progresso-nivel {
+    display: block;
+    width: 60%;
+    height: 100%;
+
+    background-color: var(--cor-roxo);
+    border-radius: 20px;
+}
+
+.detalhes-aluno summary {
+    cursor: pointer;
+
+    color: var(--cor-azul);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.detalhes-aluno p {
+    margin: 10px 0 0;
+    font-size: 14px;
+    color: var(--cor-texto-secundario);
+}
+
+/*
+	mobile
+*/
+
+@media (max-width: 768px) {
+
+    .pagina-painel {
+        flex-direction: column;
+    }
+
+    .barra-lateral {
+        width: 100%;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 16px;
+
+        padding: 20px 24px;
+    }
+
+    .marca-barra-lateral h2 {
+        margin: 0;
+    }
+
+    .selecao-turma {
+        margin-bottom: 0;
+    }
+
+    .navegacao-lateral {
+        flex-basis: 100%;
+    }
+
+    .navegacao-lateral ul {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+
+    .sair-barra-lateral {
+        padding-top: 0;
+        border-top: none;
+    }
+
+    .conteudo-painel {
+        padding: 24px 20px;
+    }
+
+    .cabecalho-painel {
+        flex-direction: column;
+        gap: 12px;
+    }
+
+    .resumo-turma {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .cabecalho-secao {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .busca-aluno {
+        width: 100%;
+    }
+}

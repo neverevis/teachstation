@@ -1,86 +1,125 @@
 <!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Insert title here</title>
-</head>
-<body>
-	<!-- Lado Esquerdo: Menu e Seleções, a parte onde vai escolher quais dados deseja ver -->
-	    <aside>
-	        <h2>TechStation</h2>
-	        
-	        <form action="#" method="get">
-	            <label for="turma">Turma:</label>
-	            <select id="turma" name="turma">
-	                <option></option>
-	            </select>
-	        </form>
+<html lang="pt-BR">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" th:href="@{/css/styles.css}">
+		<link rel="stylesheet" th:href="@{/css/dashboard.css}">
+		<title>Dashboard - TeachStation</title>
+	</head>
+	<body>
+		<div class="pagina-painel">
 
-	        <nav>
-	            <ul>
-	                <li><a href="#">Visão Geral</a></li>
-	                <li><a href="#">Alunos e Notas</a></li>
-	                <li><a href="#">Chamada / Frequência</a></li>
-	                <li><a href="#">Avisos e Tarefas</a></li>
-	                <li><a href="#">Configurações</a></li>
-	            </ul>
-	        </nav>
+			<!-- lado esquerdo: -->
+			<aside class="barra-lateral">
+				<div class="marca-barra-lateral">
+					<h2>TeachStation</h2>
+				</div>
 
-	        <div>
-	            <a href="/login">Sair</a>
-	        </div>
-	    </aside>
+				<form class="selecao-turma" action="#" method="get">
+					<label for="turma">Turma</label>
+					<select id="turma" name="turma">
+						<option>3º Ano A</option>
+					</select>
+				</form>
 
-	    <hr>
+				<nav class="navegacao-lateral">
+					<ul>
+						<li><a href="#" class="link-ativo">Visão Geral</a></li>
+						<li><a href="#">Alunos e Notas</a></li>
+						<li><a href="#">Chamada / Frequência</a></li>
+						<li><a href="#">Avisos e Tarefas</a></li>
+						<li><a href="#">Configurações</a></li>
+					</ul>
+				</nav>
 
-	    <!-- Lado Direito: Dados Principais, onde ficaram os dados, por enquanto não tem muito o que colocar  -->
-	    <main>
-	        <header>
-	            <span>Professor</span>
-	        </header>
+				<div class="sair-barra-lateral">
+					<a href="/login">Sair</a>
+				</div>
+			</aside>
 
-	        <section>
-	            <h3>Resumo da Turma</h3>
-	            <ul>
-	                <li>Total de Alunos: <span>0</span></li>
-	                <li>Média Geral: 7.8</li>
-	                <li>Frequência Média: 94%</li>
-	            </ul>
-	        </section>
+			<!-- lado direito -->
+			<main class="conteudo-painel">
+				<header class="cabecalho-painel">
+					<div>
+						<h1>Dashboard</h1>
+						<p>progresso e a participação dos alunos.</p>
+					</div>
 
-	        <section>
-	            <h3>Lista de Alunos</h3>
-	            <table border="1">
-	                <thead>
-	                    <tr>
-	                        <th>RA</th>
-	                        <th>Nome</th>
-	                        <th>Nivel</th>
-	                        <th>Ações / Detalhes</th>
-	                    </tr>
-	                </thead>
-	                <tbody>
-	                    <tr>
-	                        <td>RA21244124</td>
-	                        <td>Nome</td>
-	                        <td>Nivel</td>
-	                        <td>
-	                            <details>
-	                                <summary>Clique para ver detalhes</summary>
-	                                <p><strong>E-mail:</strong> <span>email@exemplo.com</span></p>
-	                                <p><strong>Telefone Responsável:</strong> <span>(16)99204-1245</span></p>
-	                                <p><strong>Idade:</strong> <span>16 anos</span></p>
-	                            </details>
-	                        </td>
-	                    </tr>
-	                </tbody>
-	            </table>
-	        </section>
-	    </main>
-	
-	<footer>
-	    <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
-	    <p>Projeto desenvolvido para fins educacionais.</p>
-	</footer>
-</body>
+					<div class="perfil-professor">
+						<span class="avatar-professor">P</span>
+						<span>usuario teste</span>
+					</div>
+				</header>
+
+				<section class="resumo-turma">
+					<div class="card-resumo">
+						<span class="rotulo-card">Total de Alunos</span>
+						<strong class="valor-card">0</strong>
+					</div>
+
+					<div class="card-resumo">
+						<span class="rotulo-card">Média Geral</span>
+						<strong class="valor-card">7.8</strong>
+					</div>
+
+					<div class="card-resumo">
+						<span class="rotulo-card">Frequência Média</span>
+						<strong class="valor-card">94%</strong>
+					</div>
+
+					<div class="card-resumo">
+						<span class="rotulo-card">ra Ativas</span>
+						<strong class="valor-card">12</strong>
+					</div>
+				</section>
+
+				<section class="lista-alunos-secao">
+					<div class="cabecalho-secao">
+						<h3>Lista de Alunos</h3>
+						<input type="search" class="busca-aluno" placeholder="Buscar por nome ou RA" aria-label="Buscar aluno por nome ou RA">
+					</div>
+
+					<div class="tabela-alunos-wrapper">
+						<table class="tabela-alunos">
+							<thead>
+								<tr>
+									<th>RA</th>
+									<th>Nome</th>
+									<th>Nível</th>
+									<th>Ações / Detalhes</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>RA21244124</td>
+									<td>Nome do Aluno</td>
+									<td>
+										<span class="nivel-aluno">
+											<span class="etiqueta-nivel">Nível 3</span>
+											<span class="barra-nivel">
+												<span class="progresso-nivel"></span>
+											</span>
+										</span>
+									</td>
+									<td>
+										<details class="detalhes-aluno">
+											<summary>Ver detalhes</summary>
+											<p><strong>E-mail:</strong> <span>email@exemplo.com</span></p>
+											<p><strong>Telefone do responsável:</strong> <span>(16) 99204-1245</span></p>
+											<p><strong>Idade:</strong> <span>16 anos</span></p>
+										</details>
+									</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+				</section>
+			</main>
+		</div>
+
+		<footer class="rodape">
+			<p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+		</footer>
+	</body>
 </html>
