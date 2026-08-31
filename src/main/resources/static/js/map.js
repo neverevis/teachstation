@@ -16,7 +16,9 @@ class GameObject{
 	}
 	
 	setPosition(vector2){
-		this.element.style.transform = `translate(${vector2.x}px, ${vector2.y}px)`;
+		this.position = vector2;
+		this.element.style.left = `${vector2.x}%`;
+		this.element.style.top = `${vector2.y}%`;			
 	}
 }
 
