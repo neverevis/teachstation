@@ -27,10 +27,25 @@
 				</div>
 			</a>
 			
+			<a th:href="@{#}">
+				<div id="btn4" class="map-button">			
+				</div>
+			</a>
+			
+			<a th:href="@{#}">
+				<div id="btn5" class="map-button">			
+				</div>
+			</a>
+			
+			<a th:href="@{#}">
+				<div id="btn6" class="map-button">			
+				</div>
+			</a>
+			
 			<div id="game-card" class="game-card">
 				<div class="game-card-cover"></div>
 				<p>iniciar</p>
-				<a href="#">INICIAR</a>
+				<a th:href="@{/studyarea/portuguese/level1}">INICIAR</a>
 			</div>
 		</div>
 	</div>
@@ -42,26 +57,51 @@
 	</footer>
 	<script th:src="@{/js/map.js}"></script>
 	<script>
-		
+			
 		// x% = (pixelX / larguraOriginalDoMapa) * 100
 		// y% = (pixelY / alturaOriginalDoMapa) * 100
-		
 		
 		let botao1 = document.getElementById("btn1");
 		let botao2 = document.getElementById("btn2");
 		let botao3 = document.getElementById("btn3");
-		let gameCard = document.getElementById("game-card")
-
-		let cardYOffset = -500;
-		let cardXOffset = parseFloat(getComputedStyle(gameCard).width) / 2;
-						
+		let botao4 = document.getElementById("btn4");
+		let botao5 = document.getElementById("btn5");
+		let botao6 = document.getElementById("btn6");
 				
 		
-		let gameObject1 = new GameObject(botao1, new Vector2( (500 / 1920) * 100, (656 / 1080) * 100) );
-		let gameObject2 = new GameObject(botao2, new Vector2( (660 / 1920) * 100, (518/1080) * 100) );
-		let gameObject3 = new GameObject(botao3, new Vector2( (1165 / 1920) * 100, (626/1080) * 100) );
-		let cardObject = new GameObject(gameCard, new Vector2( ((500 - cardXOffset)/ 1920) * 100,  ((656 + cardYOffset)/ 1080)*100 ) )
+		let gameCard = document.getElementById("game-card")
 		
+		let levels = [
+		    { button: botao1, position: new Vector2((251 / 1920) * 100, (716 / 1080) * 100) },
+		    { button: botao2, position: new Vector2((534 / 1920) * 100, (656 / 1080) * 100) },
+		    { button: botao3, position: new Vector2((694 / 1920) * 100, (518 / 1080) * 100)  },
+			{ button: botao4, position: new Vector2((852 / 1920) * 100, (626 / 1080) * 100) },
+			{ button: botao5, position: new Vector2((1026 / 1920) * 100, (626 / 1080) * 100)  },
+			{ button: botao6, position: new Vector2((1199 / 1920) * 100, (626 / 1080) * 100) },
+									
+			
+		];
+		
+		/*
+			btn1:
+			btn2: (534 / 1920) * 100, (656 / 1080) * 100)
+			btn3: (694 / 1920) * 100, (518 / 1080) * 100) 
+			btn4:
+			btn5: 
+			btn6: (1199 / 1920) * 100, (626 / 1080) * 100)
+		 */
+		
+		let gameObjects = levels.map(level => new GameObject(level.button, level.position));
+	
+		let cardObject = new GameCard(gameCard, levels[0].position, 35 )
+		
+		levels.forEach(level => {
+			level.button.addEventListener("click", (event) => {
+				event.preventDefault();
+				cardObject.setPosition(level.position)
+			})
+		})
+			
 	</script>
 </body>
 </html>

@@ -12,7 +12,7 @@
 .map-background {
 	position: absolute; 
 	inset: 0;
-	background-image: url('../images/prototipo.png'); 
+	background-image: url('../images/mapa.png'); 
 	background-size: cover; 
 	background-position: center; 
 	z-index: -1; 
@@ -22,27 +22,28 @@
 	background-image: url('../images/button.png'); 
 	z-index: 5; 
 	position: absolute;
-	width: 3.65%; 
+	width: 3.65%;
 	height: 3.24%;
 	background-size: contain;
 	background-repeat: no-repeat;
+	transform: translate(-50%, 0);
 }
 
 .game-card {
 	position: absolute;
-	width: 25vh;
-	height: 30vh;
+	width: 13.02%;
+	height: 27.8%;
 	display: flex;
 	align-items: center;
 	justify-content: start;
 	flex-direction: column;
 	border-radius: 16px;
-	border: 2px solid var(--cor-roxo);
+	border: 5px solid var(--cor-roxo);
 	background-color: var(--cor-branco);
 	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
 	gap: 13px;
 	overflow: hidden;
-	transform: translateZ(0);
+	transform: translate(-50%, 0);
 	z-index: 6;
 }
 

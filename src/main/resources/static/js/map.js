@@ -8,17 +8,19 @@ let windowHeight = screen.height;
 class GameObject{
 	
 	constructor(element, position){
-		this.element = element;
-		this.position = position;
-		this.element.style.position = "absolute";
-		this.setPosition(position);
-			
+	    this.element = element;
+	    this.element.style.position = "absolute";
+	    this.setPosition(position);
 	}
-	
+
 	setPosition(vector2){
-		this.position = vector2;
-		this.element.style.left = `${vector2.x}%`;
-		this.element.style.top = `${vector2.y}%`;			
+	    this.position = vector2;
+	    this._applyPosition(vector2);
+	}
+
+	_applyPosition(vector2){
+	    this.element.style.left = `${vector2.x}%`;
+	    this.element.style.top = `${vector2.y}%`;
 	}
 }
 
@@ -63,6 +65,22 @@ class Vector2{
 	
 	
 	// o que eu vou precisar -> método de settar posição e método de pegar distância 
-	
-	
 }
+
+	class GameCard extends GameObject {
+		//o tamanho do elemento vai ser calculado com base no css 
+	
+		constructor(element, position, cardYOffsetPercent = 5){
+			super(element, position);              
+			this.cardYOffsetPercent = cardYOffsetPercent; 
+			this.setPosition(position);             
+		}
+		
+		setPosition(vector2){
+			let adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent )
+			super.setPosition(adjustedPos)
+		}
+		
+		
+		
+	}	
