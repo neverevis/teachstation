@@ -22,15 +22,33 @@
 						<option>3º Ano A</option>
 					</select>
 				</form>
-
+				
 				<nav class="navegacao-lateral">
-					<ul>
-						<li><a href="#" class="link-ativo">Visão Geral</a></li>
-						<li><a href="#">Alunos e Notas</a></li>
-						<li><a href="#">Chamada / Frequência</a></li>
-						<li><a href="#">Avisos e Tarefas</a></li>
-						<li><a href="#">Configurações</a></li>
-					</ul>
+				    <ul>
+				        <li>
+				            <a href="#" class="link-ativo">Visão Geral</a>
+				        </li>
+
+				        <li th:if="${perfil == 'secretaria'}">
+				            <a href="/cadastros">Cadastros</a>
+				        </li>
+
+				        <li>
+				            <a href="#">Alunos e Notas</a>
+				        </li>
+
+				        <li>
+				            <a href="#">Chamada / Frequência</a>
+				        </li>
+
+				        <li>
+				            <a href="#">Avisos e Tarefas</a>
+				        </li>
+
+				        <li>
+				            <a href="#">Configurações</a>
+				        </li>
+				    </ul>
 				</nav>
 
 				<div class="sair-barra-lateral">
@@ -43,7 +61,13 @@
 				<header class="cabecalho-painel">
 					<div>
 						<h1>Dashboard</h1>
-						<p>progresso e a participação dos alunos.</p>
+						<p th:if="${perfil == 'professor'}">
+						    Acompanhe o progresso e a participação dos alunos.
+						</p>
+
+						<p th:if="${perfil == 'secretaria'}">
+						    Gerencie alunos, professores e informações da instituição.
+						</p>
 					</div>
 
 					<div class="perfil-professor">
@@ -69,7 +93,7 @@
 					</div>
 
 					<div class="card-resumo">
-						<span class="rotulo-card">ra Ativas</span>
+						<span class="rotulo-card">RA Ativas</span>
 						<strong class="valor-card">12</strong>
 					</div>
 				</section>

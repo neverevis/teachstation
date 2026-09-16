@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+	<head>
+	    <meta charset="UTF-8">
+	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+		
+		<link rel="stylesheet" th:href="@{/css/styles.css}">
+		<link rel="stylesheet" th:href="@{/css/cadastros.css}">
+		
+		<title>Cadastros - TeachStation</title>
+	</head>
+	<body>
+		<main class="pagina-cadastros">
+		    <section class="cabecalho-cadastros">
+		        <a href="/dashboard" class="voltar-dashboard">
+		            ← Voltar para o Dashboard
+		        </a>
+		
+		        <h1>Cadastros</h1>
+	
+		        <p>
+		            Selecione o tipo de usuário que deseja cadastrar.
+		        </p>
+		
+		    </section>
+		    <section class="opcoes-cadastro">
+		        <a href="/cadastro/aluno" class="card-cadastro">
+		
+		            <div class="icone-cadastro">
+		                A
+		            </div>
+		
+		            <div>
+		                <h2>Cadastrar Aluno</h2>
+		
+		                <p>
+		                    Cadastre alunos informando RA, dados pessoais,
+		                    e-mail e informações do responsável.
+		                </p>
+		            </div>
+		
+		        </a>
+		
+		        <a href="/cadastro/professor" class="card-cadastro">
+		
+		            <div class="icone-cadastro">
+		                P
+		            </div>
+		
+		            <div>
+		                <h2>Cadastrar Professor</h2>
+		
+		                <p>
+		                    Cadastre professores informando prontuário,
+		                    dados pessoais, e-mail e telefone.
+		                </p>
+		            </div>
+		
+		        </a>
+		
+		    </section>
+		
+		</main>
+		
+		<footer class="rodape">
+		    <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+		</footer>
+
+	
+	</body>
+
+</html>
