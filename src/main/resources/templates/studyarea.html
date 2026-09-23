@@ -17,14 +17,21 @@
 			<h1>Escolha sua Área de Estudo</h1>
 		</div>
 		
-		
-		<div class="subject-segment"> <!-- geografia ou qlqr outra matéria -->
-					
-					<div class="subject-description">
-						<h1>Matemática é uma área do conhecimento que inclui os tópicos dos números, fórmulas e estruturas relacionadas, formas e os espaços em que estão contidos, e quantidades e suas mudanças. Esses tópicos são representados na matemática moderna com as principais subdisciplinas da teoria dos números,[1] álgebra,[2] geometria[1] e análise,[3] respectivamente.</h1>
+		<div class="subject-segment"> <!-- português -->
+			<div class="subject-card">
+				<h1>Língua Portuguesa</h1>
+				<img th:src="@{/images/LinguaPortuguesa.png}" alt="Língua Portuguesa">
+				
+				<div class="area-progresso">
+					<div class="barra-progresso">
+						<div class="progresso-atual"></div>
 					</div>
-					
-					<div class="subject-card">
+				</div>
+				<a th:href="@{/studyarea/portuguese }">Iniciar</a>
+				
+			</div>
+			
+			<div class="subject-card">
 									<h1>Matemática</h1>
 									<img th:src="@{/images/matematica.png}" alt="Matemática">
 									
@@ -35,35 +42,7 @@
 							</div>
 						<a th:href="@{/studyarea/portuguese }">Iniciar</a>
 					</div>
-				</div>
-			
-		<div class="subject-segment"> <!-- português -->
-			<div class="subject-card">
-				<h1>Língua Portuguesa</h1>
-				<img th:src="@{/images/LinguaPortuguesa.png}" alt="Língua Portuguesa">
-				
-				<div class="area-progresso">
-					                <div class="barra-progresso">
-					                    <div class="progresso-atual"></div>
-					</div>
-				</div>
-				<a th:href="@{/studyarea/portuguese }">Iniciar</a>
-				
-			</div>
-			
-			<div class="subject-description">
-				<h1>Língua portuguesa, também designada português, é uma língua indo-europeia românica flexiva ocidental originada no galego-português falado no Reino da Galiza e no norte de Portugal. Com a criação do Reino de Portugal em 1139 e a expansão para o sul na sequência da Reconquista, deu-se a difusão da língua pelas terras conquistadas e, mais tarde, com as descobertas portuguesas, para o Brasil, África e outras partes do mundo.[9]</h1>
-			</div>
-
-		</div>
-		
-		
-		<div class="subject-segment"> <!-- geografia ou qlqr outra matéria -->
-			
-			<div class="subject-description">
-				<h1>Geografia (do grego antigo γεωγραφία geōgraphía; combinação de gê 'Terra' e gráphō 'escrever') é o estudo das terras, características, habitantes e fenômenos da Terra.[1] É uma disciplina abrangente que busca compreender a Terra e suas complexidades humanas e naturais</h1>
-			</div>
-			
+					
 			<div class="subject-card">
 					<h1>Geografia</h1>
 					<img th:src="@{/images/geografia.png}" alt="Geografia">
@@ -74,8 +53,10 @@
 						</div>
 					</div>
 				<a th:href="@{/studyarea/portuguese }">Iniciar</a>
-			</div>
+			</div>		
+		
 		</div>
+		
 		
 	</main>
 	

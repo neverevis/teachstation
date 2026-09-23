@@ -44,12 +44,23 @@
 	width: 30%;
 	background-color: var(--cor-branco);	
 	border-radius: 16px;
-	border: 1px solid var(--cor-roxo);
 	display: flex;
 	flex-direction: column;
 	align-items: center	;
+	position: relative;
+	z-index: 1;
 }
 
+.subject-card::after{
+	content: '';
+	position: absolute;
+	height: 110%;
+	width: 110%;
+	border-radius: 16px;
+	background-image: var(--degrade-principal);
+	transform: translate(0, -3%);
+	z-index: -1;
+}
 
 .subject-icon {
     width: 72px;
