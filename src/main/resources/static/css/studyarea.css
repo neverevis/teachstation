@@ -1,0 +1,144 @@
+
+.studyarea {
+	flex: 1;
+	width: 100%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: #FFFFFF;
+	padding: 30px 0px;
+}
+
+.title-segment{
+	margin-bottom: 15px;
+	font-size: 28px;
+	color: var(--cor-azul-escuro);
+}
+
+.subject-segment{
+	width: 100%;
+	margin: 10px 10px 45px 10px;
+	padding: 50px;
+	display: flex;
+	justify-content: space-between;
+	align-items: stretch;
+	flex-direction: row;
+}
+
+.subject-description{
+	font-size: 9px;
+	margin: 0 15px;
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 16px;
+	border: rgb(197, 197, 197) 1px solid;
+	padding: 20px;
+}
+
+.subject-card{
+	margin: 0 15px;
+	height: 38vh;
+	min-width: 20%;
+	width: 30%;
+	background-color: var(--cor-branco);	
+	border-radius: 16px;
+	border: 1px solid var(--cor-roxo);
+	display: flex;
+	flex-direction: column;
+	align-items: center	;
+}
+
+
+.subject-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 24px;
+    font-size: 32px;
+    color: var(--cor-branco);
+    background: var(--degrade-principal);
+}
+
+
+.subject-progress-bar {
+	background-color: var(--cor-borda);
+	width: 100%;
+	height: 20px;
+	overflow: hidden;
+	border-radius: 16px;
+}
+
+.subject-card h1 {
+    font-size: 20px;
+    color: var(--cor-azul-escuro);
+    margin: 16px 0 8px;
+}
+
+
+.subject-card a {
+    margin-top: auto;
+    margin-bottom: 24px;
+    padding: 12px 32px;
+    border-radius: 10px;
+    background: var(--degrade-principal);
+    color: var(--cor-branco);
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.subject-card a:hover {
+    opacity: 0.9;
+    transform: translateY(-2px);
+}
+
+.subject-card img {
+	border-radius: 10px;
+	border: 1px solid var(--cor-roxo);
+	width: 70%;
+	height: 60%;
+}
+
+.disabled-card {
+    background-color: var(--cor-fundo-avaliacao);
+    border: 1px solid var(--cor-borda);
+    filter: grayscale(70%);
+    position: relative;
+}
+
+.disabled-card .subject-icon {
+    background: var(--cor-borda);
+    color: var(--cor-texto-secundario);
+}
+
+.disabled-card::after {
+    content: "🔒";
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    font-size: 20px;
+    opacity: 0.6;
+}
+
+.disabled-card .subject-card-label {
+    margin-top: 12px;
+    margin-bottom: 24px;
+    padding: 10px 24px;
+    border-radius: 10px;
+    background: var(--cor-borda);
+    color: var(--cor-texto-secundario);
+    font-weight: 600;
+    font-size: 14px;
+}
+
+
+.subject-card:not(.disabled-card):hover {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    transition: transform 0.2s, box-shadow 0.2s;
+}

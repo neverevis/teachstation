@@ -22,7 +22,7 @@ class GameObject{
 	    this.element.style.left = `${vector2.x}%`;
 	    this.element.style.top = `${vector2.y}%`;
 	}
-}
+} 
 
 class Vector2{
 	constructor(x, y){

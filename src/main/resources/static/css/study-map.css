@@ -12,18 +12,18 @@
 .map-background {
 	position: absolute; 
 	inset: 0;
-	background-image: url('../images/mapa.png'); 
+	background-image: url('../images/overworld.png'); 
 	background-size: cover; 
 	background-position: center; 
 	z-index: -1; 
 }
 
 .map-button {
-	background-image: url('../images/button.png'); 
+	background-image: url('../images/button2.png'); 
 	z-index: 5; 
 	position: absolute;
-	width: 3.65%;
-	height: 3.24%;
+	width: 6.75%; 
+	height: 6.75%;
 	background-size: contain;
 	background-repeat: no-repeat;
 	transform: translate(-50%, 0);

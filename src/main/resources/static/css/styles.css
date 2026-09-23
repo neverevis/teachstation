@@ -134,18 +134,13 @@ body {
 
 .login-container button {
     width: 100%;
-
     padding: 14px;
-
     border: none;
     border-radius: 10px;
-
     background: var(--degrade-principal);
     color: var(--cor-branco);
-
     font-size: 16px;
     font-weight: 600;
-
     cursor: pointer;
 
     transition: transform 0.2s, opacity 0.2s;

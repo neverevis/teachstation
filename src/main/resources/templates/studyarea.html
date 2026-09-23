@@ -3,45 +3,83 @@
 <head>
 	<meta charset="UTF-8">
 	<link rel="stylesheet" th:href="@{/css/styles.css}">
-	<link rel="stylesheet" th:href="@{/css/study-map.css}">
+	<link rel="stylesheet" th:href="@{/css/studyarea.css}">
 	<script th:src="@{/js/map.js}"></script>
 	<title>Área de Estudos</title>
-</head>
-	
+</head>	
 <body>
-	<h1>Escolha sua área de estudo:</h1>
+	<header class="cabecalho-avaliacao">
+		<h1>TeachStation</h1>
+	</header>
 	
-	<!--A ideia é tudo virar cards centralizados, com português no meio e os outros dois trancados e cinzas, com mensagem tipo "comming soon", mas faça como achar melhor. -->
-	<div>
-			<!--Não existe então vê como vai deixar cinza, não clicável e pá -->
-	        <a th:href="@{studyarea/math}">
-	            <div>
-	                <img src="img/matemática.png" alt="Matemática">
-	                <h2>Matemática</h2>
-	                <p>Aprenda sobre...</p>
-	            </div>
-	        </a>
-			
-			<!-- Português que foi o escolhido para implementar, colorido e clicável -->
-	        <a th:href="@{/studyarea/portuguese}">
-	            <div>
-	                <img src="img/português.png" alt="Português">
-	                <h2>Português</h2>
-	                <p>Entenda como...</p>
-	            </div>
-	        </a>
-			
-			<!--Não existe então vê como vai deixar cinza, não clicável e pá -->
-	        <a th:href="@{/studyarea/geography}">
-	            <div>
-	                <img src="img/geografia.png" alt="Geografia">
-	                <h2>Geografia</h2>
-	                <p>Descubra a...</p>
-	            </div>
-	        </a>
-	    </div>
+	<main class="studyarea">
+		<div class="title-segment">
+			<h1>Escolha sua Área de Estudo</h1>
+		</div>
 		
-		<footer>
+		
+		<div class="subject-segment"> <!-- geografia ou qlqr outra matéria -->
+					
+					<div class="subject-description">
+						<h1>Matemática é uma área do conhecimento que inclui os tópicos dos números, fórmulas e estruturas relacionadas, formas e os espaços em que estão contidos, e quantidades e suas mudanças. Esses tópicos são representados na matemática moderna com as principais subdisciplinas da teoria dos números,[1] álgebra,[2] geometria[1] e análise,[3] respectivamente.</h1>
+					</div>
+					
+					<div class="subject-card">
+									<h1>Matemática</h1>
+									<img th:src="@{/images/matematica.png}" alt="Matemática">
+									
+							<div class="area-progresso">
+								<div class="barra-progresso">
+									<div class="progresso-atual"></div>
+								</div>
+							</div>
+						<a th:href="@{/studyarea/portuguese }">Iniciar</a>
+					</div>
+				</div>
+			
+		<div class="subject-segment"> <!-- português -->
+			<div class="subject-card">
+				<h1>Língua Portuguesa</h1>
+				<img th:src="@{/images/LinguaPortuguesa.png}" alt="Língua Portuguesa">
+				
+				<div class="area-progresso">
+					                <div class="barra-progresso">
+					                    <div class="progresso-atual"></div>
+					</div>
+				</div>
+				<a th:href="@{/studyarea/portuguese }">Iniciar</a>
+				
+			</div>
+			
+			<div class="subject-description">
+				<h1>Língua portuguesa, também designada português, é uma língua indo-europeia românica flexiva ocidental originada no galego-português falado no Reino da Galiza e no norte de Portugal. Com a criação do Reino de Portugal em 1139 e a expansão para o sul na sequência da Reconquista, deu-se a difusão da língua pelas terras conquistadas e, mais tarde, com as descobertas portuguesas, para o Brasil, África e outras partes do mundo.[9]</h1>
+			</div>
+
+		</div>
+		
+		
+		<div class="subject-segment"> <!-- geografia ou qlqr outra matéria -->
+			
+			<div class="subject-description">
+				<h1>Geografia (do grego antigo γεωγραφία geōgraphía; combinação de gê 'Terra' e gráphō 'escrever') é o estudo das terras, características, habitantes e fenômenos da Terra.[1] É uma disciplina abrangente que busca compreender a Terra e suas complexidades humanas e naturais</h1>
+			</div>
+			
+			<div class="subject-card">
+					<h1>Geografia</h1>
+					<img th:src="@{/images/geografia.png}" alt="Geografia">
+							
+					<div class="area-progresso">
+						<div class="barra-progresso">
+							<div class="progresso-atual"></div>
+						</div>
+					</div>
+				<a th:href="@{/studyarea/portuguese }">Iniciar</a>
+			</div>
+		</div>
+		
+	</main>
+	
+		<footer class="rodape">
 		    <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
 		    <p>Projeto desenvolvido para fins educacionais.</p>
 		</footer>
