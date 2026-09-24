@@ -22,6 +22,10 @@ class GameObject{
 	    this.element.style.left = `${vector2.x}%`;
 	    this.element.style.top = `${vector2.y}%`;
 	}
+	
+	animateTo(positionA, duration = 400){
+		
+	}
 } 
 
 class Vector2{
@@ -63,7 +67,11 @@ class Vector2{
 		return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 	}
 	
-	
+	lerp(posA, posB, delta){
+		posA.x + (posB.x - posA.x) * delta,
+		posA.y + (posB.y - posA.y) * delta
+		return new Vector2(posA, posB);
+	}
 	// o que eu vou precisar -> método de settar posição e método de pegar distância 
 }
 
