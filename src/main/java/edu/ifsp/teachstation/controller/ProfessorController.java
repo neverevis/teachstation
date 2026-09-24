@@ -1,72 +1,62 @@
 package edu.ifsp.teachstation.controller;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.validation.Errors;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import edu.ifsp.teachstation.model.Professor;
 import edu.ifsp.teachstation.persistence.ProfessorRepository;
-import jakarta.validation.Valid;
+
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
+import java.sql.Date;
 
 @Controller
 public class ProfessorController {
 
-    @Autowired
-    private ProfessorRepository repo;
+    private final ProfessorRepository professorRepository;
+
+    public ProfessorController(ProfessorRepository professorRepository) {
+        this.professorRepository = professorRepository;
+    }
 
     @GetMapping("/cadastro/professor")
     public String cadastroProfessor() {
         return "cadastro-professor";
     }
 
-    @GetMapping("/professor/novo")
-    public String iniciar(Model model) {
-        model.addAttribute("professor", new Professor());
-        return "professor/editar";
-    }
-    
-    @PostMapping("/professor/salvar")
-    public String salvar(@Valid Professor professor, Errors errors) {
-        if (errors.hasErrors()) {
-            for (var e : errors.getAllErrors()) {
-                System.out.println(e);
-            }
-            return "professor/editar";
+    @PostMapping("/cadastro/professor")
+    public String cadastrarProfessor(
+            @RequestParam("nome") String nome,
+            @RequestParam("prontuario") String prontuario,
+            @RequestParam("data-nascimento") String dataNascimento,
+            @RequestParam("email") String email,
+            @RequestParam("telefone") String telefone,
+            @RequestParam("genero") String genero,
+            @RequestParam("nome-social") String nomeSocial,
+            @RequestParam("senha") String senha,
+            @RequestParam("confirmar-senha") String confirmarSenha
+    ) {
+
+        if (!senha.equals(confirmarSenha)) {
+            return "redirect:/cadastro/professor";
         }
-        
-        System.out.println("ProfessorController.salvar()");
-        repo.save(professor);
-        return "redirect:/professor/" + professor.getId() + "/editar";
-    }
-    
-    @GetMapping("/professor/{id}/editar")
-    public String editar(@PathVariable(name = "id") Integer id, Model model) {
-        Professor professor = repo.findById(id).get();
-        model.addAttribute("professor", professor);
-        return "professor/editar";
-    }
-    
-    @GetMapping("/professor/listar")
-    public String listar(Model model) {
-        Iterable<Professor> professores = repo.findAll();
-        model.addAttribute("professores", professores);
-        return "professor/listar";
-    }
-    
-    @PostMapping("/professor/{id}/excluir")
-    public String excluir(
-            @PathVariable(name = "id") Integer id,
-            RedirectAttributes redirectAttributes
-            ) {
-        
-        repo.deleteById(id);
-        redirectAttributes.addFlashAttribute("deleteOk", id);
-        
-        return "redirect:/professor/listar";
+
+        Professor professor = new Professor();
+
+        professor.setNomeCompleto(nome);
+        professor.setProntuario(prontuario);
+        professor.setDataNascimento(Date.valueOf(dataNascimento));
+        professor.setEmail(email);
+        professor.setTelefone(telefone);
+        professor.setGenero(genero);
+        professor.setNomeSocial(nomeSocial);
+        professor.setSenha(senha);
+
+        professor.setTipoUsuario("PROFESSOR");
+        professor.setDataCadastro(new java.util.Date());
+
+        professorRepository.save(professor);
+
+        return "redirect:/cadastro/professor";
     }
 }
