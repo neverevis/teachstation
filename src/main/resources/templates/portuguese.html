@@ -105,7 +105,7 @@
 		levels.forEach(level => {
 			level.button.addEventListener("click", (event) => {
 				event.preventDefault();
-				cardObject.setPosition(level.position)
+				cardObject.animateTo(level.position, 400)
 			})
 		})
 			

@@ -8,9 +8,11 @@ let windowHeight = screen.height;
 class GameObject{
 	
 	constructor(element, position){
-	    this.element = element;
-	    this.element.style.position = "absolute";
-	    this.setPosition(position);
+		this.element = element;
+		this.element.style.position = "absolute";
+		this.position = position;
+		this._applyPosition(position);
+		this._animationFrame = null;
 	}
 
 	setPosition(vector2){
@@ -23,8 +25,36 @@ class GameObject{
 	    this.element.style.top = `${vector2.y}%`;
 	}
 	
-	animateTo(positionA, duration = 400){
+	animateTo(vector2, duration = 400){
+		if (this._animationFrame){
+			cancelAnimationFrame(this._animationFrame);
+		}
 		
+		const start = this.position;
+		const end = vector2;
+		const startTime = performance.now();
+		
+		const step = (now) => {
+			const elapsed = now - startTime; //tempo decorrido
+			const t = Math.min(elapsed / duration, 1);
+			const eased = GameObject.easeOutCubic(t);
+			
+			const current = Vector2.lerp(start, end, eased);
+			this._applyPosition(current);
+			this.position = current;
+			
+			if (t < 1){
+				this._animationFrame = requestAnimationFrame(step);
+			} else {
+				this._animationFrame = null;
+			}
+		};
+		
+		this._animationFrame = requestAnimationFrame(step);
+	}
+
+	static easeOutCubic(t){
+		return 1 - Math.pow(1 - t, 3);
 	}
 } 
 
@@ -67,28 +97,37 @@ class Vector2{
 		return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 	}
 	
-	lerp(posA, posB, delta){
-		posA.x + (posB.x - posA.x) * delta,
-		posA.y + (posB.y - posA.y) * delta
-		return new Vector2(posA, posB);
+	static lerp(posA, posB, delta){
+		const x = posA.x + (posB.x - posA.x) * delta;
+		const y = posA.y + (posB.y - posA.y) * delta;
+		return new Vector2(x, y);
 	}
-	// o que eu vou precisar -> método de settar posição e método de pegar distância 
 }
 
-	class GameCard extends GameObject {
+class GameCard extends GameObject {
 		//o tamanho do elemento vai ser calculado com base no css 
 	
 		constructor(element, position, cardYOffsetPercent = 5){
-			super(element, position);              
-			this.cardYOffsetPercent = cardYOffsetPercent; 
-			this.setPosition(position);             
+			const adjustedPos = new Vector2(position.x, position.y - cardYOffsetPercent);
+			super(element, adjustedPos);
+			this.cardYOffsetPercent = cardYOffsetPercent;
 		}
-		
+
 		setPosition(vector2){
-			let adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent )
-			super.setPosition(adjustedPos)
+			const adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent);
+			super.setPosition(adjustedPos);
 		}
-		
-		
-		
-	}	
+
+		animateTo(vector2, duration = 400){
+			const adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent);
+			super.animateTo(adjustedPos, duration);
+		}
+}	
+
+
+
+
+
+
+
+
