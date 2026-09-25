@@ -1,7 +1,4 @@
 -- TeachStation - Banco de Dados
--- Modelo compatível com JPA @Inheritance(strategy = InheritanceType.JOINED)
--- As tabelas de especialização (aluno, professor e secretaria)
--- utilizam "id" como PK e FK para usuario.id.
 
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
@@ -38,8 +35,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 -- =====================================================
 -- Tabela: aluno
--- Compatível com JOINED:
--- aluno.id -> usuario.id
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS `aluno` (
@@ -63,8 +58,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 -- =====================================================
 -- Tabela: professor
--- Compatível com JOINED:
--- professor.id -> usuario.id
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS `professor` (
@@ -88,8 +81,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 -- =====================================================
 -- Tabela: secretaria
--- Compatível com JOINED:
--- secretaria.id -> usuario.id
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS `secretaria` (
@@ -128,7 +119,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 -- =====================================================
 -- Tabela: avaliacao_diagnostica
--- aluno_id -> aluno.id
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS `avaliacao_diagnostica` (
@@ -177,7 +167,6 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 -- =====================================================
 -- Tabela: tentativas_atividades
--- aluno_id -> aluno.id
 -- =====================================================
 
 CREATE TABLE IF NOT EXISTS `tentativas_atividades` (
@@ -206,10 +195,6 @@ ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
-
--- =====================================================
--- Restaurar configurações do MySQL
--- =====================================================
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
