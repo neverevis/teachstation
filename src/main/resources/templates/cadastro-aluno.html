@@ -1,139 +1,212 @@
+```html
 <!DOCTYPE html>
-<html lang="pt-BR">
-	<head>
-	    <meta charset="UTF-8">
-	    <link rel="stylesheet" th:href="@{/css/styles.css}">
-	    <title>Cadastro de Aluno - TeachStation</title>
-	</head>
-	<body>
-	    <main class="pagina-login">
-	        <section class="apresentacao-login">
-	            <h1>TeachStation</h1>
-	
-	            <p>Aprenda no seu ritmo.</p>
-	        </section>
-	
-	        <section class="login-container cadastro-container">
-	            <div class="cabecalho-cadastro">
-	                <h2>Cadastro de Aluno</h2>
-	
-	                <p class="texto-cadastro">
-	                    Preencha os dados do aluno.
-	                </p>
-	            </div>
-	
-	            <form action="/signup" method="POST">
-	                <div class="campo-formulario">
-	
-	                    <label for="nome">
-	                        Nome Completo:
-	                    </label>
-	
-	                    <input type="text" id="nome" name="nome"required>
-	                </div>
-	
-	                <div class="linha-formulario">
-	                    <div class="campo-formulario">
-	                        <label for="ra">
-	                            RA:
-	                        </label>
-	
-	                        <input type="text" id="ra" name="ra" required>
-	                    </div>
-						
-	                    <div class="campo-formulario">
-	                        <label for="data-nascimento">
-	                            Data de Nascimento:
-	                        </label>
-	
-	                        <input type="date" id="data-nascimento" name="data-nascimento" required>
-	                    </div>
-	                </div>
-	
-	                <div class="campo-formulario">
-	                    <label for="email">
-	                        E-mail:
-	                    </label>
-	
-	                    <input type="email" id="email" name="email" required>
-	                </div>
-	
-	                <div class="campo-formulario">
-	                    <label for="telefone-responsavel">
-	                        Telefone do Responsável:
-	                    </label>
-	
-	                    <input type="tel" id="telefone-responsavel" name="telefone-responsavel">
-	                </div>
-	
-	                <div class="campo-formulario">
-	                    <label for="genero">
-	                        Gênero:
-	                    </label>
-	
-	                    <select id="genero" name="genero" required>
-	                        <option value="" selected disabled>
-	                            Selecione uma opção
-	                        </option>
-	
-	                        <option value="masculino">
-	                            Masculino
-	                        </option>
-	
-	                        <option value="feminino">
-	                            Feminino
-	                        </option>
-							
-							<option value="outro">
-								Outro
-							</option>
-							
-	                        <option value="nao-informar">
-	                            Prefiro não informar
-	                        </option>
-	                    </select>
-	                </div>
-	
-	                <div class="campo-formulario">
-	                    <label for="nome-social">
-	                        Apelido (Nome Social):
-	                    </label>
-	
-	                    <input type="text" id="nome-social" name="nome-social">
-	                </div>
-	
-	                <div class="linha-formulario">
-	                    <div class="campo-formulario">
-	                        <label for="senha">
-	                            Senha:
-	                        </label>
-	
-	                        <input type="password" id="senha" name="senha" required>
-	                    </div>
-	
-	                    <div class="campo-formulario">
-	                        <label for="confirmar-senha">
-	                            Confirmar senha:
-	                        </label>
-	
-	                        <input type="password" id="confirmar-senha" name="confirmar-senha" required>
-	                    </div>
-	                </div>
-	
-					<button type="submit">
-		                Cadastrar Aluno
-		            </button>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 
-		        </form>
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>Cadastro de Aluno - TeachStation</title>
+</head>
 
-		        <p>
-		            <a href="/cadastros">
-		                Voltar para Cadastros
-		            </a>
-		        </p>
-	            </form>
-	
-	        </section>
-	    </main>
-	</body>
+<body>
+
+    <main class="pagina-login">
+
+        <section class="apresentacao-login">
+            <h1>TeachStation</h1>
+            <p>Aprenda no seu ritmo.</p>
+        </section>
+
+        <section class="login-container cadastro-container">
+
+            <div class="cabecalho-cadastro">
+                <h2>Cadastro de Aluno</h2>
+
+                <p class="texto-cadastro">
+                    Preencha os dados do aluno.
+                </p>
+            </div>
+
+            <!-- Mensagem de erro -->
+            <p th:if="${erro}" th:text="${erro}" class="mensagem-erro"></p>
+
+            <form th:action="@{/signup}" method="POST">
+
+                <div class="campo-formulario">
+
+                    <label for="nome">
+                        Nome Completo:
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        required>
+                </div>
+
+
+                <div class="linha-formulario">
+
+                    <div class="campo-formulario">
+
+                        <label for="ra">
+                            RA:
+                        </label>
+
+                        <input
+                            type="text"
+                            id="ra"
+                            name="ra"
+                            required>
+                    </div>
+
+
+                    <div class="campo-formulario">
+
+                        <label for="data-nascimento">
+                            Data de Nascimento:
+                        </label>
+
+                        <input
+                            type="date"
+                            id="data-nascimento"
+                            name="data-nascimento"
+                            required>
+                    </div>
+
+                </div>
+
+
+                <div class="campo-formulario">
+
+                    <label for="email">
+                        E-mail:
+                    </label>
+
+                    <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required>
+                </div>
+
+
+                <div class="campo-formulario">
+
+                    <label for="telefone-responsavel">
+                        Telefone do Responsável:
+                    </label>
+
+                    <input
+                        type="tel"
+                        id="telefone-responsavel"
+                        name="telefone-responsavel">
+                </div>
+
+
+                <div class="campo-formulario">
+
+                    <label for="genero">
+                        Gênero:
+                    </label>
+
+                    <select
+                        id="genero"
+                        name="genero"
+                        required>
+
+                        <option value="" selected disabled>
+                            Selecione uma opção
+                        </option>
+
+                        <option value="masculino">
+                            Masculino
+                        </option>
+
+                        <option value="feminino">
+                            Feminino
+                        </option>
+
+                        <option value="outro">
+                            Outro
+                        </option>
+
+                        <option value="nao-informar">
+                            Prefiro não informar
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <div class="campo-formulario">
+
+                    <label for="nome-social">
+                        Apelido (Nome Social):
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nome-social"
+                        name="nome-social">
+
+                </div>
+
+
+                <div class="linha-formulario">
+
+                    <div class="campo-formulario">
+
+                        <label for="senha">
+                            Senha:
+                        </label>
+
+                        <input
+                            type="password"
+                            id="senha"
+                            name="senha"
+                            required>
+
+                    </div>
+
+
+                    <div class="campo-formulario">
+
+                        <label for="confirmar-senha">
+                            Confirmar senha:
+                        </label>
+
+                        <input
+                            type="password"
+                            id="confirmar-senha"
+                            name="confirmar-senha"
+                            required>
+
+                    </div>
+
+                </div>
+
+
+                <button type="submit">
+                    Cadastrar Aluno
+                </button>
+
+            </form>
+
+
+            <p>
+                <a th:href="@{/cadastros}">
+                    Voltar para Cadastros
+                </a>
+            </p>
+
+        </section>
+
+    </main>
+
+</body>
+
 </html>
+```
