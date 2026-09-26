@@ -282,10 +282,11 @@ body {
 }
 
 .progresso-atual {
-    width: 10%;
+    width: 10%; /* Largura inicial */
     height: 100%;
     background: var(--degrade-principal);
     border-radius: 20px;
+    transition: width 0.4s ease; /* Transição suave quando a largura mudar */
 }
 
 .area-progresso {

@@ -1,93 +1,76 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-	<head>
-	    <meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" th:href="@{/css/styles.css}">
-	    <title>Avaliação Inicial - TeachStation</title>
-	</head>
-	<body>
-		<main class="pagina-avaliacao">
-			<header class="cabecalho-avaliacao">
-	            <h1>TeachStation</h1>
-	        </header>
-			
-			<section class="conteudo-avaliacao">
-	            <div class="introducao-avaliacao">
-	                <h2>Olá! Vamos nos conhecer melhor?</h2>
-	                <p>
-	                    Responda às questões com calma. Esta avaliação vai nos ajudar
-	                    a preparar atividades adequadas para o seu aprendizado.
-	                </p>
-	            </div>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <title>Avaliação Inicial - TeachStation</title>
+</head>
+<body>
+    <main class="pagina-avaliacao">
+        <header class="cabecalho-avaliacao">
+            <h1>TeachStation</h1>
+        </header>
+        
+        <section class="conteudo-avaliacao">
+            <div class="introducao-avaliacao">
+                <h2>Olá! Vamos nos conhecer melhor?</h2>
+                <p>Responda às questões com calma para identificarmos seu nível inicial.</p>
+            </div>
 
-	            <div class="informacoes-avaliacao">
-	                <div class="informacao-questao">
-	                    <span>Questão</span>
+            <div class="informacoes-avaliacao">
+                <div class="informacao-questao">
+                    <span>Questão</span>
+                    <strong th:text="${numeroQuestao} + ' de ' + ${totalQuestoes}">1 de 10</strong>
+                </div>
 
-	                    <strong>1 de 10</strong>
-	                </div>
+                <div class="informacao-tempo">
+                    <span>⏱</span>
+                    <strong>Faça no seu ritmo</strong>
+                </div>
+            </div>
 
-	                <div class="informacao-tempo">
-	                    <span>⏱</span>
+            <div class="area-progresso">
+                <div class="barra-progresso">
+                    <div class="progresso-atual" th:style="'width: ' + ${progressoPorcentagem} + '%;'"></div>
+                </div>
+            </div>
 
-	                    <strong>Faça no seu ritmo</strong>
-	                </div>
-	            </div>
+            <article class="card-questao">
+                <span class="numero-questao" th:text="'QUESTÃO ' + ${#numbers.formatInteger(numeroQuestao, 2)}">QUESTÃO 01</span>
 
-	            <div class="area-progresso">
-	                <div class="barra-progresso">
-	                    <div class="progresso-atual"></div>
-	                </div>
-	            </div>
+                <h3 th:text="${questao.enunciado}">Enunciado da questão</h3>
 
-	            <article class="card-questao">
-	                <span class="numero-questao">
-	                    QUESTÃO 01
-	                </span>
+                <form th:action="@{/first-test/responder}" method="post">
+                    <input type="hidden" name="questaoId" th:value="${questao.id}" />
 
-	                <h3>
-	                    Qual palavra está escrita corretamente?
-	                </h3>
+                    <!-- Lista de alternativas vindas do banco -->
+                    <div class="alternativas">
+                        <label class="alternativa" th:each="opt : ${questao.opcoes}">
+                            <input type="radio" name="opcaoId" th:value="${opt.id}" required th:disabled="${respostaExibida}">
+                            <span th:text="${opt.letra != null ? opt.letra + ') ' + opt.texto : opt.texto}">Opção</span>
+                        </label>
+                    </div>
 
-	                <div class="alternativas">
-	                    <label class="alternativa">
-	                        <input type="radio" name="questao-1">
-	                        <span>Exceção</span>
-	                    </label>
+                    <!-- Feedback exibido ao responder -->
+                    <div th:if="${respostaExibida}" class="card-feedback" th:classappend="${acertou} ? 'sucesso' : 'erro'">
+                        <p th:if="${acertou}"><strong>Parabéns! Você acertou!</strong></p>
+                        <p th:if="${!acertou}"><strong>A resposta correta é:</strong> <span th:text="${gabarito}"></span></p>
+                    </div>
 
-	                    <label class="alternativa">
-	                        <input type="radio" name="questao-1">
-	                        <span>Excessão</span>
-	                    </label>
+                    <div class="acoes-avaliacao">
+                        <button th:if="${!(respostaExibida ?: false)}" type="submit" class="botao-proxima">Confirmar Resposta</button>
+                        <a th:if="${respostaExibida}" th:href="@{/first-test}" class="botao-proxima">Próxima questão →</a>
+                    </div>
+                </form>
+            </article>
 
-	                    <label class="alternativa">
-	                        <input type="radio" name="questao-1">
-	                        <span>Exessão</span>
-	                    </label>
+            <p class="aviso-avaliacao">Não se preocupe em acertar tudo. Responda da melhor forma que conseguir.</p>
+        </section>
+    </main>
 
-	                    <label class="alternativa">
-	                        <input type="radio" name="questao-1">
-	                        <span>Eseção</span>
-	                    </label>
-	                </div>
-
-	                <div class="acoes-avaliacao">
-	                    <button type="button" class="botao-proxima">
-	                        Próxima questão →
-	                    </button>
-	                </div>
-	            </article>
-
-	            <p class="aviso-avaliacao">
-	                Não se preocupe em acertar tudo. Responda da melhor forma que conseguir.
-	            </p>
-	        </section>
-		</main>
-		
-		<footer class="rodape">
-	        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
-	        <p>Projeto desenvolvido para fins educacionais.</p>
-	    </footer>
-	</body>
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
+</body>
 </html>

@@ -1,64 +1,105 @@
 package edu.ifsp.teachstation.model;
 
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
 
+@Entity
+@Table(name = "questoes")
 public class Questao {
 
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-	
-	private String enunciado;
-	
-	private String dificuldade;
-	
-	private Integer pontos;
+    
+    private String enunciado;
+    
+    private String tipo;
+    
+    private String dificuldade;
+    
+    private Integer pontos;
 
-	private AreaConhecimento materia;
-	
-	public Integer getId() {
-		return id;
-	}
+    @ManyToOne
+    @JoinColumn(name = "area_id")
+    private AreaConhecimento materia;
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    @OneToMany(mappedBy = "questao", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OpcaoQuestao> opcoes = new ArrayList<>();
 
-	public String getEnunciado() {
-		return enunciado;
-	}
+    public Integer getId() {
+        return id;
+    }
 
-	public void setEnunciado(String enunciado) {
-		this.enunciado = enunciado;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public String getDificuldade() {
-		return dificuldade;
-	}
+    public String getEnunciado() {
+        return enunciado;
+    }
 
-	public void setDificuldade(String dificuldade) {
-		this.dificuldade = dificuldade;
-	}
+    public void setEnunciado(String enunciado) {
+        this.enunciado = enunciado;
+    }
 
-	public Integer getPontos() {
-		return pontos;
-	}
+    public String getTipo() {
+        return tipo;
+    }
 
-	public void setPontos(Integer pontos) {
-		this.pontos = pontos;
-	}
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
+    }
 
-	public AreaConhecimento getMateria() {
-		return materia;
-	}
+    public String getDificuldade() {
+        return dificuldade;
+    }
 
-	public void setMateria(AreaConhecimento materia) {
-		this.materia = materia;
-	}
-	
-	
-	
-	
+    public void setDificuldade(String dificuldade) {
+        this.dificuldade = dificuldade;
+    }
+
+    public Integer getPontos() {
+        return pontos;
+    }
+
+    public void setPontos(Integer pontos) {
+        this.pontos = pontos;
+    }
+
+    public AreaConhecimento getMateria() {
+        return materia;
+    }
+
+    public void setMateria(AreaConhecimento materia) {
+        this.materia = materia;
+    }
+
+    public List<OpcaoQuestao> getOpcoes() {
+        return opcoes;
+    }
+
+    public void setOpcoes(List<OpcaoQuestao> opcoes) {
+        this.opcoes = opcoes;
+    }
+
+    // Método para localizar a opção correta
+    public OpcaoQuestao getOpcaoCorreta() {
+        if (opcoes != null) {
+            for (OpcaoQuestao opt : opcoes) {
+                if (Boolean.TRUE.equals(opt.getCorreta())) {
+                    return opt;
+                }
+            }
+        }
+        return null;
+    }
 }
