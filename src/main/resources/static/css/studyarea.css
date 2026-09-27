@@ -1,4 +1,3 @@
-
 .studyarea {
 	flex: 1;
 	width: 100%;
@@ -38,20 +37,20 @@
 }
 
 .subject-card {
-    margin: 0 15px;
-    height: 38vh;
-    min-width: 20%;
-    width: 30%;
-    border-radius: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    position: relative;
-
-    border: 15px solid transparent;
-    background:
-        linear-gradient(var(--cor-branco), var(--cor-branco)) padding-box,
-        var(--degrade-principal) border-box;
+	margin: 0 15px;
+	height: 38vh;
+	min-width: 20%;
+	width: 30%;
+	border-radius: 16px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	position: relative;
+	overflow: hidden;
+	justify-content: flex-start;
+	background:
+		var(--degrade-principal) padding-box,
+		var(--degrade-principal) border-box;
 }
 
 .subject-icon {
@@ -79,7 +78,7 @@
 .subject-card h1 {
     font-size: 20px;
     color: var(--cor-azul-escuro);
-    margin: 16px 0 8px;
+	position: relative;
 }
 
 
@@ -87,9 +86,9 @@
     margin-top: auto;
     margin-bottom: 24px;
     padding: 12px 32px;
-    border-radius: 10px;
-    background: var(--degrade-principal);
-    color: var(--cor-branco);
+    border-radius: 13px;
+    background: var(--cor-branco);
+    color: var(--cor-azul-escuro);
     text-decoration: none;
     font-weight: 600;
     transition: transform 0.2s, opacity 0.2s;
@@ -101,42 +100,54 @@
 }
 
 .subject-card img {
-	border-radius: 10px;
-	border: 1px solid var(--cor-roxo);
-	width: 70%;
-	height: 60%;
+	width: 100%;
+	height: 80%;
+	min-height: 0;
+	object-fit: cover;
+	display: block;     
+}
+
+.subject-card-container {
+	position: relative;
+	width: 100%;
 }
 
 .disabled-card {
-    background-color: var(--cor-fundo-avaliacao);
-    border: 1px solid var(--cor-borda);
-    filter: grayscale(70%);
-    position: relative;
+	filter: grayscale(85%) brightness(0.95);
 }
 
+
+.lock-icon {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	width: 20%;
+	max-width: 170px;
+	height: auto;
+	z-index: 10;
+	pointer-events: none;
+}
 .disabled-card .subject-icon {
     background: var(--cor-borda);
     color: var(--cor-texto-secundario);
 }
 
-.disabled-card::after {
-    content: "🔒";
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-size: 20px;
-    opacity: 0.6;
+.disabled-link {
+	margin-top: auto;
+	margin-bottom: 24px;
+	padding: 12px 32px;
+	border-radius: 10px;
+	background: var(--cor-branco);
+	color: var(--cor-texto-secundario);
+	font-weight: 600;
+	opacity: 0.7;
+	cursor: not-allowed;
 }
 
-.disabled-card .subject-card-label {
-    margin-top: 12px;
-    margin-bottom: 24px;
-    padding: 10px 24px;
-    border-radius: 10px;
-    background: var(--cor-borda);
-    color: var(--cor-texto-secundario);
-    font-weight: 600;
-    font-size: 14px;
+.disabled-card:hover {
+	transform: none;
+	box-shadow: none;
 }
 
 
@@ -144,4 +155,79 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     transform: translateY(-3px);
     transition: transform 0.2s, box-shadow 0.2s;
+	box-shadow: 5px 10px var(--degrade-principal);	
 }
+
+.subject-media {
+	position: relative;
+	width: 100%;
+	flex: 1;
+	min-height: 0;
+	overflow: hidden;
+}
+
+.subject-media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+	transition: transform 0.4s ease;
+}
+
+.subject-card:not(.disabled-card):hover .subject-media img {
+	transform: scale(1.06);
+}
+
+.subject-overlay {
+	position: absolute;
+	inset: 0;
+	background: linear-gradient(
+		to top,
+		rgba(0, 0, 0, 0.85) 0%,
+		rgba(0, 0, 0, 0.35) 40%,
+		rgba(0, 0, 0, 0) 70%
+	);
+	z-index: 1;
+}
+
+.subject-title {
+	margin-bottom: 14px;
+	font-size: 22px;
+	font-weight: 800;
+	letter-spacing: 0.4px;
+	text-align: center;
+	color: var(--cor-roxo);
+	position: relative;
+	padding-bottom: 8px;
+}
+
+.subject-title::after {
+	content: "";
+	position: absolute;
+	left: 50%;
+	bottom: 0;
+	transform: translateX(-50%);
+	width: 36px;
+	height: 3px;
+	border-radius: 2px;
+	background: var(--degrade-principal);
+}
+
+.subject-card:not(.disabled-card):hover .subject-media img {
+	transform: scale(1.06);
+}
+
+.subject-wrapper {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin: 0 15px;
+	min-width: 20%;
+	width: 30%;
+}
+
+.subject-wrapper .subject-card {
+	margin: 0;
+	width: 100%;
+}
+

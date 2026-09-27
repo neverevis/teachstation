@@ -8,16 +8,14 @@
 	margin: 0 auto;
 	overflow: hidden;
 }
-
 .map-background {
 	position: absolute; 
 	inset: 0;
-	background-image: url('../images/overworld.png'); 
+	background-image: url('../images/novooverworld.gif'); 
 	background-size: cover; 
 	background-position: center; 
 	z-index: -1; 
 }
-
 .map-button {
 	background-image: url('../images/button2.png'); 
 	z-index: 5; 
@@ -28,46 +26,83 @@
 	background-repeat: no-repeat;
 	transform: translate(-50%, 0);
 }
-
 .game-card {
 	position: absolute;
 	width: 13.02%;
 	height: 27.8%;
 	display: flex;
 	align-items: center;
-	justify-content: start;
+	justify-content: flex-start;
 	flex-direction: column;
-	border-radius: 16px;
-	border: 5px solid var(--cor-roxo);
-	background-color: var(--cor-branco);
-	box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
-	gap: 13px;
+	border-radius: 18px;
+	background:
+		linear-gradient(var(--cor-branco), var(--cor-branco)) padding-box,
+		linear-gradient(135deg, var(--cor-azul), var(--cor-roxo)) border-box;
+	box-shadow:
+		0 10px 30px rgba(0, 0, 0, 0.18),
+		0 0 0 4px rgba(255, 255, 255, 0.4) inset;
+	gap: 30px;
 	overflow: hidden;
 	transform: translate(-50%, 0);
 	z-index: 6;
+	transition: box-shadow 0.3s ease;
+	animation: cardPop 0.35s ease;
 }
+
 
 .game-card-cover {
 	width: 100%;
+	height: 22%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	background-image: linear-gradient(135deg, var(--cor-azul), var(--cor-roxo));
-	border-top-left-radius: 5px;
-	border-top-right-radius: 5px;
 	border-bottom: 3px solid var(--cor-borda);
-	height: 20%;
-	margin-bottom: 20px;
-} 
+	position: relative;
+}
 
-.game-card a{
+.game-card-phase {
+	color: var(--cor-branco);
+	font-weight: 800;
+	font-size: 16px;
+	letter-spacing: 0.5px;
+	text-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+}
+
+.game-card-title {
+	font-size: 14px;
+	font-weight: 600;
+	color: var(--cor-roxo);
+	text-align: center;
+	padding: 0 8px;
+}
+
+.game-card-btn {
 	background-image: linear-gradient(135deg, var(--cor-azul), var(--cor-roxo));
 	color: var(--cor-branco);
 	padding: 14px;
-	border-radius: 16px;
-	width: 45%;
+	border-radius: 14px;
+	width: 55%;
 	height: 17%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	text-align: center;
-	text-decoration: none;	
+	text-decoration: none;
 	font-size: 15px;
 	font-weight: 700;
+	letter-spacing: 0.5px;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.game-card-btn:hover {
+	transform: translateY(-2px) scale(1.04);
+	box-shadow: 0 6px 16px rgba(0, 0, 0, 0.28);
+}
+
+.game-card-btn:active {
+	transform: translateY(0) scale(0.98);
 }
 
 

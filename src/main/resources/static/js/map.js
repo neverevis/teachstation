@@ -78,7 +78,7 @@ class Vector2{
 	
 	getY(){
 			return this.y;
-		}
+	}
 		
 	setY(y){
 		if (Number.isFinite(y)){
@@ -106,7 +106,7 @@ class Vector2{
 
 class GameCard extends GameObject {
 		//o tamanho do elemento vai ser calculado com base no css 
-	
+		
 		constructor(element, position, cardYOffsetPercent = 5){
 			const adjustedPos = new Vector2(position.x, position.y - cardYOffsetPercent);
 			super(element, adjustedPos);

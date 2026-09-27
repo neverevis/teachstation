@@ -17,44 +17,55 @@
 			<h1>Escolha sua Área de Estudo</h1>
 		</div>
 		
-		<div class="subject-segment"> <!-- português -->
-			<div class="subject-card">
-				<h1>Língua Portuguesa</h1>
-				<img th:src="@{/images/LinguaPortuguesa.png}" alt="Língua Portuguesa">
-				
-				<div class="area-progresso">
-					<div class="barra-progresso">
-						<div class="progresso-atual"></div>
+		<div class="subject-segment">
+
+			<div class="subject-wrapper">
+				<h1 class="subject-title">Português</h1>
+				<div class="subject-card">
+					<div class="subject-media">
+						<img th:src="@{/images/portugues.png}" alt="Língua Portuguesa">
 					</div>
-				</div>
-				<a th:href="@{/studyarea/portuguese }">Iniciar</a>
-				
-			</div>
-			
-			<div class="subject-card">
-									<h1>Matemática</h1>
-									<img th:src="@{/images/matematica.png}" alt="Matemática">
-									
-							<div class="area-progresso">
-								<div class="barra-progresso">
-									<div class="progresso-atual"></div>
-								</div>
-							</div>
-						<a th:href="@{/studyarea/portuguese }">Iniciar</a>
-					</div>
-					
-			<div class="subject-card">
-					<h1>Geografia</h1>
-					<img th:src="@{/images/geografia.png}" alt="Geografia">
-							
 					<div class="area-progresso">
 						<div class="barra-progresso">
 							<div class="progresso-atual"></div>
 						</div>
 					</div>
-				<a th:href="@{/studyarea/portuguese }">Iniciar</a>
-			</div>		
-		
+					<a th:href="@{/studyarea/portuguese}">Iniciar</a>
+				</div>
+			</div>
+
+			<div class="subject-wrapper">
+				<h1 class="subject-title">Matemática</h1>
+				<div class="subject-card disabled-card">
+					<div class="subject-media">
+						<img th:src="@{/images/matematica.png}" alt="Matemática">
+						<img class="lock-icon" th:src="@{/images/lock.png}" alt="Bloqueado">
+					</div>
+					<div class="area-progresso">
+						<div class="barra-progresso">
+							<div class="progresso-atual"></div>
+						</div>
+					</div>
+					<span class="disabled-link">Bloqueado</span>
+				</div>
+			</div>
+
+			<div class="subject-wrapper">
+				<h1 class="subject-title">Geografia</h1>
+				<div class="subject-card disabled-card">
+					<div class="subject-media">
+						<img th:src="@{/images/geografia.png}" alt="Geografia">
+						<img class="lock-icon" th:src="@{/images/lock.png}" alt="Bloqueado">
+					</div>
+					<div class="area-progresso">
+						<div class="barra-progresso">
+							<div class="progresso-atual"></div>
+						</div>
+					</div>
+					<span class="disabled-link">Bloqueado</span>
+				</div>
+			</div>
+
 		</div>
 		
 		

@@ -53,9 +53,11 @@
 			</a>
 			
 			<div id="game-card" class="game-card">
-				<div class="game-card-cover"></div>
-				<p>iniciar</p>
-				<a th:href="@{/studyarea/portuguese/level1}">INICIAR</a>
+				<div class="game-card-cover">
+					<span id="game-card-phase" class="game-card-phase">Fase 1</span>
+				</div>
+				<p class="game-card-title">Pronto para começar?</p>
+				<a id="game-card-link" th:href="@{#}" class="game-card-btn">INICIAR</a>
 			</div>
 		</div>
 	</div>
@@ -77,6 +79,9 @@
 				
 		
 		let gameCard = document.getElementById("game-card")
+		let gameCardLink = document.getElementById("game-card-link");
+		let gameCardPhase = document.getElementById("game-card-phase");
+		
 		
 		let levels = [
 		    { button: botao1, position: new Vector2((180 / 1920) * 100, (797 / 1080) * 100) },
@@ -102,12 +107,16 @@
 	
 		let cardObject = new GameCard(gameCard, levels[0].position, 35 )
 		
-		levels.forEach(level => {
+		levels.forEach((level, index) => {
 			level.button.addEventListener("click", (event) => {
 				event.preventDefault();
-				cardObject.animateTo(level.position, 400)
-			})
-		})
+				const levelNumber = index + 1;
+
+				cardObject.animateTo(level.position, 400);
+				gameCardLink.setAttribute("href", `/studyarea/portuguese/level${levelNumber}`);
+				gameCardPhase.textContent = `Fase ${levelNumber}`;
+			});
+		});
 			
 	</script>
 </body>
