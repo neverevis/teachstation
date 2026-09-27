@@ -1,0 +1,11 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_DATABASE: teachstation
+    ports:
+      - "3306:3306"
+    volumes:
+      - /teachstation.sql:/docker-entrypoint-initdb.d/teachstation.sql
