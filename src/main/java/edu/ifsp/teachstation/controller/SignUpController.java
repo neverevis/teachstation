@@ -4,6 +4,7 @@ import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.persistence.AlunoRepository;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,9 +15,11 @@ import java.sql.Date;
 public class SignUpController {
 
     private final AlunoRepository alunoRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public SignUpController(AlunoRepository alunoRepository) {
+    public SignUpController(AlunoRepository alunoRepository, PasswordEncoder passwordEncoder) {
         this.alunoRepository = alunoRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/cadastro/aluno")
@@ -50,7 +53,7 @@ public class SignUpController {
         aluno.setTelefoneResponsavel(telefoneResponsavel);
         aluno.setGenero(genero);
         aluno.setNomeSocial(nomeSocial);
-        aluno.setSenha(senha);
+        aluno.setSenha(passwordEncoder.encode(senha));
 
         aluno.setTipoUsuario("ALUNO");
         aluno.setDataCadastro(new java.util.Date());

@@ -4,6 +4,7 @@ import edu.ifsp.teachstation.model.Professor;
 import edu.ifsp.teachstation.persistence.ProfessorRepository;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -14,9 +15,11 @@ import java.sql.Date;
 public class ProfessorController {
 
     private final ProfessorRepository professorRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public ProfessorController(ProfessorRepository professorRepository) {
+    public ProfessorController(ProfessorRepository professorRepository, PasswordEncoder passwordEncoder) {
         this.professorRepository = professorRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @GetMapping("/cadastro/professor")
@@ -50,7 +53,7 @@ public class ProfessorController {
         professor.setTelefone(telefone);
         professor.setGenero(genero);
         professor.setNomeSocial(nomeSocial);
-        professor.setSenha(senha);
+        professor.setSenha(passwordEncoder.encode(senha));
 
         professor.setTipoUsuario("PROFESSOR");
         professor.setDataCadastro(new java.util.Date());
