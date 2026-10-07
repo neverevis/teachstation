@@ -8,4 +8,8 @@ services:
     ports:
       - "3307:3306"
     volumes:
-      - /teachstation.sql:/docker-entrypoint-initdb.d/teachstation.sql
+      - db_data:/var/lib/mysql
+      - ./teachstation.sql:/docker-entrypoint-initdb.d/teachstation.sql
+
+volumes:
+  db_data:
