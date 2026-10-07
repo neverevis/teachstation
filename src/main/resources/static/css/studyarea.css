@@ -9,7 +9,7 @@
 }
 
 .title-segment{
-	margin-bottom: 15px;
+	margin-bottom: 5px;
 	font-size: 28px;
 	color: var(--cor-azul-escuro);
 }
@@ -38,7 +38,6 @@
 
 .subject-card {
 	margin: 0 15px;
-	height: 38vh;
 	min-width: 20%;
 	width: 30%;
 	border-radius: 16px;
@@ -83,9 +82,8 @@
 
 
 .subject-card a {
-    margin-top: auto;
-    margin-bottom: 24px;
-    padding: 12px 32px;
+    margin: 14px 0;
+    padding: 10px 32px;
     border-radius: 13px;
     background: var(--cor-branco);
     color: var(--cor-azul-escuro);
@@ -99,32 +97,34 @@
     transform: translateY(-2px);
 }
 
-.subject-card img {
-	width: 100%;
-	height: 80%;
-	min-height: 0;
-	object-fit: cover;
-	display: block;     
-}
-
 .subject-card-container {
 	position: relative;
 	width: 100%;
 }
 
 .disabled-card {
+	background: linear-gradient(135deg, #4b4358, #625a70);
+}
+
+.disabled-card .subject-media img:not(.lock-icon) {
 	filter: grayscale(85%) brightness(0.95);
 }
 
+.subject-card .area-progresso {
+	display: none;
+}
 
-.lock-icon {
+
+.subject-media .lock-icon {
 	position: absolute;
 	top: 50%;
 	left: 50%;
 	transform: translate(-50%, -50%);
-	width: 20%;
-	max-width: 170px;
+	width: 18%;
+	max-width: 100px;
+	min-width: 56px;
 	height: auto;
+	object-fit: contain;
 	z-index: 10;
 	pointer-events: none;
 }
@@ -134,14 +134,12 @@
 }
 
 .disabled-link {
-	margin-top: auto;
-	margin-bottom: 24px;
-	padding: 12px 32px;
+	margin: 14px 0;
+	padding: 10px 32px;
 	border-radius: 10px;
-	background: var(--cor-branco);
-	color: var(--cor-texto-secundario);
+	background: #C7C3CE;
+	color: #6b6674;
 	font-weight: 600;
-	opacity: 0.7;
 	cursor: not-allowed;
 }
 
@@ -155,14 +153,14 @@
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
     transform: translateY(-3px);
     transition: transform 0.2s, box-shadow 0.2s;
-	box-shadow: 5px 10px var(--degrade-principal);	
+	box-shadow: 5px 10px var(--degrade-principal);
 }
 
 .subject-media {
 	position: relative;
 	width: 100%;
-	flex: 1;
-	min-height: 0;
+	aspect-ratio: 2 / 1;
+	flex: none;
 	overflow: hidden;
 }
 
@@ -230,4 +228,3 @@
 	margin: 0;
 	width: 100%;
 }
-
