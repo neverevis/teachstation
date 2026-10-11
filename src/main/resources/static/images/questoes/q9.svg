@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Claquete de cinema com estrelas">
+<rect width="400" height="240" rx="24" fill="#EDE7F6"/>
+
+<rect x="100" y="104" width="200" height="104" rx="8" fill="#37474F" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M120 138h160M120 166h160" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+<g transform="rotate(-14 100 104)"><rect x="100" y="70" width="200" height="34" rx="6" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M136 70l-18 34M180 70l-18 34M224 70l-18 34M268 70l-18 34" stroke="#333" stroke-width="12"/></g>
+<path d="M200 146l8 16h18l-14 11l5 17l-17-10l-17 10l5-17l-14-11h18z" fill="#FFD54F" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60 56l6 12l13 2l-9 9l2 13l-12-6l-12 6l2-13l-9-9l13-2z" fill="#FFD54F" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M340 60l6 12l13 2l-9 9l2 13l-12-6l-12 6l2-13l-9-9l13-2z" fill="#FFD54F" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M340 170l5 10l11 2l-8 8l2 11l-10-5l-10 5l2-11l-8-8l11-2z" fill="#CE93D8" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+</svg>

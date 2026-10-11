@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Sol, livro e espelho mostrando a luz">
+<rect width="400" height="240" rx="24" fill="#FFFDE7"/>
+
+<circle cx="52" cy="48" r="28" fill="#FFD54F"/>
+<g stroke="#FFB300" stroke-width="5" stroke-linecap="round"><path d="M52 6v10M52 80v10M10 48h10M84 48h10M22 18l7 7M75 71l7 7M82 18l-7 7M29 71l-7 7"/></g>
+<path d="M82 62L132 150M82 62L290 112" stroke="#FFB300" stroke-width="5" stroke-dasharray="4 10" stroke-linecap="round"/>
+<rect y="200" width="400" height="40" fill="#FFE082"/>
+<rect x="90" y="150" width="86" height="52" rx="6" fill="#42A5F5" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M133 150v52" stroke="#333" stroke-width="3"/>
+<path d="M104 166h20M104 180h20M144 166h20M144 180h20" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+<ellipse cx="300" cy="120" rx="58" ry="80" fill="#E1F5FE" stroke="#8D6E63" stroke-width="10"/>
+<path d="M270 80l36 -8M268 100l46-8" stroke="#fff" stroke-width="6" stroke-linecap="round"/>
+<rect x="268" y="130" width="64" height="40" rx="6" fill="#42A5F5" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M300 130v40" stroke="#333" stroke-width="3"/>
+<rect x="286" y="200" width="28" height="30" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+</svg>

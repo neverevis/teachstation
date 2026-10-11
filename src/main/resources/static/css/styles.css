@@ -16,6 +16,7 @@
 	--cor-borda: #E5E7EB;
 	
     --degrade-principal: linear-gradient(135deg, var(--cor-azul), var(--cor-roxo));
+	--degrade-principal-invertido: linear-gradient(135deg, var(--cor-roxo), var(--cor-azul));
 }
 
 
@@ -25,6 +26,10 @@
 
 * {
     box-sizing: border-box;
+}
+
+[hidden] {
+    display: none !important;
 }
 
 body {
@@ -214,6 +219,8 @@ body {
 .pagina-avaliacao {
     flex: 1;
     background-color: var(--cor-fundo-avaliacao);
+    font-family: Verdana, Arial, sans-serif; /* letras mais abertas e fáceis de ler */
+    line-height: 1.6;
 }
 
 .cabecalho-avaliacao {
@@ -275,7 +282,7 @@ body {
 
 .barra-progresso {
     width: 100%;
-    height: 12px;
+    height: 16px;
     background-color: var(--cor-borda);
     border-radius: 20px;
     overflow: hidden;
@@ -314,10 +321,77 @@ body {
 
 .card-questao h3 {
     margin: 0 0 28px;
-    font-size: 24px;
-    line-height: 1.4;
+    font-size: 26px;
+    line-height: 1.5;
     color: var(--cor-texto);
 }
+
+/* Ilustração da questão */
+
+.ilustracao-questao {
+    margin: 0 0 24px;
+    text-align: center;
+}
+
+.ilustracao-questao img {
+    display: block;
+    width: 100%;
+    max-width: 520px;
+    max-height: 300px;
+    margin: 0 auto;
+    object-fit: contain;
+    border-radius: 16px;
+    background-color: var(--cor-fundo-avaliacao);
+}
+
+/* Texto de apoio ("Leia o texto") */
+
+.texto-apoio {
+    margin-bottom: 24px;
+    padding: 18px 22px;
+    background-color: #FFFBE6;
+    border-left: 8px solid #FFC83D;
+    border-radius: 12px;
+}
+
+.texto-apoio-titulo {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: 700;
+    color: #8A6200;
+}
+
+.texto-apoio-corpo {
+    margin: 0;
+    font-size: 20px;
+    line-height: 1.9;
+    white-space: pre-line; /* mantém as quebras de linha de poemas */
+}
+
+/* Botão "Ouvir a questão" */
+
+.botao-ouvir {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 20px;
+    padding: 10px 18px;
+    border: 2px solid var(--cor-roxo);
+    border-radius: 999px;
+    background-color: #F3EEFF;
+    color: var(--cor-azul-escuro);
+    font: inherit;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.botao-ouvir:hover {
+    background-color: var(--cor-lilas);
+}
+
+/* Alternativas */
 
 .alternativas {
     display: flex;
@@ -326,26 +400,118 @@ body {
 }
 
 .alternativa {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 16px 18px;
-    border: 2px solid var(--cor-borda);
-    border-radius: 10px;
+    gap: 16px;
+    min-height: 72px; /* área grande para clicar/tocar */
+    padding: 14px 18px;
+    border: 3px solid var(--cor-borda);
+    border-radius: 14px;
     cursor: pointer;
-    font-size: 18px;
+    font-size: 20px;
+    line-height: 1.45;
     transition: border-color 0.2s, background-color 0.2s;
 }
 
+/* o botão de rádio some, mas continua funcionando (mouse, toque e teclado) */
 .alternativa input {
-    width: 20px;
-    height: 20px;
-    accent-color: var(--cor-roxo);
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
 }
+
+.letra-alternativa {
+    flex: 0 0 auto;
+    display: grid;
+    place-items: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: var(--cor-letra, var(--cor-roxo));
+    color: var(--cor-branco);
+    font-size: 22px;
+    font-weight: 700;
+}
+
+/* uma cor para cada letra (a letra continua escrita, a cor não é a única pista) */
+.alt-a { --cor-letra: #D32F2F; }
+.alt-b { --cor-letra: #1565C0; }
+.alt-c { --cor-letra: #2E7D32; }
+.alt-d { --cor-letra: #E65100; }
 
 .alternativa:hover {
     border-color: var(--cor-roxo);
     background-color: #FAF8FF;
+}
+
+/* alternativa escolhida */
+.alternativa:has(input:checked) {
+    border-color: var(--cor-letra, var(--cor-roxo));
+    background-color: var(--cor-branco);
+    box-shadow: 0 0 0 4px rgba(134, 70, 218, 0.2);
+}
+
+.alternativa:has(input:focus-visible) {
+    outline: 4px solid var(--cor-azul-escuro);
+    outline-offset: 3px;
+}
+
+/* depois de responder, as alternativas ficam só para leitura */
+.alternativa:has(input:disabled) {
+    cursor: default;
+}
+
+.alternativa:has(input:disabled):hover {
+    border-color: var(--cor-borda);
+    background-color: transparent;
+}
+
+.alternativa.correta,
+.alternativa.correta:has(input:disabled):hover {
+    border-color: #2E7D32;
+    background-color: #E8F5E9;
+}
+
+.alternativa.correta::after {
+    content: "✔ certa";
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 700;
+    color: #1B5E20;
+    white-space: nowrap;
+}
+
+/* Retorno depois de responder */
+
+.card-feedback {
+    margin-top: 28px;
+    padding: 22px;
+    border: 3px solid;
+    border-radius: 14px;
+    text-align: center;
+    font-size: 20px;
+    line-height: 1.5;
+}
+
+.card-feedback p {
+    margin: 0;
+}
+
+.card-feedback.sucesso {
+    background-color: #E8F5E9;
+    border-color: #66BB6A;
+    color: #1B5E20;
+}
+
+.card-feedback.erro {
+    background-color: #FFF3E0;
+    border-color: #FFB74D;
+    color: #8A3B00;
 }
 
 .acoes-avaliacao {
@@ -355,13 +521,18 @@ body {
 }
 
 .botao-proxima {
-    padding: 14px 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 14px 28px;
     border: none;
     border-radius: 10px;
     background: var(--degrade-principal);
     color: var(--cor-branco);
-    font-size: 16px;
+    font-size: 18px;
     font-weight: 600;
+    text-decoration: none;
     cursor: pointer;
     transition: transform 0.2s, opacity 0.2s;
 }
@@ -369,6 +540,11 @@ body {
 .botao-proxima:hover {
     opacity: 0.9;
     transform: translateY(-2px);
+}
+
+.botao-proxima:focus-visible {
+    outline: 4px solid var(--cor-azul-escuro);
+    outline-offset: 3px;
 }
 
 .aviso-avaliacao {
@@ -401,7 +577,7 @@ body {
 
 .rodape {
     padding: 24px;
-    background: var(--degrade-principal);
+    background: var(--degrade-principal-invertido);
     color: var(--cor-branco);
     text-align: center;
     font-size: 14px;
@@ -485,12 +661,23 @@ body {
 	}
 
 	.card-questao h3 {
-	    font-size: 21px;
+	    font-size: 22px;
 	}
 
 	.alternativa {
-	    padding: 16px;
-	    font-size: 17px;
+	    padding: 14px;
+	    font-size: 18px;
+	    gap: 12px;
+	}
+
+	.letra-alternativa {
+	    width: 42px;
+	    height: 42px;
+	    font-size: 20px;
+	}
+
+	.texto-apoio-corpo {
+	    font-size: 18px;
 	}
 
 	.acoes-avaliacao {
@@ -500,4 +687,13 @@ body {
 	.botao-proxima {
 	    width: 100%;
 	}
+}
+
+/* Quem prefere menos movimento não vê animações */
+
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+    }
 }

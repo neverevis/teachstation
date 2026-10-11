@@ -1,86 +1,58 @@
 package edu.ifsp.teachstation.model;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.List;
 
+import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
+@Entity
+@Table(name = "atividades")
 public class Atividade {
 
-	
-	@Id
+    @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-	
-	private Date dataTentativa;
-	
-	private Integer acertos;
-	
-	private float pontosObtidos;
-	
-	private List<Questao> questoes;
-	
-	
-	public float calcularPontos() {
+    
+    private Date dataTentativa;
+    
+    private Integer acertos;
+    
+    private float pontosObtidos;
+    
+    // Getters e Setters
+    public Integer getId() {
+        return id;
+    }
 
-		float total = 0;
-		for (Questao questao : questoes) {
-			total += questao.getPontos();
-		}
-		
-		return total;
-	}
-	
-	public boolean calculoAvanco() {
-		
-		if(calcularPontos() >= 70) {
-			return true;
-		}else {
-			return false;
-		}
-	}
-	
-	
-	public Integer getId() {
-		return id;
-	}
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
-	public void setId(Integer id) {
-		this.id = id;
-	}
+    public Date getDataTentativa() {
+        return dataTentativa;
+    }
 
-	public Date getDataTentativa() {
-		return dataTentativa;
-	}
+    public void setDataTentativa(Date dataTentativa) {
+        this.dataTentativa = dataTentativa;
+    }
 
-	public void setDataTentativa(Date dataTentativa) {
-		this.dataTentativa = dataTentativa;
-	}
+    public Integer getAcertos() {
+        return acertos;
+    }
 
-	public Integer getAcertos() {
-		return acertos;
-	}
+    public void setAcertos(Integer acertos) {
+        this.acertos = acertos;
+    }
 
-	public void setAcertos(Integer acertos) {
-		this.acertos = acertos;
-	}
+    public float getPontosObtidos() {
+        return pontosObtidos;
+    }
 
-	public float getPontosObtidos() {
-		return pontosObtidos;
-	}
-
-	public void setPontosObtidos(float pontosObtidos) {
-		this.pontosObtidos = pontosObtidos;
-	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
+    public void setPontosObtidos(float pontosObtidos) {
+        this.pontosObtidos = pontosObtidos;
+    }
 }

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Flor azul balançando com a brisa e um beija-flor">
+<rect width="400" height="240" rx="24" fill="#E1F5FE"/>
+
+<rect y="196" width="400" height="44" fill="#A5D6A7"/>
+<path d="M130 196q-6-50 6-90" fill="none" stroke="#2E7D32" stroke-width="8" stroke-linecap="round"/>
+<path d="M134 160q-40-10-46-40q36 0 46 40z" fill="#66BB6A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<g fill="#64B5F6" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><circle cx="136" cy="62" r="20"/><circle cx="166" cy="82" r="20"/><circle cx="160" cy="116" r="20"/><circle cx="110" cy="116" r="20"/><circle cx="104" cy="82" r="20"/></g>
+<circle cx="136" cy="92" r="17" fill="#FFD54F" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<g fill="none" stroke="#90CAF9" stroke-width="6" stroke-linecap="round"><path d="M10 70q40-24 70 0q20 16 0 28"/><path d="M180 150q50-24 90 0q26 16 0 30"/><path d="M200 40q30-14 50 4"/></g>
+<ellipse cx="320" cy="96" rx="32" ry="20" fill="#26A69A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="350" cy="84" r="14" fill="#26A69A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M362 82l36-6" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+<circle cx="354" cy="81" r="3" fill="#333"/>
+<ellipse cx="316" cy="66" rx="30" ry="12" transform="rotate(-25 316 66)" fill="#80CBC4" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M290 106l-34 16l30 2z" fill="#26A69A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+
+</svg>

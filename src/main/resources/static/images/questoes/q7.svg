@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Leão bravo e ratinho pequeno">
+<rect width="400" height="240" rx="24" fill="#FFF8E1"/>
+
+<rect y="206" width="400" height="34" fill="#C5E1A5"/>
+<circle cx="132" cy="116" r="72" fill="#FB8C00" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="132" cy="120" r="46" fill="#FFCA28" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="96" cy="66" r="16" fill="#FFCA28" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="168" cy="66" r="16" fill="#FFCA28" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 104l16 -4M160 104l-16 -4" stroke="#333" stroke-width="5" stroke-linecap="round"/>
+<circle cx="112" cy="114" r="5" fill="#333"/><circle cx="152" cy="114" r="5" fill="#333"/>
+<path d="M122 132h20l-10 12z" fill="#6D4C41" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M112 152q20 -14 40 0" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="318" cy="180" rx="38" ry="26" fill="#B0BEC5" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="354" cy="170" r="17" fill="#B0BEC5" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="348" cy="150" r="10" fill="#F8BBD0" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="366" cy="152" r="9" fill="#F8BBD0" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="358" cy="168" r="3" fill="#333"/><circle cx="371" cy="176" r="3.5" fill="#333"/>
+<path d="M280 184q-34 -4 -36 -34q-2 -16 12 -18" fill="none" stroke="#F48FB1" stroke-width="5" stroke-linecap="round"/>
+<text x="318" y="60" font-size="34" font-family="Verdana,sans-serif" font-weight="700" fill="#E65100" text-anchor="middle">!!!</text>
+
+</svg>

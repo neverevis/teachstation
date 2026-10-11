@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Ônibus parado ao lado do guichê da rodoviária">
+<rect width="400" height="240" rx="24" fill="#E3F2FD"/>
+
+<circle cx="345" cy="42" r="24" fill="#FFD54F"/>
+<rect y="196" width="400" height="44" fill="#90A4AE"/>
+<rect x="18" y="98" width="182" height="92" rx="18" fill="#66BB6A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="32" y="112" width="38" height="34" rx="6" fill="#E1F5FE" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="78" y="112" width="38" height="34" rx="6" fill="#E1F5FE" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="124" y="112" width="38" height="34" rx="6" fill="#E1F5FE" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="168" y="112" width="22" height="64" rx="5" fill="#E1F5FE" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="64" cy="192" r="19" fill="#37474F"/><circle cx="64" cy="192" r="7" fill="#CFD8DC"/>
+<circle cx="154" cy="192" r="19" fill="#37474F"/><circle cx="154" cy="192" r="7" fill="#CFD8DC"/>
+<rect x="238" y="62" width="144" height="134" rx="10" fill="#FFE082" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="238" y="62" width="144" height="30" rx="10" fill="#F57C00" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="310" y="84" font-size="16" font-family="Verdana,sans-serif" font-weight="700" fill="#fff" text-anchor="middle">GUICHÊ</text>
+<rect x="258" y="104" width="104" height="54" rx="8" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="310" cy="122" r="13" fill="#FFCC80" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="294" y="136" width="32" height="22" rx="6" fill="#42A5F5" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="262" y="166" width="96" height="22" rx="4" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="310" y="182" font-size="13" font-family="Verdana,sans-serif" font-weight="700" fill="#333" text-anchor="middle">PASSAGEM</text>
+
+</svg>

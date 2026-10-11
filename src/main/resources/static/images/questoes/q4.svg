@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Xícara com asa, cadeira e camisa">
+<rect width="400" height="240" rx="24" fill="#FFF3E0"/>
+
+<rect y="200" width="400" height="40" fill="#FFCC80"/>
+<path d="M30 96h92v42q0 40-46 40q-46 0-46-40z" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M122 108q38 0 32 28q-6 22-34 18" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="22" cy="124" rx="16" ry="9" transform="rotate(-30 22 124)" fill="#B3E5FC" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60 70q6-14 0-24M84 70q6-14 0-24" fill="none" stroke="#B0BEC5" stroke-width="5" stroke-linecap="round"/>
+<rect x="182" y="70" width="12" height="74" rx="4" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="182" y="70" width="74" height="12" rx="4" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="176" y="136" width="86" height="16" rx="5" fill="#A1887F" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="182" y="152" width="12" height="46" rx="3" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="244" y="152" width="12" height="46" rx="3" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M300 78l30-16q16 14 32 0l30 16l-20 30l-14-9v74h-44v-74l-14 9z" fill="#EF5350" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="346" cy="100" r="4" fill="#fff"/><circle cx="346" cy="124" r="4" fill="#fff"/><circle cx="346" cy="148" r="4" fill="#fff"/>
+
+</svg>

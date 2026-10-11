@@ -1,5 +1,6 @@
 -- TeachStation - Banco de Dados
 
+SET NAMES utf8mb4;
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0;
 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION';
@@ -144,11 +145,15 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- =====================================================
 -- Tabela: questoes
 -- =====================================================
+-- texto_apoio: texto que o aluno lê antes de responder ("Leia o texto").
+-- imagem_url:  ilustração exibida na questão (arquivos em static/images/questoes).
 
 CREATE TABLE IF NOT EXISTS `questoes` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `area_id` INT NOT NULL,
     `enunciado` TEXT NOT NULL,
+    `texto_apoio` TEXT NULL DEFAULT NULL,
+    `imagem_url` VARCHAR(255) NULL DEFAULT NULL,
     `tipo` ENUM('TESTE') NOT NULL DEFAULT 'TESTE',
     `dificuldade` ENUM('INICIANTE', 'INTERMEDIARIA', 'AVANCADA') NOT NULL,
     `pontos` INT NOT NULL,
@@ -236,15 +241,17 @@ USE `teachstation`;
 -- Usuários
 -- =====================================================
 
+-- SENHA dos usuários comuns: 123456
+-- SENHA ADMIN (secretaria): 123
 INSERT IGNORE INTO `usuario`
 (`id`, `nome_completo`, `nome_social`, `email`, `senha`, `data_nascimento`, `genero`, `tipo_usuario`)
 VALUES
-(1, 'Maria Silva', NULL, 'maria@gmail.com', '123456', '2008-05-15', 'Feminino', 'ALUNO'),
-(2, 'João Santos', NULL, 'joao@gmail.com', '123456', '2009-08-20', 'Masculino', 'ALUNO'),
-(3, 'Roberta', NULL, 'roberta@gmail.com', '123456', '2009-08-20', 'Feminino', 'ALUNO'),
-(4, 'Joana', NULL, 'joana@gmail.com', '123456', '2009-08-20', 'Feminino', 'ALUNO'),
-(5, 'Ana Oliveira', 'Ana', 'ana@gmail.com', '123456', '1985-03-10', 'Feminino', 'PROFESSOR'),
-(6, 'Secretaria', NULL, 'admin@gmail.com', '123', '1980-11-25', 'Feminino', 'SECRETARIA');
+(1, 'Maria Silva', NULL, 'maria@gmail.com', '$2a$10$oXCUubZy0HEMCuClALRXvu2kPrzdiBVcRV29SC9XXNEMsyOCQIEyC', '2008-05-15', 'Feminino', 'ALUNO'),
+(2, 'João Santos', NULL, 'joao@gmail.com', '$2a$10$oXCUubZy0HEMCuClALRXvu2kPrzdiBVcRV29SC9XXNEMsyOCQIEyC', '2009-08-20', 'Masculino', 'ALUNO'),
+(3, 'Roberta', NULL, 'roberta@gmail.com', '$2a$10$oXCUubZy0HEMCuClALRXvu2kPrzdiBVcRV29SC9XXNEMsyOCQIEyC', '2009-08-20', 'Feminino', 'ALUNO'),
+(4, 'Joana', NULL, 'joana@gmail.com', '$2a$10$oXCUubZy0HEMCuClALRXvu2kPrzdiBVcRV29SC9XXNEMsyOCQIEyC', '2009-08-20', 'Feminino', 'ALUNO'),
+(5, 'Ana Oliveira', 'Ana', 'ana@gmail.com', '$2a$10$oXCUubZy0HEMCuClALRXvu2kPrzdiBVcRV29SC9XXNEMsyOCQIEyC', '1985-03-10', 'Feminino', 'PROFESSOR'),
+(6, 'Secretaria', NULL, 'admin@gmail.com', '$2a$10$EYiwVXTbPCJs6rPdZKbC8ustD218M1vDbftxOcxlK/LOzmlYgG9wm', '1980-11-25', 'Feminino', 'SECRETARIA');
 
 -- =====================================================
 -- Alunos
@@ -288,22 +295,73 @@ VALUES
 (1, 'Português', 1);
 
 -- =====================================================
--- Questões
+-- Questões (Simulados A1 e B1 - Avaliação Diagnóstica, 2º semestre)
 -- =====================================================
+-- Avaliação diagnóstica: 10 questões (nota de 0 a 200), misturando os simulados A1 e B1:
+--   ids 1-3   INICIANTE      (3 questões x 30 pts = 90)   - simulado A1
+--   ids 4-7   INTERMEDIARIA  (4 questões x 20 pts = 80)   - simulado B1
+--   ids 8-10  AVANCADA       (3 questões x 10 pts = 30)   - simulado B1
+-- Níveis: <= 90 INICIANTE | <= 170 INTERMEDIARIO | > 170 AVANCADO
+-- O comentário acima de cada questão indica a origem e o texto de apoio.
+-- ids das opções: (id_da_questão - 1) * 4 + 1 (A) ... + 4 (D)
 
 INSERT IGNORE INTO `questoes`
-(`id`, `area_id`, `enunciado`, `tipo`, `dificuldade`, `pontos`)
+(`id`, `area_id`, `enunciado`, `texto_apoio`, `imagem_url`, `tipo`, `dificuldade`, `pontos`)
 VALUES
-(1, 1, 'Qual palavra está escrita corretamente?', 'TESTE', 'INICIANTE', 30),
-(2, 1, 'Identifique o sujeito da frase: "Maria estudou para a prova de Português."', 'TESTE', 'INICIANTE', 30),
-(3, 1, 'Qual das opções apresenta um substantivo próprio?', 'TESTE', 'INICIANTE', 10),
-(4, 1, 'Assinale a alternativa em que todas as palavras são oxítonas:', 'TESTE', 'INTERMEDIARIA', 15),
-(5, 1, 'Qual é o plural correto da palavra "cidadão"?', 'TESTE', 'INTERMEDIARIA', 15),
-(6, 1, 'Qual frase apresenta concordância verbal CORRETA?', 'TESTE', 'INTERMEDIARIA', 15),
-(7, 1, 'Assinale a alternativa em que a crase foi usada CORRETAMENTE:', 'TESTE', 'AVANCADA', 20),
-(8, 1, 'Identifique a figura de linguagem na frase: "O sol sorriu para nós naquela manhã."', 'TESTE', 'AVANCADA', 20),
-(9, 1, 'Qual das frases abaixo está no tempo verbal Pretérito Perfeito do Indicativo?', 'TESTE', 'AVANCADA', 20),
-(10, 1, 'Qual é o sinônimo da palavra "efêmero"?', 'TESTE', 'AVANCADA', 20);
+-- A1 q9 / B1 q16 | 'Anedota' (Ziraldo)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(1, 1, 'Esse texto tem graça porque o moço do guichê pensou que Florisbela era o nome', 'Seu Tonico chegou ao guichê da rodoviária, sorrindo de orelha a orelha.
+— Bom dia, moço! Me dá uma passagem para Florisbela, por favor.
+O moço do guichê olhou a lista de viagens e coçou a cabeça:
+— Florisbela? Aqui não tem nenhuma estação com esse nome.
+— Mas tem a minha irmã! — explicou Seu Tonico. — Hoje ela faz aniversário e eu vou visitá-la.', '/images/questoes/q1.svg', 'TESTE', 'INICIANTE', 30),
+-- A1 q12 / B1 q10 | 'O Dia da Terra é mais importante do que nunca' (nacoesunidas.org)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(2, 1, 'O trecho que mostra a opinião do autor do texto é:', 'Todo ano, no dia 22 de abril, as pessoas param para pensar no planeta. 22 de abril é o Dia da Terra.
+A primeira vez que o Dia da Terra foi celebrado foi em 1970. Vinte milhões de pessoas, preocupadas com a poluição do ar e dos rios, foram às ruas protestar.
+Elas mostraram que, quando muita gente se une, as coisas podem mudar.
+Hoje o planeta ainda precisa de ajuda. Por isso, agora é hora de demonstrarmos solidariedade, cuidando da natureza todos juntos.', '/images/questoes/q2.svg', 'TESTE', 'INICIANTE', 30),
+-- A1 q20 / B1 q9 | 'A brisa e a flor' (Iza Ramos de Azevedo Souza)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(3, 1, 'Pode-se afirmar que quem “Quis seguir”', 'Na manhã de sol, uma brisa fresca passeava pelo jardim e fazia cócegas nas pétalas da florzinha.
+Um colibri parou ali perto, bebeu um golinho de néctar e saiu zumbindo.
+A florzinha ficou olhando. Quis seguir o colibri pelo céu azul, mas não podia: suas raízes a prendiam à terra.', '/images/questoes/q3.svg', 'TESTE', 'INICIANTE', 30),
+-- B1 q3 | Poema 'Inutilidade' (José Paulo Paes)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(4, 1, 'Esse texto provoca um efeito humorístico porque', 'A cadeira tem pé, mas nunca andou.
+A camisa tem botão, mas não toca campainha.
+A xícara tem boca, mas nunca falou.
+O sofá tem braço, mas não sabe abraçar.', '/images/questoes/q4.svg', 'TESTE', 'INTERMEDIARIA', 20),
+-- B1 q4 | 'Auto da compadecida' (Ariano Suassuna)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(5, 1, 'Na fala de Zeca, as expressões “Muito pelo contrário” e “Mas” estabelecem um efeito de', 'TONICO: — Você está com preguiça de ajudar na feira, Zeca?
+ZECA: — Muito pelo contrário! Eu adoro ajudar. Mas hoje meu braço está doendo.', '/images/questoes/q5.svg', 'TESTE', 'INTERMEDIARIA', 20),
+-- B1 q6 | Diálogo 'Mas, mãe! Como pode?' (Ciência Hoje das Crianças)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(6, 1, 'Em qual das frases do texto observa-se uma relação de causa e consequência?', '— Mãe, olha! Eu vejo a minha sombra no chão, mas não consigo pegá-la!
+— É que a sombra não é uma coisa, filho. Ela só aparece porque o sol bate em você e a luz não consegue passar.
+— E quando não tem sol, onde ela fica?
+— Ela não fica em lugar nenhum, filho. Só fica o chão claro.', '/images/questoes/q6.svg', 'TESTE', 'INTERMEDIARIA', 20),
+-- B1 q12 | Fábula 'Hierarquia' (Millôr Fernandes) - adjetivos que o leão usa contra o rato  >> texto de apoio ORIGINAL (substitui o do simulado)
+(7, 1, 'Na fala do leão, as palavras “feio”, “sujo”, “fraco”, “ridículo” e “inútil” têm o objetivo de', 'O leão acordou de mau humor. Quando abriu os olhos, viu um ratinho passeando pela toca.
+— Saia daqui, bicho feio, sujo, fraco, ridículo! — rugiu o leão. — Você é a coisa mais inútil que eu já vi!
+O ratinho encolheu as orelhas e saiu correndo.', '/images/questoes/q7.svg', 'TESTE', 'INTERMEDIARIA', 20),
+-- B1 q5 | Poema 'Desabar' (Carlos Drummond de Andrade, As impurezas do branco)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(8, 1, 'Ao utilizar o recurso de letras soltas no meio do poema, o texto pretende', 'Chegou a tempestade.
+O vento levou o chapéu,
+a janela, o varal.
+Correr pra onde?
+
+t
+o
+v
+ã
+r
+o
+
+Tudo girando, voando, caindo...
+Depois, só o silêncio.', '/images/questoes/q8.svg', 'TESTE', 'AVANCADA', 10),
+-- B1 q20 | Crítica 'A Mulher Rei' (CNN Brasil, Brian Lowry)  >> texto de apoio ORIGINAL (substitui o do simulado)
+(9, 1, 'No trecho da crítica, o modalizador que reforça a certeza do autor é:', 'O filme “A Ilha dos Ventos” conta a história de uma menina que procura um tesouro escondido.
+Embora a aventura seja cheia de mistério, a diversão está claramente em primeiro lugar: o diretor sabe o que o público quer ver.
+O tema subjacente, sobre amizade e coragem, fica em segundo plano.
+A emoção é aumentada por uma trilha sonora marcante.', '/images/questoes/q9.svg', 'TESTE', 'AVANCADA', 10),
+-- B1 q14 | Trecho de 'Triste fim de Policarpo Quaresma' (Lima Barreto) - verbos 'rogou, instou, chorou'
+(10, 1, 'Ao organizar os verbos destacados de tal maneira, o autor do texto teve a intenção de', 'O macaco ROGOU, INSTOU, CHOROU; mas a onça parecia inflexível. Simão então lembrou que a demanda fosse resolvida pelo juiz de direito. Foram a ele, o macaco sempre agarrado pela onça. É juiz de direito, entre os animais, o jabuti, cujas audiências são dadas à borda dos rios, colocando-se ele em cima de uma pedra.', '/images/questoes/q10.svg', 'TESTE', 'AVANCADA', 10);
 
 -- =====================================================
 -- Opções de Questões (Gabarito e Alternativas)
@@ -312,65 +370,65 @@ VALUES
 INSERT IGNORE INTO `opcoes_questoes`
 (`id`, `questao_id`, `letra`, `texto`, `correta`)
 VALUES
--- Questão 1
-(1, 1, 'A', 'Exceção', 1),
-(2, 1, 'B', 'Esceção', 0),
-(3, 1, 'C', 'Exseção', 0),
-(4, 1, 'D', 'Eceção', 0),
+-- Questão 1 (INICIANTE) - gabarito: B
+(1, 1, 'A', 'de uma mulher.', 0),
+(2, 1, 'B', 'de uma estação.', 1),
+(3, 1, 'C', 'da rodoviária.', 0),
+(4, 1, 'D', 'da passagem.', 0),
 
--- Questão 2
-(5, 2, 'A', 'prova', 0),
-(6, 2, 'B', 'Maria', 1),
-(7, 2, 'C', 'Português', 0),
-(8, 2, 'D', 'estudou', 0),
+-- Questão 2 (INICIANTE) - gabarito: C
+(5, 2, 'A', '“A primeira vez que o Dia da Terra foi celebrado foi em 1970.”', 0),
+(6, 2, 'B', '“Vinte milhões de pessoas [...] foram às ruas protestar”', 0),
+(7, 2, 'C', '“agora é hora de demonstrarmos solidariedade”', 1),
+(8, 2, 'D', '“22 de abril é o Dia da Terra.”', 0),
 
--- Questão 3
-(9, 3, 'A', 'casa', 0),
-(10, 3, 'B', 'Brasil', 1),
-(11, 3, 'C', 'caneta', 0),
-(12, 3, 'D', 'amor', 0),
+-- Questão 3 (INICIANTE) - gabarito: B
+(9, 3, 'A', 'foi a brisa.', 0),
+(10, 3, 'B', 'foi a florzinha.', 1),
+(11, 3, 'C', 'foram as pétalas.', 0),
+(12, 3, 'D', 'foi o colibri.', 0),
 
--- Questão 4
-(13, 4, 'A', 'Café, cipó, caju', 1),
-(14, 4, 'B', 'Mesa, lápis, régua', 0),
-(15, 4, 'C', 'Lâmpada, médico, ônibus', 0),
-(16, 4, 'D', 'Árvore, fácil, livro', 0),
+-- Questão 4 (INTERMEDIARIA) - gabarito: B
+(13, 4, 'A', 'fala de coisas do nosso cotidiano.', 0),
+(14, 4, 'B', 'explora os diferentes significados das palavras.', 1),
+(15, 4, 'C', 'traz informações velhas e redundantes.', 0),
+(16, 4, 'D', 'relembra cenas de nossa infância.', 0),
 
--- Questão 5
-(17, 5, 'A', 'Cidadões', 0),
-(18, 5, 'B', 'Cidadãos', 1),
-(19, 5, 'C', 'Cidadõeses', 0),
-(20, 5, 'D', 'Cidadans', 0),
+-- Questão 5 (INTERMEDIARIA) - gabarito: C
+(17, 5, 'A', 'alternância.', 0),
+(18, 5, 'B', 'adição.', 0),
+(19, 5, 'C', 'oposição.', 1),
+(20, 5, 'D', 'explicação.', 0),
 
--- Questão 6
-(21, 6, 'A', 'Fazem dois anos que não o vejo.', 0),
-(22, 6, 'B', 'Houveram muitos problemas na reunião.', 0),
-(23, 6, 'C', 'A maioria dos alunos aprovou a ideia.', 1),
-(24, 6, 'D', 'Sobrou muitas vagas para o curso.', 0),
+-- Questão 6 (INTERMEDIARIA) - gabarito: C
+(21, 6, 'A', '“Eu vejo a minha sombra no chão, mas não consigo pegá-la!”', 0),
+(22, 6, 'B', '“E quando não tem sol, onde ela fica?”', 0),
+(23, 6, 'C', '“Ela só aparece porque o sol bate em você e a luz não consegue passar.”', 1),
+(24, 6, 'D', '“Ela não fica em lugar nenhum, filho.”', 0),
 
--- Questão 7
-(25, 7, 'A', 'Vou á praia no final de semana.', 0),
-(26, 7, 'B', 'Fui à escola ontem de manhã.', 1),
-(27, 7, 'C', 'Ele começou à falar sem parar.', 0),
-(28, 7, 'D', 'Entreguei o documento à ele.', 0),
+-- Questão 7 (INTERMEDIARIA) - gabarito: C
+(25, 7, 'A', 'demonstrar a consideração do leão pelo rato.', 0),
+(26, 7, 'B', 'retratar todos os defeitos que o rato possui.', 0),
+(27, 7, 'C', 'dar ênfase ao desprezo do leão pelo rato.', 1),
+(28, 7, 'D', 'indicar que o leão conhece muitos adjetivos.', 0),
 
--- Questão 8
-(29, 8, 'A', 'Metáfora', 0),
-(30, 8, 'B', 'Prosopopeia (Personificação)', 1),
-(31, 8, 'C', 'Hipérbole', 0),
-(32, 8, 'D', 'Antítese', 0),
+-- Questão 8 (AVANCADA) - gabarito: A
+(29, 8, 'A', 'ressaltar o caos provocado pela situação descrita.', 1),
+(30, 8, 'B', 'reforçar a ideia de que a fuga é inevitável.', 0),
+(31, 8, 'C', 'indicar a sua desorientação diante do problema.', 0),
+(32, 8, 'D', 'evidenciar a existência de dois momentos distintos no poema.', 0),
 
--- Questão 9
-(33, 9, 'A', 'Eu estudo todos os dias.', 0),
-(34, 9, 'B', 'Eu estudava quando você chegou.', 0),
-(35, 9, 'C', 'Eu estudei bastante ontem.', 1),
-(36, 9, 'D', 'Eu estudarei amanhã.', 0),
+-- Questão 9 (AVANCADA) - gabarito: C
+(33, 9, 'A', '“embora”.', 0),
+(34, 9, 'B', '“aumentada”.', 0),
+(35, 9, 'C', '“claramente”.', 1),
+(36, 9, 'D', '“subjacente”.', 0),
 
--- Questão 10
-(37, 10, 'A', 'Eterno', 0),
-(38, 10, 'B', 'Passageiro', 1),
-(39, 10, 'C', 'Duradouro', 0),
-(40, 10, 'D', 'Forte', 0);
+-- Questão 10 (AVANCADA) - gabarito: D
+(37, 10, 'A', 'criar uma repetição de ideia a fim de deixar o leitor confuso quanto às ações e aos sentimentos do macaco.', 0),
+(38, 10, 'B', 'fazer uma oposição de ideias para mostrar ao leitor como o macaco estava confuso em relação aos seus atos.', 0),
+(39, 10, 'C', 'reduzir os sentimentos do macaco para demonstrar ao leitor que a personagem já tinha desistido de se explicar perante a onça.', 0),
+(40, 10, 'D', 'destacar a gradação de ideias relacionadas a esses verbos a fim de demonstrar as ações e os sentimentos do macaco perante a onça.', 1);
 
 -- =====================================================
 -- Avaliações diagnósticas
@@ -389,11 +447,12 @@ VALUES
 INSERT IGNORE INTO `tentativas_atividades`
 (`id`, `aluno_id`, `questao_id`, `opcao_selecionada_id`, `data_tentativa`, `acertou`, `pontos_obtidos`)
 VALUES
-(1, 1, 1, 1, '2026-09-22 14:00:00', 1, 30),
-(2, 1, 2, 6, '2026-09-22 14:05:00', 1, 30),
+(1, 1, 1, 2, '2026-09-22 14:00:00', 1, 30),
+(2, 1, 2, 7, '2026-09-22 14:05:00', 1, 30),
 (3, 1, 3, 9, '2026-09-22 14:10:00', 0, 0),
-(4, 2, 1, 1, '2026-09-23 15:00:00', 1, 30),
-(5, 2, 3, 10, '2026-09-23 15:05:00', 1, 10);
+(4, 2, 1, 2, '2026-09-23 15:00:00', 1, 30),
+(5, 2, 3, 10, '2026-09-23 15:05:00', 1, 30);
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

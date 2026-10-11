@@ -74,6 +74,11 @@ public class LoginController {
         {
             return "redirect:/dashboard";
         }
+        
+        //SECRETARIA
+        if (usuario.getTipoUsuario().equals("SECRETARIA")) {
+            return "redirect:/dashboard";
+        }
 
         return "redirect:/login?error";
     }

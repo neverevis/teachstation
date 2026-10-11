@@ -18,6 +18,7 @@ public interface TentativaAtividadeRepository extends JpaRepository<TentativaAti
     boolean existsByAlunoIdAndQuestaoId(Integer alunoId, Integer questaoId);
 
     // Calcula a pontuação total acumulada pelo aluno nas tentativas
+    // COALESCE = retorna o primeiro valor que não seja NULL entre os valores passados
     @Query("SELECT COALESCE(SUM(t.pontosObtidos), 0) FROM TentativaAtividade t WHERE t.aluno.id = :alunoId")
     Integer sumPontosByAlunoId(@Param("alunoId") Integer alunoId);
 }

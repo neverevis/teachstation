@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Macaco pedindo perdão para a onça">
+<rect width="400" height="240" rx="24" fill="#E0F2F1"/>
+
+<rect y="206" width="400" height="34" fill="#A5D6A7"/>
+<circle cx="86" cy="104" r="16" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="170" cy="104" r="16" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="128" cy="124" r="48" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<ellipse cx="128" cy="138" rx="30" ry="24" fill="#FFE0B2" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 114l14-7M152 114l-14-7" stroke="#333" stroke-width="5" stroke-linecap="round"/>
+<circle cx="112" cy="122" r="5" fill="#333"/><circle cx="144" cy="122" r="5" fill="#333"/>
+<path d="M114 150q14-10 28 0" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M104 134q-4 12 0 22" fill="none" stroke="#4FC3F7" stroke-width="6" stroke-linecap="round"/>
+<circle cx="112" cy="190" r="14" fill="#FFE0B2" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="146" cy="190" r="14" fill="#FFE0B2" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="258" cy="90" r="14" fill="#FFB74D" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/><circle cx="346" cy="90" r="14" fill="#FFB74D" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="302" cy="124" r="54" fill="#FFB74D" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<g fill="#5D4037"><circle cx="280" cy="102" r="6"/><circle cx="322" cy="100" r="6"/><circle cx="270" cy="132" r="5"/><circle cx="334" cy="130" r="5"/></g>
+<circle cx="286" cy="120" r="6" fill="#333"/><circle cx="318" cy="120" r="6" fill="#333"/>
+<path d="M292 138h20l-10 10z" fill="#333" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M302 148v8M290 160q12 8 24 0" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M270 148l-26-4M270 154l-26 6M334 148l26-4M334 154l26 6" stroke="#333" stroke-width="3" stroke-linecap="round"/>
+
+</svg>

@@ -19,13 +19,19 @@ public class Questao {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    
+
     private String enunciado;
-    
+
+    // Texto que o aluno lê antes de responder (coluna texto_apoio)
+    private String textoApoio;
+
+    // Ilustração da questão, ex.: /images/questoes/q1.svg (coluna imagem_url)
+    private String imagemUrl;
+
     private String tipo;
-    
+
     private String dificuldade;
-    
+
     private Integer pontos;
 
     @ManyToOne
@@ -49,6 +55,22 @@ public class Questao {
 
     public void setEnunciado(String enunciado) {
         this.enunciado = enunciado;
+    }
+
+    public String getTextoApoio() {
+        return textoApoio;
+    }
+
+    public void setTextoApoio(String textoApoio) {
+        this.textoApoio = textoApoio;
+    }
+
+    public String getImagemUrl() {
+        return imagemUrl;
+    }
+
+    public void setImagemUrl(String imagemUrl) {
+        this.imagemUrl = imagemUrl;
     }
 
     public String getTipo() {

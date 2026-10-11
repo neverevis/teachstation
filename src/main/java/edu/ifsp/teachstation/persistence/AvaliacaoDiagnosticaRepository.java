@@ -10,6 +10,7 @@ import edu.ifsp.teachstation.model.AvaliacaoDiagnostica;
 public interface AvaliacaoDiagnosticaRepository extends JpaRepository<AvaliacaoDiagnostica, Integer> {
 
     // Busca a avaliação diagnóstica realizada por um aluno
+	// Optional = pode ou não existir
     Optional<AvaliacaoDiagnostica> findByAlunoId(Integer alunoId);
 
     // Verifica se o aluno já realizou a avaliação diagnóstica

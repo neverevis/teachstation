@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Prédios com rachaduras, de onde caem pedaços">
+<rect width="400" height="240" rx="24" fill="#ECEFF1"/>
+
+<rect y="196" width="400" height="44" fill="#90A4AE"/>
+<rect x="30" y="90" width="64" height="106" fill="#90CAF9" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<g transform="rotate(8 190 196)"><rect x="150" y="50" width="76" height="146" fill="#FFAB91" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/></g>
+<rect x="270" y="110" width="70" height="86" fill="#CE93D8" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<g fill="#fff" stroke="#333" stroke-width="3"><rect x="44" y="104" width="16" height="16"/><rect x="66" y="104" width="16" height="16"/><rect x="44" y="136" width="16" height="16"/><rect x="284" y="124" width="16" height="16"/><rect x="310" y="124" width="16" height="16"/><rect x="284" y="156" width="16" height="16"/></g>
+<path d="M300 110l-10 22l12 10l-8 20" fill="none" stroke="#333" stroke-width="4" stroke-linecap="round"/>
+<g fill="#BCAAA4" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><rect x="236" y="70" width="20" height="18" transform="rotate(20 246 79)"/><rect x="250" y="120" width="14" height="14" transform="rotate(-25 257 127)"/><rect x="106" y="100" width="16" height="14" transform="rotate(30 114 107)"/></g>
+<g fill="#CFD8DC"><circle cx="100" cy="196" r="22"/><circle cx="128" cy="204" r="18"/><circle cx="250" cy="198" r="24"/><circle cx="352" cy="200" r="16"/></g>
+
+</svg>

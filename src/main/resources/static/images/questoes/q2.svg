@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Planeta Terra com folhas e um coração">
+<rect width="400" height="240" rx="24" fill="#E8F5E9"/>
+
+<circle cx="60" cy="50" r="26" fill="#FFD54F"/>
+<g stroke="#FFB300" stroke-width="5" stroke-linecap="round"><path d="M60 8v10M60 82v10M18 50h10M92 50h10M30 20l7 7M83 73l7 7M90 20l-7 7M37 73l-7 7"/></g>
+<circle cx="205" cy="116" r="82" fill="#4FC3F7" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M150 92q20-30 48-12q12 22-10 38q-28 10-38-26z" fill="#66BB6A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M214 128q28-12 44 10q-4 34-34 32q-22-12-10-42z" fill="#66BB6A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M232 66q16-6 22 8q-12 8-22-8z" fill="#66BB6A" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M330 60c-14-18-38 4-18 24l18 16l18-16c20-20-4-42-18-24z" fill="#EF5350" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M60 210q30-40 62-8q-30 24-62 8z" fill="#81C784" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M340 210q-30-40-62-8q30 24 62 8z" fill="#81C784" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="130" y="204" width="150" height="28" rx="14" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="205" y="224" font-size="16" font-family="Verdana,sans-serif" font-weight="700" fill="#2E7D32" text-anchor="middle">22 de abril</text>
+
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 240" role="img" aria-label="Dois amigos conversando, um deles diz Mas">
+<rect width="400" height="240" rx="24" fill="#F3E5F5"/>
+
+<rect y="206" width="400" height="34" fill="#CE93D8"/>
+<circle cx="108" cy="140" r="50" fill="#FFCC80" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M62 112q46-22 92 0z" fill="#8D6E63" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M52 114h112" stroke="#333" stroke-width="6" stroke-linecap="round"/>
+<circle cx="90" cy="140" r="5" fill="#333"/><circle cx="126" cy="140" r="5" fill="#333"/>
+<path d="M88 162q20 14 40 0" fill="none" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="292" cy="140" r="50" fill="#FFE0B2" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M246 126q8-34 46-34q38 0 46 34q-46-16-92 0z" fill="#5D4037" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="274" cy="146" r="5" fill="#333"/><circle cx="310" cy="146" r="5" fill="#333"/>
+<ellipse cx="292" cy="170" rx="9" ry="7" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="30" y="18" width="110" height="46" rx="18" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M80 64l-8 20l26-20z" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="85" y="49" font-size="22" font-family="Verdana,sans-serif" font-weight="700" fill="#6A1B9A" text-anchor="middle">Mas!</text>
+<rect x="262" y="18" width="90" height="46" rx="18" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M300 64l10 20l8-20z" fill="#fff" stroke="#333" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="307" y="50" font-size="24" font-family="Verdana,sans-serif" font-weight="700" fill="#6A1B9A" text-anchor="middle">Ih...</text>
+
+</svg>

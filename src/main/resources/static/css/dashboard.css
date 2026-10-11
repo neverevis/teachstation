@@ -14,6 +14,8 @@
 
     --cor-fundo-avaliacao: #F8F7FC;
     --cor-borda: #E5E7EB;
+	
+	--degrade-principal: linear-gradient(135deg, var(--cor-azul), var(--cor-roxo));
 }
 
 /*
@@ -44,7 +46,7 @@
 
     color: var(--cor-branco);
 
-    background-color: var(--cor-azul-escuro);
+    background: var(--degrade-principal);
 }
 
 .marca-barra-lateral h2 {
