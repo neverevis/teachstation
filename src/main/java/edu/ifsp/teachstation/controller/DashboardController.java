@@ -14,17 +14,8 @@ public class DashboardController {
     @GetMapping("/dashboard")
     public String dashboard(Model model, HttpSession session) 
     {
-
-  
-        //String perfil = "secretaria"; alternar de "professor" para "secretaria" para visualizar a opção de "cadastros" aparecer no Menu do dashboard
      
-
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
-
-        if (usuarioLogado == null) 
-        {
-            return "redirect:/login";
-        }
 
         String perfil = usuarioLogado.getTipoUsuario().toLowerCase();
 

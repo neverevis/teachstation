@@ -41,7 +41,8 @@ public class FirstTestController {
 
         int indiceAtual = tentativasRealizadas.size();
 
-        if (indiceAtual >= questoesDiagnosticas.size()) {
+        if (indiceAtual >= questoesDiagnosticas.size()) 
+        {
             nivelamentoService.finalizarAvaliacao(alunoLogado);
             return "redirect:/studyarea";
         }
@@ -64,10 +65,6 @@ public class FirstTestController {
             Model model) {
 
         Aluno alunoLogado = (Aluno) session.getAttribute("alunoLogado");
-        
-        if (alunoLogado == null) {
-            return "redirect:/login";
-        }
 
         // Delegamos a validação e o salvamento ao Service
         TentativaAtividade tentativa = nivelamentoService.registrarResposta(alunoLogado, questaoId, opcaoId);

@@ -40,7 +40,8 @@ public class SignUpController {
             @RequestParam("confirmar-senha") String confirmarSenha
     ) {
 
-        if (!senha.equals(confirmarSenha)) {
+        if (!senha.equals(confirmarSenha)) 
+        {
             return "redirect:/cadastro/aluno";
         }
 

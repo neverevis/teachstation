@@ -1,3 +1,4 @@
+
 package edu.ifsp.teachstation.config;
 
 import org.springframework.context.annotation.Bean;
@@ -14,19 +15,47 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
-    
+
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(
+            HttpSecurity http) throws Exception {
 
         http
-            .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll()
+        .csrf(csrf -> csrf.disable())
+        .authorizeHttpRequests(auth -> auth
+        	    .requestMatchers(
+        	        "/",
+        	        "/login",
+        	        "/css/**",
+        	        "/js/**",
+        	        "/images/**",
+        	        "/webjars/**").permitAll()
+
+        	    .requestMatchers(
+        	        "/cadastro-aluno/**",
+        	        "/cadastro-professor/**").hasAuthority("ROLE_SECRETARIA")
+
+        	    .requestMatchers("/dashboard")
+        	        .hasAnyAuthority("ROLE_PROFESSOR", "ROLE_SECRETARIA")
+
+        	    .requestMatchers(
+        	        "/first-test/**",
+        	        "/studyarea/**").hasAnyAuthority("ROLE_ALUNO", "ROLE_PROFESSOR", "ROLE_SECRETARIA")
+
+        	    .anyRequest().hasAnyAuthority("ROLE_PROFESSOR", "ROLE_SECRETARIA")
+        	)
+            .formLogin(form -> form
+                .loginPage("/login")
+                .disable()
             )
-            .csrf(csrf -> csrf.disable())
-            .formLogin(form -> form.disable())
-            .httpBasic(basic -> basic.disable());
+            .httpBasic(basic -> basic.disable())
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/login?logout")
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .permitAll()
+            );
 
         return http.build();
     }

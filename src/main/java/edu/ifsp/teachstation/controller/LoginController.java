@@ -1,12 +1,23 @@
+
 package edu.ifsp.teachstation.controller;
+
+import java.util.List;
 
 import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.model.Usuario;
 import edu.ifsp.teachstation.persistence.UserRepository;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,14 +33,15 @@ public class LoginController {
     private PasswordEncoder passwordEncoder;
 
     @GetMapping("/login")
-    public String login() 
-    {
+    public String login(HttpSession session){
+        session.invalidate();
+        SecurityContextHolder.clearContext();
+
         return "login";
     }
 
     @GetMapping("/")
-    public String home() 
-    {
+    public String home() {
         return "login";
     }
 
@@ -37,23 +49,49 @@ public class LoginController {
     public String realizarLogin(
             @RequestParam("username") String username,
             @RequestParam("password") String password,
-            HttpSession session) 
-    {
+            HttpSession session,
+            HttpServletRequest request,
+            HttpServletResponse response) {
+
 
         Usuario usuario = userRepository.findByEmail(username);
 
-        if (usuario == null) {
+        if (usuario == null || !passwordEncoder.matches(password, usuario.getSenha())) 
+        {
             return "redirect:/login?error";
         }
 
-        if (!passwordEncoder.matches(password, usuario.getSenha())) {
+        String tipoUsuario = usuario.getTipoUsuario();
+
+        if (!List.of("ALUNO", "PROFESSOR", "SECRETARIA").contains(tipoUsuario)) 
+        {
             return "redirect:/login?error";
         }
+
+        SimpleGrantedAuthority autoridade =
+                new SimpleGrantedAuthority("ROLE_" + tipoUsuario);
+
+        UsernamePasswordAuthenticationToken autenticacao =
+                new UsernamePasswordAuthenticationToken(
+                        usuario,
+                        null,
+                        List.of(autoridade));
+
+        SecurityContext contexto =
+                SecurityContextHolder.createEmptyContext();
+
+        contexto.setAuthentication(autenticacao);
+        
+        SecurityContextHolder.setContext(contexto);
+
+        HttpSessionSecurityContextRepository repositorio =
+                new HttpSessionSecurityContextRepository();
+
+        repositorio.saveContext(contexto, request, response);
 
         session.setAttribute("usuarioLogado", usuario);
-        
-        //ALUNO
-        if (usuario.getTipoUsuario().equals("ALUNO")) 
+
+        if (tipoUsuario.equals("ALUNO")) 
         {
 
             Aluno aluno = (Aluno) usuario;
@@ -62,24 +100,12 @@ public class LoginController {
 
             if (aluno.getNivelAtual() == null) 
             {
-            	//Não está sendo direcionado pq não existem questões ainda
                 return "redirect:/first-test";
             }
 
             return "redirect:/studyarea";
         }
-        
-        //PROFESSOR
-        if (usuario.getTipoUsuario().equals("PROFESSOR")) 
-        {
-            return "redirect:/dashboard";
-        }
-        
-        //SECRETARIA
-        if (usuario.getTipoUsuario().equals("SECRETARIA")) {
-            return "redirect:/dashboard";
-        }
 
-        return "redirect:/login?error";
+        return "redirect:/dashboard";
     }
 }
