@@ -1,7 +1,11 @@
 
 package edu.ifsp.teachstation.controller;
 
+import java.awt.Canvas;
+import java.awt.image.BufferedImage;
 import java.util.List;
+
+import javax.swing.JFrame;
 
 import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.model.Usuario;
@@ -25,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class LoginController {
+
 
     @Autowired
     private UserRepository userRepository;
@@ -56,14 +61,14 @@ public class LoginController {
 
         Usuario usuario = userRepository.findByEmail(username);
 
-        if (usuario == null || !passwordEncoder.matches(password, usuario.getSenha())) 
+        if (usuario == null || !passwordEncoder.matches(password, usuario.getSenha()))
         {
             return "redirect:/login?error";
         }
 
         String tipoUsuario = usuario.getTipoUsuario();
 
-        if (!List.of("ALUNO", "PROFESSOR", "SECRETARIA").contains(tipoUsuario)) 
+        if (!List.of("ALUNO", "PROFESSOR", "SECRETARIA").contains(tipoUsuario))
         {
             return "redirect:/login?error";
         }
@@ -81,7 +86,7 @@ public class LoginController {
                 SecurityContextHolder.createEmptyContext();
 
         contexto.setAuthentication(autenticacao);
-        
+
         SecurityContextHolder.setContext(contexto);
 
         HttpSessionSecurityContextRepository repositorio =
@@ -91,14 +96,14 @@ public class LoginController {
 
         session.setAttribute("usuarioLogado", usuario);
 
-        if (tipoUsuario.equals("ALUNO")) 
+        if (tipoUsuario.equals("ALUNO"))
         {
 
             Aluno aluno = (Aluno) usuario;
 
             session.setAttribute("alunoLogado", aluno);
 
-            if (aluno.getNivelAtual() == null) 
+            if (aluno.getNivelAtual() == null)
             {
                 return "redirect:/first-test";
             }

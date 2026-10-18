@@ -1,0 +1,34 @@
+.map-button-bloqueado {
+	filter: grayscale(1) brightness(0.8);
+}
+
+.map-button-bloqueado::after {
+	content: "";
+	position: absolute;
+	inset: 12% 22%;
+	background: url('../images/lock.png') center / contain no-repeat;
+	filter: none;
+}
+
+
+.game-card-bloqueada .game-card-cover {
+	background-image: linear-gradient(135deg, #6B6B78, #9A9AA8);
+}
+
+.game-card-bloqueada .game-card-title {
+	color: var(--cor-texto-secundario);
+}
+
+.game-card-btn[aria-disabled="true"] {
+	background-image: none;
+	background-color: #B8B8C4;
+	color: var(--cor-texto);
+	cursor: not-allowed;
+	box-shadow: none;
+}
+
+.game-card-btn[aria-disabled="true"]:hover,
+.game-card-btn[aria-disabled="true"]:active {
+	transform: none;
+	box-shadow: none;
+}

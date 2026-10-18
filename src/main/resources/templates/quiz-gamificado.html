@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/quiz-gamificado.css}">
+    <title>Questionário Gamificado - TeachStation</title>
+</head>
+<body>
+    <main class="pagina-avaliacao">
+        <header class="cabecalho-avaliacao">
+            <h1>TeachStation</h1>
+        </header>
+
+        <section id="quiz" class="conteudo-avaliacao quiz"
+                 th:data-api="@{/studyarea/portuguese/quiz/api}"
+                 th:data-fase="${fase}"
+                 th:data-mapa="@{/studyarea/portuguese}">
+
+            <div class="introducao-avaliacao">
+                <h2>Vamos jogar com o Português!</h2>
+                <p>Responda às questões no seu ritmo. Cada formato tem um jeito diferente de jogar.</p>
+            </div>
+
+            <!-- O JavaScript (quiz-gamificado.js) monta as questões aqui, sem recarregar a página -->
+            <div id="quizPalco">
+                <p class="quiz-aviso-tela" role="status">Carregando as questões…</p>
+                <noscript><p class="quiz-aviso-tela">Ative o JavaScript para jogar.</p></noscript>
+            </div>
+        </section>
+    </main>
+
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
+
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+
+    <script th:src="@{/js/quiz-gamificado.js}"></script>
+</body>
+</html>
