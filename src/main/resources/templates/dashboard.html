@@ -78,7 +78,7 @@
 				<section class="resumo-turma">
 					<div class="card-resumo">
 						<span class="rotulo-card">Total de Alunos</span>
-						<strong class="valor-card">0</strong>
+						<strong class="valor-card" th:text="${alunos.size()}">0</strong>
 					</div>
 
 					<div class="card-resumo">
@@ -114,23 +114,26 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td>RA21244124</td>
-									<td>Nome do Aluno</td>
+								<tr th:if="${alunos.isEmpty()}">
+									<td colspan="4">nenhum aluno cadastrado.</td>
+								</tr>
+								<tr th:each="aluno : ${alunos}">
+									<td th:text="${aluno.ra}">RA21244124</td>
+									<td th:text="${aluno.nomeSocial != null and !aluno.nomeSocial.isBlank() ? aluno.nomeSocial : aluno.nomeCompleto}">Nome do Aluno</td>
 									<td>
 										<span class="nivel-aluno">
-											<span class="etiqueta-nivel">Nível 3</span>
+											<span class="etiqueta-nivel" th:text="${aluno.nivelAtual != null ? aluno.nivelAtual : 'sem nível'}">Nível 3</span>
 											<span class="barra-nivel">
-												<span class="progresso-nivel"></span>
+												<span class="progresso-nivel" th:style="'width: ' + ${aluno.progressoNivel} + '%'"></span>
 											</span>
 										</span>
 									</td>
 									<td>
 										<details class="detalhes-aluno">
 											<summary>Ver detalhes</summary>
-											<p><strong>E-mail:</strong> <span>email@exemplo.com</span></p>
-											<p><strong>Telefone do responsável:</strong> <span>(16) 99204-1245</span></p>
-											<p><strong>Idade:</strong> <span>16 anos</span></p>
+											<p><strong>E-mail:</strong> <span th:text="${aluno.email}">email@exemplo.com</span></p>
+											<p><strong>Telefone do responsável:</strong> <span th:text="${aluno.telefoneResponsavel != null ? aluno.telefoneResponsavel : '-'}">(16) 99204-1245</span></p>
+											<p><strong>Idade:</strong> <span th:text="${aluno.idade != null ? aluno.idade + ' anos' : '-'}">16 anos</span></p>
 										</details>
 									</td>
 								</tr>
