@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+
 import java.util.List;
 import java.util.Map;
 
@@ -31,13 +32,13 @@ public class QuizGamificadoController {
     @Autowired
     private QuizGamificadoService quizService;
 
-    // Questões da fase (sem gabarito) e o estado do aluno na rodada atual
-
+    // Fases liberadas para o aluno (a primeira e as que vêm depois de uma fase concluída); o mapa bloqueia as demais
     @GetMapping("/fases")
-    public List<Integer> listarFases() {
-        return quizService.listarFasesDisponiveis();
+    public List<Integer> listarFases(HttpSession session) {
+        return quizService.listarFasesLiberadas(alunoLogado(session));
     }
 
+    // Questões da fase (sem gabarito) e o estado do aluno na rodada atual
     @GetMapping("/fases/{fase}")
     public FaseDto obterFase(@PathVariable("fase") int fase,
                              @RequestParam(value = "nova", defaultValue = "false") boolean nova,
