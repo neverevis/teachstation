@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 	<head>
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,7 +13,6 @@
 		</header>
 		<div class="pagina-painel">
 			
-			<!-- lado esquerdo: -->
 			<aside class="barra-lateral">
 				<form class="selecao-turma" action="#" method="get">
 					<label for="turma">Turma</label>
@@ -25,11 +24,19 @@
 				<nav class="navegacao-lateral">
 				    <ul>
 				        <li>
-				            <a href="#" class="link-ativo">Visão Geral</a>
+				            <a href="/dashboard" class="link-ativo">Visão Geral</a>
 				        </li>
 
 				        <li th:if="${perfil == 'secretaria'}">
 				            <a href="/cadastros">Cadastros</a>
+				        </li>
+
+				        <li th:if="${perfil == 'secretaria' or perfil == 'professor'}">
+				            <a href="/aluno/listar">Gerenciar Alunos</a>
+				        </li>
+
+				        <li th:if="${perfil == 'secretaria'}">
+				            <a href="/professor/listar">Gerenciar Professores</a>
 				        </li>
 
 				        <li>
@@ -55,7 +62,6 @@
 				</div>
 			</aside>
 
-			<!-- lado direito -->
 			<main class="conteudo-painel">
 				<header class="cabecalho-painel">
 					<div>
@@ -70,15 +76,15 @@
 					</div>
 
 					<div class="perfil-professor">
-						<span class="avatar-professor">P</span>
-						<span>usuario teste</span>
+						<span class="avatar-professor" th:text="${usuarioLogado != null and usuarioLogado.nomeCompleto != null ? #strings.substring(usuarioLogado.nomeCompleto, 0, 1) : 'U'}">P</span>
+						<span th:text="${usuarioLogado != null ? (usuarioLogado.nomeSocial != null and !usuarioLogado.nomeSocial.isBlank() ? usuarioLogado.nomeSocial : usuarioLogado.nomeCompleto) : 'Usuário'}">usuario</span>
 					</div>
 				</header>
 
 				<section class="resumo-turma">
 					<div class="card-resumo">
 						<span class="rotulo-card">Total de Alunos</span>
-						<strong class="valor-card">0</strong>
+						<strong class="valor-card" th:text="${totalAlunos}">0</strong>
 					</div>
 
 					<div class="card-resumo">
@@ -93,14 +99,18 @@
 
 					<div class="card-resumo">
 						<span class="rotulo-card">RA Ativas</span>
-						<strong class="valor-card">12</strong>
+						<strong class="valor-card" th:text="${totalAlunos}">0</strong>
 					</div>
 				</section>
 
 				<section class="lista-alunos-secao">
 					<div class="cabecalho-secao">
 						<h3>Lista de Alunos</h3>
-						<input type="search" class="busca-aluno" placeholder="Buscar por nome ou RA" aria-label="Buscar aluno por nome ou RA">
+						<form th:action="@{/dashboard}" method="get" style="display: flex; gap: 8px;">
+							<input type="search" name="busca" th:value="${busca}" class="busca-aluno" placeholder="Buscar por nome ou RA" aria-label="Buscar aluno por nome ou RA">
+							<button type="submit" style="padding: 10px 16px; border: none; border-radius: 10px; background-color: var(--cor-roxo); color: var(--cor-branco); font-weight: 600; cursor: pointer;">Buscar</button>
+							<a th:if="${busca != null and !busca.isEmpty()}" th:href="@{/dashboard}" style="padding: 10px 14px; border: 2px solid var(--cor-borda); border-radius: 10px; background: var(--cor-branco); color: var(--cor-texto); text-decoration: none; font-size: 14px; font-weight: 600; display: inline-flex; align-items: center;">Limpar</a>
+						</form>
 					</div>
 
 					<div class="tabela-alunos-wrapper">
@@ -114,23 +124,27 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr>
-									<td>RA21244124</td>
-									<td>Nome do Aluno</td>
+								<tr th:if="${#lists.isEmpty(alunos)}">
+									<td colspan="4" style="text-align: center; color: var(--cor-texto-secundario); padding: 32px;">Nenhum aluno encontrado.</td>
+								</tr>
+								<tr th:each="aluno : ${alunos}">
+									<td th:text="${aluno.ra}"></td>
+									<td th:text="${aluno.nomeCompleto}"></td>
 									<td>
 										<span class="nivel-aluno">
-											<span class="etiqueta-nivel">Nível 3</span>
+											<span class="etiqueta-nivel" th:text="${aluno.nivelAtual != null ? aluno.nivelAtual : 'INICIANTE'}">INICIANTE</span>
 											<span class="barra-nivel">
-												<span class="progresso-nivel"></span>
+												<span class="progresso-nivel" 
+												      th:style="${aluno.nivelAtual == 'AVANCADO' ? 'width: 100%' : (aluno.nivelAtual == 'INTERMEDIARIO' ? 'width: 60%' : 'width: 30%')}"></span>
 											</span>
 										</span>
 									</td>
 									<td>
 										<details class="detalhes-aluno">
 											<summary>Ver detalhes</summary>
-											<p><strong>E-mail:</strong> <span>email@exemplo.com</span></p>
-											<p><strong>Telefone do responsável:</strong> <span>(16) 99204-1245</span></p>
-											<p><strong>Idade:</strong> <span>16 anos</span></p>
+											<p><strong>E-mail:</strong> <span th:text="${aluno.email}"></span></p>
+											<p><strong>Telefone do responsável:</strong> <span th:text="${aluno.telefoneResponsavel != null and !aluno.telefoneResponsavel.isEmpty() ? aluno.telefoneResponsavel : 'Não informado'}"></span></p>
+											<p><strong>Data de nascimento:</strong> <span th:text="${aluno.dataNascimento != null ? #dates.format(aluno.dataNascimento, 'dd/MM/yyyy') : 'Não informada'}"></span></p>
 										</details>
 									</td>
 								</tr>

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastros.css}">
+    <title>Editar Aluno - TeachStation</title>
+    <style>
+        .card-formulario { max-width: 800px; margin: 0 auto; padding: 36px 40px; background-color: var(--cor-branco); border: 1px solid var(--cor-borda); border-radius: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); }
+        .grupo-botoes-form { display: flex; gap: 12px; margin-top: 28px; }
+        .grupo-botoes-form button, .grupo-botoes-form a { min-width: 130px; }
+        .mensagem-erro-campo { color: #dc2626; font-size: 13px; margin-top: 4px; font-weight: 500; }
+        .botao-primario { display: inline-flex; align-items: center; justify-content: center; padding: 10px 18px; border: none; border-radius: 10px; background: var(--degrade-principal); color: var(--cor-branco); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; }
+        .botao-secundario { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 2px solid var(--cor-borda); border-radius: 10px; background: var(--cor-branco); color: var(--cor-texto); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <header class="cabecalho-avaliacao">
+        <h1>TeachStation</h1>
+    </header>
+
+    <main class="pagina-cadastros">
+        <section class="cabecalho-cadastros">
+            <a href="/aluno/listar" class="voltar-dashboard">← Voltar para Lista de Alunos</a>
+            <h1 th:text="${aluno.id == null ? 'Novo Aluno' : 'Editar Aluno'}">Aluno</h1>
+            <p>Preencha os dados cadastrais do aluno.</p>
+        </section>
+
+        <div class="card-formulario">
+            <form method="post" th:action="@{/aluno/salvar}" th:object="${aluno}">
+                <input type="hidden" th:field="*{id}">
+                <input type="hidden" th:field="*{tipoUsuario}">
+
+                <div class="campo-formulario" th:if="${aluno.id != null}">
+                    <label>ID:</label>
+                    <input type="text" disabled th:value="*{id}">
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="nomeCompleto">Nome Completo:</label>
+                    <input type="text" id="nomeCompleto" th:field="*{nomeCompleto}" required>
+                    <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('nomeCompleto')}" th:errors="*{nomeCompleto}"></span>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="campo-formulario">
+                        <label for="ra">RA:</label>
+                        <input type="text" id="ra" th:field="*{ra}" required>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('ra')}" th:errors="*{ra}"></span>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="dataNascimento">Data de Nascimento:</label>
+                        <input type="date" id="dataNascimento" th:field="*{dataNascimento}" required>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('dataNascimento')}" th:errors="*{dataNascimento}"></span>
+                    </div>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="campo-formulario">
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" th:field="*{email}" required>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="telefoneResponsavel">Telefone do Responsável:</label>
+                        <input type="tel" id="telefoneResponsavel" th:field="*{telefoneResponsavel}">
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('telefoneResponsavel')}" th:errors="*{telefoneResponsavel}"></span>
+                    </div>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="campo-formulario">
+                        <label for="genero">Gênero:</label>
+                        <select id="genero" th:field="*{genero}">
+                            <option value="">Selecione uma opção</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                            <option value="Outro">Outro</option>
+                            <option value="Não Informar">Prefiro não informar</option>
+                        </select>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('genero')}" th:errors="*{genero}"></span>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="nomeSocial">Apelido (Nome Social):</label>
+                        <input type="text" id="nomeSocial" th:field="*{nomeSocial}">
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('nomeSocial')}" th:errors="*{nomeSocial}"></span>
+                    </div>
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="nivelAtual">Nível Atual:</label>
+                    <select id="nivelAtual" th:field="*{nivelAtual}">
+                        <option value="INICIANTE">Iniciante</option>
+                        <option value="INTERMEDIARIO">Intermediário</option>
+                        <option value="AVANCADO">Avançado</option>
+                    </select>
+                    <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('nivelAtual')}" th:errors="*{nivelAtual}"></span>
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" th:field="*{senha}" th:required="${aluno.id == null}">
+                    <small th:if="${aluno.id != null}" style="color: var(--cor-texto-secundario); margin-top: 4px; font-size: 13px;">Deixe em branco para manter a senha atual.</small>
+                    <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
+                </div>
+
+                <div class="grupo-botoes-form">
+                    <button type="submit" class="botao-primario">Salvar Aluno</button>
+                    <a th:href="@{/aluno/listar}" class="botao-secundario">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
+
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+</body>
+</html>

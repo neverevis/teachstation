@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastros.css}">
+    <title>Gerenciar Professores - TeachStation</title>
+    <style>
+        .barra-acoes-gerenciar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 24px; flex-wrap: wrap; }
+        .form-busca { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .campo-busca { width: 280px; padding: 10px 14px; border: 2px solid var(--cor-borda); border-radius: 10px; font-size: 14px; outline: none; }
+        .campo-busca:focus { border-color: var(--cor-roxo); box-shadow: 0 0 0 3px var(--cor-lilas); }
+        .botao-primario { display: inline-flex; align-items: center; justify-content: center; padding: 10px 18px; border: none; border-radius: 10px; background: var(--degrade-principal); color: var(--cor-branco); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; }
+        .botao-secundario { display: inline-flex; align-items: center; justify-content: center; padding: 10px 16px; border: 2px solid var(--cor-borda); border-radius: 10px; background: var(--cor-branco); color: var(--cor-texto); font-size: 14px; font-weight: 600; cursor: pointer; text-decoration: none; }
+        .container-tabela { background-color: var(--cor-branco); border: 1px solid var(--cor-borda); border-radius: 16px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06); overflow-x: auto; }
+        .tabela-gerenciar { width: 100%; border-collapse: collapse; }
+        .tabela-gerenciar th, .tabela-gerenciar td { padding: 16px 20px; text-align: left; font-size: 14px; }
+        .tabela-gerenciar thead th { background-color: var(--cor-fundo-avaliacao); color: var(--cor-azul-escuro); font-size: 13px; text-transform: uppercase; letter-spacing: 0.03em; }
+        .tabela-gerenciar tbody tr { border-top: 1px solid var(--cor-borda); }
+        .tabela-gerenciar tbody tr:hover { background-color: #FAF8FF; }
+        .acoes-celula { display: flex; gap: 8px; align-items: center; }
+        .botao-acao-editar { padding: 6px 12px; border-radius: 6px; background-color: var(--cor-lilas); color: var(--cor-azul-escuro); text-decoration: none; font-size: 13px; font-weight: 600; }
+        .botao-acao-excluir { padding: 6px 12px; border-radius: 6px; border: 1px solid #fca5a5; background-color: #fef2f2; color: #b91c1c; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .alerta-sucesso { padding: 14px 18px; background-color: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; border-radius: 10px; margin-bottom: 24px; font-size: 14px; font-weight: 600; }
+    </style>
+</head>
+<body>
+    <header class="cabecalho-avaliacao">
+        <h1>TeachStation</h1>
+    </header>
+
+    <main class="pagina-cadastros">
+        <section class="cabecalho-cadastros">
+            <div style="display: flex; gap: 16px;">
+                <a href="/dashboard" class="voltar-dashboard">← Voltar para o Dashboard</a>
+            </div>
+
+            <h1>Gerenciar Professores</h1>
+            <p>Consulte, pesquise, edite ou exclua professores cadastrados no sistema.</p>
+        </section>
+
+        <div th:if="${deleteOk}" class="alerta-sucesso">
+            Professor ID <span th:text="${deleteOk}"></span> excluído com sucesso.
+        </div>
+
+        <div th:if="${mensagemSucesso}" class="alerta-sucesso" th:text="${mensagemSucesso}"></div>
+
+        <div class="barra-acoes-gerenciar">
+            <form th:action="@{/professor/listar}" method="get" class="form-busca">
+                <input type="search" name="busca" th:value="${busca}" class="campo-busca" placeholder="Buscar por nome, prontuário, área ou e-mail">
+                <button type="submit" class="botao-primario">Buscar</button>
+                <a th:if="${busca != null and !busca.isEmpty()}" th:href="@{/professor/listar}" class="botao-secundario">Limpar</a>
+            </form>
+
+            <a th:href="@{/professor/novo}" class="botao-primario">+ Cadastrar Novo Professor</a>
+        </div>
+
+        <div class="container-tabela">
+            <table class="tabela-gerenciar">
+                <thead>
+                    <tr>
+                        <th>Prontuário</th>
+                        <th>Nome Completo</th>
+                        <th>Área de Atuação</th>
+                        <th>E-mail</th>
+                        <th>Telefone</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:if="${#lists.isEmpty(professores)}">
+                        <td colspan="6" style="text-align: center; color: var(--cor-texto-secundario); padding: 32px;">Nenhum professor encontrado.</td>
+                    </tr>
+                    <tr th:each="professor : ${professores}">
+                        <td th:text="${professor.prontuario}"></td>
+                        <td th:text="${professor.nomeCompleto}"></td>
+                        <td th:text="${professor.areaAtuacao != null and !professor.areaAtuacao.isEmpty() ? professor.areaAtuacao : '-'}"></td>
+                        <td th:text="${professor.email}"></td>
+                        <td th:text="${professor.telefone != null and !professor.telefone.isEmpty() ? professor.telefone : '-'}"></td>
+                        <td>
+                            <div class="acoes-celula">
+                                <a th:href="@{'/professor/' + ${professor.id} + '/editar'}" class="botao-acao-editar">Editar</a>
+                                <form method="post" th:action="@{'/professor/' + ${professor.id} + '/excluir'}" style="display:inline;">
+                                    <button type="submit" class="botao-acao-excluir" onclick="return confirm('Deseja realmente excluir este professor?');">Excluir</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
+
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+</body>
+</html>

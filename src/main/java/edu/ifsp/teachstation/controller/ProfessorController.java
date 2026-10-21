@@ -1,65 +1,121 @@
 package edu.ifsp.teachstation.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.propertyeditors.CustomDateEditor;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
 import edu.ifsp.teachstation.model.Professor;
 import edu.ifsp.teachstation.persistence.ProfessorRepository;
-
-import org.springframework.stereotype.Controller;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import java.sql.Date;
+import jakarta.validation.Valid;
 
 @Controller
+@RequestMapping("/professor")
 public class ProfessorController {
 
-    private final ProfessorRepository professorRepository;
-    private final PasswordEncoder passwordEncoder;
+    @Autowired
+    private ProfessorRepository repo;
 
-    public ProfessorController(ProfessorRepository professorRepository, PasswordEncoder passwordEncoder) {
-        this.professorRepository = professorRepository;
-        this.passwordEncoder = passwordEncoder;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @InitBinder
+    public void initBinder(WebDataBinder binder) {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        dateFormat.setLenient(false);
+        binder.registerCustomEditor(Date.class, new CustomDateEditor(dateFormat, true));
     }
 
-    @GetMapping("/cadastro/professor")
-    public String cadastroProfessor() {
-        return "cadastro-professor";
+    @GetMapping("/novo")
+    public String iniciar(Model model) {
+        Professor professor = new Professor();
+        professor.setTipoUsuario("PROFESSOR");
+        model.addAttribute("professor", professor);
+        return "professor/editar";
     }
 
-    @PostMapping("/cadastro/professor")
-    public String cadastrarProfessor(
-            @RequestParam("nome") String nome,
-            @RequestParam("prontuario") String prontuario,
-            @RequestParam("data-nascimento") String dataNascimento,
-            @RequestParam("email") String email,
-            @RequestParam("telefone") String telefone,
-            @RequestParam("genero") String genero,
-            @RequestParam("nome-social") String nomeSocial,
-            @RequestParam("senha") String senha,
-            @RequestParam("confirmar-senha") String confirmarSenha
-    ) {
-
-        if (!senha.equals(confirmarSenha)) {
-            return "redirect:/cadastro/professor";
+    @PostMapping("/salvar")
+    public String salvar(@Valid @ModelAttribute("professor") Professor professor, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+        if (professor.getId() != null) {
+            Professor existente = repo.findById(professor.getId()).orElse(null);
+            if (existente != null) {
+                if (professor.getSenha() == null || professor.getSenha().trim().isEmpty()) {
+                    professor.setSenha(existente.getSenha());
+                } else {
+                    professor.setSenha(passwordEncoder.encode(professor.getSenha()));
+                }
+                if (professor.getDataCadastro() == null) {
+                    professor.setDataCadastro(existente.getDataCadastro());
+                }
+            }
+        } else {
+            if (professor.getSenha() == null || professor.getSenha().trim().isEmpty()) {
+                bindingResult.rejectValue("senha", "NotBlank", "A senha é obrigatória.");
+            } else {
+                professor.setSenha(passwordEncoder.encode(professor.getSenha()));
+            }
+            if (professor.getDataCadastro() == null) {
+                professor.setDataCadastro(new Date());
+            }
         }
 
-        Professor professor = new Professor();
-
-        professor.setNomeCompleto(nome);
-        professor.setProntuario(prontuario);
-        professor.setDataNascimento(Date.valueOf(dataNascimento));
-        professor.setEmail(email);
-        professor.setTelefone(telefone);
-        professor.setGenero(genero);
-        professor.setNomeSocial(nomeSocial);
-        professor.setSenha(passwordEncoder.encode(senha));
-
         professor.setTipoUsuario("PROFESSOR");
-        professor.setDataCadastro(new java.util.Date());
 
-        professorRepository.save(professor);
+        boolean hasOtherErrors = bindingResult.getFieldErrors().stream()
+                .anyMatch(fe -> !(professor.getId() != null && fe.getField().equals("senha")));
 
-        return "redirect:/cadastro/professor";
+        if (hasOtherErrors) {
+            return "professor/editar";
+        }
+
+        repo.save(professor);
+        redirectAttributes.addFlashAttribute("mensagemSucesso", "Professor salvo com sucesso!");
+        return "redirect:/professor/listar";
+    }
+
+    @GetMapping("/{id}/editar")
+    public String editar(@PathVariable(name = "id") Integer id, Model model) {
+        Professor professor = repo.findById(id).orElse(null);
+        if (professor == null) {
+            return "redirect:/professor/listar";
+        }
+        professor.setSenha("");
+        model.addAttribute("professor", professor);
+        return "professor/editar";
+    }
+
+    @GetMapping("/listar")
+    public String listar(@RequestParam(name = "busca", required = false) String busca, Model model) {
+        List<Professor> professores;
+        if (busca != null && !busca.trim().isEmpty()) {
+            professores = repo.pesquisar(busca.trim());
+        } else {
+            professores = repo.findAll();
+        }
+        model.addAttribute("professores", professores);
+        model.addAttribute("busca", busca);
+        return "professor/listar";
+    }
+
+    @PostMapping("/{id}/excluir")
+    public String excluir(@PathVariable(name = "id") Integer id, RedirectAttributes redirectAttributes) {
+        repo.deleteById(id);
+        redirectAttributes.addFlashAttribute("deleteOk", id);
+        return "redirect:/professor/listar";
     }
 }
