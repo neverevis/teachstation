@@ -22,6 +22,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.ui.Model;
 
 @Controller
 public class LoginController {
@@ -33,9 +34,22 @@ public class LoginController {
     private PasswordEncoder passwordEncoder;
 
     @GetMapping("/login")
-    public String login(HttpSession session){
+    public String login(
+            @RequestParam(value = "error", required = false) String error,
+            HttpSession session,
+            Model model) {
+
         session.invalidate();
         SecurityContextHolder.clearContext();
+
+        if (error != null) {
+            model.addAttribute(
+                "mensagem",
+                "E-mail ou senha incorretos. Verifique seus dados e tente novamente."
+            );
+
+            model.addAttribute("tipoMensagem", "erro");
+        }
 
         return "login";
     }

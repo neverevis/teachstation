@@ -26,6 +26,11 @@ public class DashboardController {
     {
      
         Usuario usuarioLogado = (Usuario) session.getAttribute("usuarioLogado");
+        
+        if (usuarioLogado == null) 
+        {
+            return "redirect:/login";
+        }
 
         String perfil = usuarioLogado.getTipoUsuario().toLowerCase();
 

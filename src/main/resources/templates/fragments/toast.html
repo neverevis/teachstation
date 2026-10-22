@@ -1,0 +1,110 @@
+
+<th:block th:fragment="toast">
+
+    <div th:if="${mensagem != null}"
+         id="toast"
+         class="toast"
+         th:classappend="${tipoMensagem == 'sucesso'} ? ' toast-sucesso' : ' toast-erro'"
+         role="alert">
+
+        <span class="toast-icone"
+              th:text="${tipoMensagem == 'sucesso'} ? '✓' : '!'">!</span>
+
+        <span class="toast-texto" th:text="${mensagem}">
+            Mensagem de notificação
+        </span>
+
+        <button type="button"
+                class="toast-fechar"
+                onclick="fecharToast()"
+                aria-label="Fechar notificação">&times;</button>
+    </div>
+
+    <style>
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 280px;
+            max-width: 400px;
+            padding: 16px 18px;
+            color: #fff;
+            border-radius: 14px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .20);
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            animation: toastEntrada .3s ease;
+        }
+
+        .toast-erro {
+            background: #6D28D9;
+        }
+
+        .toast-sucesso {
+            background: #6D28D9;
+        }
+
+        .toast-icone {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            width: 24px;
+            height: 24px;
+            border: 2px solid #fff;
+            border-radius: 50%;
+            font-weight: bold;
+        }
+
+        .toast-texto {
+            flex: 1;
+            line-height: 1.5;
+        }
+
+        .toast-fechar {
+            padding: 0;
+            margin-left: 4px;
+            border: none;
+            background: transparent;
+            color: #fff;
+            font-size: 24px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .toast-saindo {
+            animation: toastSaida .3s ease forwards;
+        }
+
+        @keyframes toastEntrada {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        @keyframes toastSaida {
+            to { opacity: 0; transform: translateX(30px); }
+        }
+    </style>
+
+    <script>
+        function fecharToast() {
+            const toast = document.getElementById("toast");
+            if (!toast) return;
+
+            toast.classList.add("toast-saindo");
+
+            setTimeout(() => toast.remove(), 300);
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            if (document.getElementById("toast")) {
+                setTimeout(fecharToast, 4000);
+            }
+        });
+    </script>
+
+</th:block>

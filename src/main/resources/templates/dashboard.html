@@ -78,7 +78,7 @@
 				<section class="resumo-turma">
 					<div class="card-resumo">
 						<span class="rotulo-card">Total de Alunos</span>
-						<strong class="valor-card" th:text="${alunos.size()}">0</strong>
+						<strong class="valor-card" th:text="${alunos != null ? alunos.size() : 0}">0</strong>
 					</div>
 
 					<div class="card-resumo">
@@ -114,8 +114,8 @@
 								</tr>
 							</thead>
 							<tbody>
-								<tr th:if="${alunos.isEmpty()}">
-									<td colspan="4">nenhum aluno cadastrado.</td>
+								<tr th:if="${alunos == null or alunos.isEmpty()}">
+									<td colspan="4">Nenhum aluno cadastrado.</td>
 								</tr>
 								<tr th:each="aluno : ${alunos}">
 									<td th:text="${aluno.ra}">RA21244124</td>
@@ -124,7 +124,10 @@
 										<span class="nivel-aluno">
 											<span class="etiqueta-nivel" th:text="${aluno.nivelAtual != null ? aluno.nivelAtual : 'sem nível'}">Nível 3</span>
 											<span class="barra-nivel">
+												
 												<span class="progresso-nivel" th:style="'width: ' + ${aluno.progressoNivel} + '%'"></span>
+												
+												<span class="progresso-nivel" style="width: 0%;"></span>
 											</span>
 										</span>
 									</td>

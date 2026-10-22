@@ -4,6 +4,7 @@ import edu.ifsp.teachstation.model.Professor;
 import edu.ifsp.teachstation.persistence.ProfessorRepository;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,7 +24,35 @@ public class ProfessorController {
     }
 
     @GetMapping("/cadastro/professor")
-    public String cadastroProfessor() {
+    public String cadastroProfessor(@RequestParam(value = "erro", required = false) String erro, @RequestParam(value = "sucesso", required = false) String sucesso, Model model) {
+
+        if (erro != null) 
+        {
+            if (erro.equals("senha")) 
+            {
+                model.addAttribute("mensagem", "As senhas não coincidem.");
+            } 
+            else 
+            {
+                model.addAttribute(
+                    "mensagem",
+                    "Não foi possível cadastrar o professor. Verifique os dados."
+                );
+            }
+
+            model.addAttribute("tipoMensagem", "erro");
+        }
+
+        if (sucesso != null) 
+        {
+            model.addAttribute(
+                "mensagem",
+                "Professor cadastrado com sucesso!"
+            );
+
+            model.addAttribute("tipoMensagem", "sucesso");
+        }
+
         return "cadastro-professor";
     }
 
@@ -40,8 +69,9 @@ public class ProfessorController {
             @RequestParam("confirmar-senha") String confirmarSenha
     ) {
 
-        if (!senha.equals(confirmarSenha)) {
-            return "redirect:/cadastro/professor";
+    	if (!senha.equals(confirmarSenha)) 
+    	{
+            return "redirect:/cadastro/professor?erro=senha";
         }
 
         Professor professor = new Professor();
@@ -58,8 +88,14 @@ public class ProfessorController {
         professor.setTipoUsuario("PROFESSOR");
         professor.setDataCadastro(new java.util.Date());
 
-        professorRepository.save(professor);
-
-        return "redirect:/cadastro/professor";
+        try 
+        {
+            professorRepository.save(professor);
+            return "redirect:/cadastro/professor?sucesso";
+        } 
+        catch (org.springframework.dao.DataAccessException e) 
+        {
+            return "redirect:/cadastro/professor?erro=cadastro";
+        }
     }
 }
