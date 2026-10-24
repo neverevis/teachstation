@@ -8,9 +8,7 @@
 </head>
 <body>
     <main class="pagina-avaliacao">
-        <header class="cabecalho-avaliacao">
-            <h1>TeachStation</h1>
-        </header>
+        <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
 
         <section class="conteudo-avaliacao">
             <div class="introducao-avaliacao">
@@ -42,7 +40,7 @@
 
                 <!-- Ilustração da questão (some sozinha se o arquivo não existir) -->
 				
-				<!-- Estava dando erro no código
+				<!-- Estava dando erro no código -->
 					
                 <figure class="ilustracao-questao"
                         th:if="${questao.imagemUrl != null and !#strings.isEmpty(questao.imagemUrl)}">
@@ -51,19 +49,19 @@
                          onerror="this.closest('figure').hidden = true">
                 </figure>
 				
-				-->
+				
 				
                 <!-- Texto de apoio ("Leia o texto") -->
 				
-				<!-- Estava dando erro no código
+				<!-- Estava dando erro no código -->
 					
                 <div class="texto-apoio"
                      th:if="${questao.textoApoio != null and !#strings.isEmpty(questao.textoApoio)}">
-                    <p class="texto-apoio-titulo">📖 Leia com calma</p>
+                    <p class="texto-apoio-titulo">📖 Leia com calma </p>
                     <p class="texto-apoio-corpo js-ler" th:text="${questao.textoApoio}">Texto de apoio</p>
                 </div>
 				
-				-->
+				
                 <button type="button" class="botao-ouvir" id="botaoOuvir">🔊 Ouvir a questão</button>
 
                 <h3 class="js-ler" th:text="${questao.enunciado}">Enunciado da questão</h3>

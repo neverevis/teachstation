@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+
+    <!--
+        Uso nos templates:
+            <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
+
+        O botão "Sair" aparece somente quando existe um usuário logado
+        na sessão (atributos `usuarioLogado` ou `alunoLogado`).
+    -->
+    <header th:fragment="cabecalho" class="cabecalho-avaliacao">
+        <h1>TeachStation</h1>
+
+        <a th:if="${session.usuarioLogado != null or session.alunoLogado != null}"
+           th:href="@{/login}"
+           class="botao-sair"
+           title="Sair da conta">
+            Sair
+        </a>
+    </header>
+
+</body>
+</html>

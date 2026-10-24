@@ -9,9 +9,7 @@
 </head>
 <body>
     <main class="pagina-avaliacao">
-        <header class="cabecalho-avaliacao">
-            <h1>TeachStation</h1>
-        </header>
+        <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
 
         <section id="quiz" class="conteudo-avaliacao quiz"
                  th:data-api="@{/studyarea/portuguese/quiz/api}"

@@ -1,157 +1,486 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-	<head>
-		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<link rel="stylesheet" th:href="@{/css/styles.css}">
-		<link rel="stylesheet" th:href="@{/css/dashboard.css}">
-		<title>Dashboard - TeachStation</title>
-	</head>
-	<body>
-		<header class="cabecalho-avaliacao">
-		    <h1>TeachStation</h1>
-		</header>
-		<div class="pagina-painel">
-			
-			<!-- lado esquerdo: -->
-			<aside class="barra-lateral">
-				<form class="selecao-turma" action="#" method="get">
-					<label for="turma">Turma</label>
-					<select id="turma" name="turma">
-						<option>3º Ano A</option>
-					</select>
-				</form>
-				
-				<nav class="navegacao-lateral">
-				    <ul>
-				        <li>
-				            <a href="#" class="link-ativo">Visão Geral</a>
-				        </li>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <title>Dashboard - TeachStation</title>
 
-				        <li th:if="${perfil == 'secretaria'}">
-				            <a href="/cadastros">Cadastros</a>
-				        </li>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
 
-				        <li>
-				            <a href="#">Alunos e Notas</a>
-				        </li>
+    <div class="pagina-painel">
 
-				        <li>
-				            <a href="#">Chamada / Frequência</a>
-				        </li>
+        <!-- ============ BARRA LATERAL ============ -->
+        <aside class="barra-lateral">
+            <nav class="navegacao-lateral">
+                <ul>
+                    <li><a href="#visao-geral" class="link-ativo">Visão Geral</a></li>
 
-				        <li>
-				            <a href="#">Avisos e Tarefas</a>
-				        </li>
+                    <li th:if="${perfil == 'secretaria'}">
+                        <a href="/cadastros">Cadastros</a>
+                    </li>
 
-				        <li>
-				            <a href="#">Configurações</a>
-				        </li>
-				    </ul>
-				</nav>
+                    <li><a href="#niveis">Distribuição por Nível</a></li>
+                    <li><a href="#desempenho">Desempenho dos Alunos</a></li>
+                    <li><a href="#avaliacoes">Avaliações Diagnósticas</a></li>
+                    <li><a href="#alunos">Alunos e Notas</a></li>
+                </ul>
+            </nav>
+        </aside>
 
-				<div class="sair-barra-lateral">
-					<a href="/login">Sair</a>
+        <!-- ============ CONTEÚDO ============ -->
+        <main class="conteudo-painel">
+
+            <header class="cabecalho-painel">
+                <div>
+                    <h1>Dashboard</h1>
+                    <p th:if="${perfil == 'professor'}">
+                        Acompanhe o progresso e a participação dos alunos.
+                    </p>
+                    <p th:if="${perfil == 'secretaria'}">
+                        Gerencie alunos, professores e informações da instituição.
+                    </p>
+                </div>
+
+                <div class="perfil-professor">
+                    <span class="avatar-professor"
+                          th:text="${#strings.substring(nomeUsuario, 0, 1)}">U</span>
+                    <span th:text="${nomeUsuario}">Usuário</span>
+                </div>
+            </header>
+
+            <!-- ============ AÇÕES DA SECRETARIA ============ -->
+            <section class="acoes-secretaria" th:if="${perfil == 'secretaria'}">
+                <a href="/cadastro/aluno" class="botao-acao">+ Cadastrar Aluno</a>
+                <a href="/cadastro/professor" class="botao-acao">+ Cadastrar Professor</a>
+            </section>
+
+            <!-- ============ CARDS DE RESUMO ============ -->
+            <section class="resumo-turma" id="visao-geral">
+                <div class="card-resumo">
+                    <span class="rotulo-card">Total de Alunos</span>
+                    <strong class="valor-card" th:text="${resumo.totalAlunos}">0</strong>
+                </div>
+
+                <div class="card-resumo">
+                    <span class="rotulo-card">Total de Professores</span>
+                    <strong class="valor-card" th:text="${resumo.totalProfessores}">0</strong>
+                </div>
+
+                <div class="card-resumo">
+                    <span class="rotulo-card">Avaliações Realizadas</span>
+                    <strong class="valor-card" th:text="${resumo.avaliacoesRealizadas}">0</strong>
+                </div>
+
+                <div class="card-resumo">
+                    <span class="rotulo-card">Média Geral (Diagnóstica)</span>
+                    <strong class="valor-card"
+                            th:text="${#numbers.formatDecimal(resumo.mediaNotaDiagnostica, 1, 2)}">0,00</strong>
+                </div>
+            </section>
+
+            <!-- ============ MÉTRICAS DE ATIVIDADES ============ -->
+            <section class="metricas-atividades">
+                <div class="metrica">
+                    <span class="metrica-rotulo">Tentativas Diagnósticas</span>
+                    <span class="metrica-valor" th:text="${resumo.tentativasDiagnosticas}">0</span>
+                </div>
+                <div class="metrica">
+                    <span class="metrica-rotulo">Taxa de Acerto (Diagnóstica)</span>
+                    <span class="metrica-valor" th:text="${resumo.taxaAcertoDiagnostica} + '%'">0%</span>
+                </div>
+                <div class="metrica">
+                    <span class="metrica-rotulo">Tentativas Gamificadas</span>
+                    <span class="metrica-valor" th:text="${resumo.tentativasGamificadas}">0</span>
+                </div>
+                <div class="metrica">
+                    <span class="metrica-rotulo">Taxa de Acerto (Gamificada)</span>
+                    <span class="metrica-valor" th:text="${resumo.taxaAcertoGamificada} + '%'">0%</span>
+                </div>
+                <div class="metrica">
+                    <span class="metrica-rotulo">Questões Cadastradas</span>
+                    <span class="metrica-valor" th:text="${resumo.totalQuestoes}">0</span>
+                </div>
+                <div class="metrica">
+                    <span class="metrica-rotulo">Questões Gamificadas</span>
+                    <span class="metrica-valor" th:text="${resumo.totalQuestoesGamificadas}">0</span>
+                </div>
+            </section>
+
+            <!-- ============ GRÁFICOS ============ -->
+            <section class="grade-graficos" id="niveis">
+
+                <!-- Gráfico 1: pizza de níveis -->
+                <div class="card-grafico">
+                    <h3>Distribuição de Alunos por Nível</h3>
+                    <div class="grafico-wrapper">
+                        <canvas id="graficoNiveis"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico 2: rosca de taxa de acerto -->
+                <div class="card-grafico">
+                    <h3>Taxa de Acerto nas Atividades</h3>
+                    <div class="grafico-wrapper">
+                        <canvas id="graficoAcertos"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ DESEMPENHO POR ALUNO ============ -->
+            <section class="grade-graficos" id="desempenho">
+
+                <!-- Gráfico 3: pontos por aluno -->
+                <div class="card-grafico card-largo">
+                    <h3>Pontos por Aluno (Diagnósticos vs Gamificados)</h3>
+                    <div class="grafico-wrapper grafico-alto">
+                        <canvas id="graficoPontos"></canvas>
+                    </div>
+                </div>
+
+                <!-- Gráfico 4: top 5 alunos por acertos -->
+                <div class="card-grafico card-largo">
+                    <h3>Top 5 Alunos por Acertos</h3>
+                    <div class="grafico-wrapper grafico-alto">
+                        <canvas id="graficoTop"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ ÚLTIMAS AVALIAÇÕES ============ -->
+            <section class="card-avaliacoes" id="avaliacoes">
+                <h3>Últimas Avaliações Diagnósticas</h3>
+					
+				<div class="tabela-avaliacoes-wrapper" th:if="${!avaliacoes.isEmpty()}">
+					<table class="tabela-avaliacoes" th:if="${!avaliacoes.isEmpty()}">
+					    <thead>
+					        <tr>
+					            <th>Aluno</th>
+					            <th>Nota Final</th>
+					            <th>Nível Classificado</th>
+					            <th>Data</th>
+					        </tr>
+					    </thead>
+					    <tbody>
+					        <tr th:each="av : ${avaliacoes}">
+					            <td th:text="${av.aluno.nomeSocial != null and !av.aluno.nomeSocial.isBlank()
+					                            ? av.aluno.nomeSocial : av.aluno.nomeCompleto}">Nome</td>
+					            <td th:text="${av.notaFinal}">0,0</td>
+					            <td>
+					                <span class="etiqueta-nivel"
+					                      th:text="${av.nivelClassificado}">INICIANTE</span>
+					            </td>
+					            <td th:text="${#temporals.format(av.dataAvaliacao, 'dd/MM/yyyy HH:mm')}">-</td>
+					        </tr>
+					    </tbody>
+					</table>
 				</div>
-			</aside>
+	                
 
-			<!-- lado direito -->
-			<main class="conteudo-painel">
-				<header class="cabecalho-painel">
-					<div>
-						<h1>Dashboard</h1>
-						<p th:if="${perfil == 'professor'}">
-						    Acompanhe o progresso e a participação dos alunos.
-						</p>
+                <p th:if="${avaliacoes.isEmpty()}" class="texto-vazio">
+                    Nenhuma avaliação diagnóstica registrada ainda.
+                </p>
+            </section>
 
-						<p th:if="${perfil == 'secretaria'}">
-						    Gerencie alunos, professores e informações da instituição.
-						</p>
-					</div>
+            <!-- ============ LISTA DE ALUNOS ============ -->
+            <section class="lista-alunos-secao" id="alunos">
+                <div class="cabecalho-secao">
+                    <h3>Lista de Alunos</h3>
+                    <input type="search"
+                           id="buscaAluno"
+                           class="busca-aluno"
+                           placeholder="Buscar por nome ou RA"
+                           aria-label="Buscar aluno por nome ou RA">
+                </div>
 
-					<div class="perfil-professor">
-						<span class="avatar-professor">P</span>
-						<span>usuario teste</span>
-					</div>
-				</header>
+                <div class="tabela-alunos-wrapper">
+                    <table class="tabela-alunos" id="tabelaAlunos">
+                        <thead>
+                            <tr>
+                                <th>RA</th>
+                                <th>Nome</th>
+                                <th>Nível</th>
+                                <th>Pontos</th>
+                                <th>Acertos</th>
+                                <th>Ações / Detalhes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${alunos == null or alunos.isEmpty()}">
+                                <td colspan="6">Nenhum aluno cadastrado.</td>
+                            </tr>
 
-				<section class="resumo-turma">
-					<div class="card-resumo">
-						<span class="rotulo-card">Total de Alunos</span>
-						<strong class="valor-card" th:text="${alunos != null ? alunos.size() : 0}">0</strong>
-					</div>
+                            <tr th:each="aluno : ${alunos}"
+                                th:attr="data-busca=${aluno.ra + ' ' + aluno.nome}">
+                                <td th:text="${aluno.ra}">RA</td>
+                                <td th:text="${aluno.nome}">Nome</td>
+                                <td>
+                                    <span class="nivel-aluno">
+                                        <span class="etiqueta-nivel"
+                                              th:text="${aluno.nivelAtual != null ? aluno.nivelAtual : 'sem nível'}">
+                                            INICIANTE
+                                        </span>
+                                        <span class="barra-nivel">
+                                            <span class="progresso-nivel"
+                                                  th:style="'width: ' + ${aluno.progressoNivel} + '%'"></span>
+                                        </span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span th:text="${aluno.pontosDiagnosticos + aluno.pontosGamificados}">0</span>
+                                </td>
+                                <td>
+                                    <span th:text="${aluno.acertos + '/' + aluno.totalTentativas
+                                                    + ' (' + aluno.taxaAcerto + '%)'}">0/0</span>
+                                </td>
+                                <td>
+                                    <details class="detalhes-aluno">
+                                        <summary>Ver detalhes</summary>
+                                        <p><strong>E-mail:</strong>
+                                            <span th:text="${aluno.email}">email</span></p>
+                                        <p><strong>Telefone do responsável:</strong>
+                                            <span th:text="${aluno.telefoneResponsavel != null
+                                                            ? aluno.telefoneResponsavel : '-'}">-</span></p>
+                                        <p><strong>Idade:</strong>
+                                            <span th:text="${aluno.idade != null ? aluno.idade + ' anos' : '-'}">-</span></p>
+                                        <p><strong>Fez avaliação diagnóstica?</strong>
+                                            <span th:text="${aluno.fezDiagnostica ? 'Sim' : 'Não'}">Não</span></p>
+                                        <p><strong>Pontos diagnósticos:</strong>
+                                            <span th:text="${aluno.pontosDiagnosticos}">0</span></p>
+                                        <p><strong>Pontos gamificados:</strong>
+                                            <span th:text="${aluno.pontosGamificados}">0</span></p>
+                                    </details>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
 
-					<div class="card-resumo">
-						<span class="rotulo-card">Média Geral</span>
-						<strong class="valor-card">7.8</strong>
-					</div>
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
 
-					<div class="card-resumo">
-						<span class="rotulo-card">Frequência Média</span>
-						<strong class="valor-card">94%</strong>
-					</div>
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
 
-					<div class="card-resumo">
-						<span class="rotulo-card">RA Ativas</span>
-						<strong class="valor-card">12</strong>
-					</div>
-				</section>
+    <!-- Busca simples -->
+    <script>
+        document.getElementById('buscaAluno')?.addEventListener('input', function (e) {
+            const termo = e.target.value.toLowerCase();
+            document.querySelectorAll('#tabelaAlunos tbody tr[data-busca]').forEach(function (linha) {
+                const texto = linha.getAttribute('data-busca').toLowerCase();
+                linha.style.display = texto.includes(termo) ? '' : 'none';
+            });
+        });
+    </script>
 
-				<section class="lista-alunos-secao">
-					<div class="cabecalho-secao">
-						<h3>Lista de Alunos</h3>
-						<input type="search" class="busca-aluno" placeholder="Buscar por nome ou RA" aria-label="Buscar aluno por nome ou RA">
-					</div>
+    <!-- =====================================================
+         SCRIPTS DOS GRÁFICOS
+         ===================================================== -->
+    <script th:inline="javascript">
+        // Paleta de cores reaproveitada em todos os gráficos
+        const CORES = {
+            azul: '#591EE7',
+            roxo: '#8646DA',
+            lilas: '#C9B6F8',
+            azulEscuro: '#2D0A82',
+            verde: '#2E7D32',
+            laranja: '#E65100',
+            cinza: '#B0B0B0'
+        };
 
-					<div class="tabela-alunos-wrapper">
-						<table class="tabela-alunos">
-							<thead>
-								<tr>
-									<th>RA</th>
-									<th>Nome</th>
-									<th>Nível</th>
-									<th>Ações / Detalhes</th>
-								</tr>
-							</thead>
-							<tbody>
-								<tr th:if="${alunos == null or alunos.isEmpty()}">
-									<td colspan="4">Nenhum aluno cadastrado.</td>
-								</tr>
-								<tr th:each="aluno : ${alunos}">
-									<td th:text="${aluno.ra}">RA21244124</td>
-									<td th:text="${aluno.nomeSocial != null and !aluno.nomeSocial.isBlank() ? aluno.nomeSocial : aluno.nomeCompleto}">Nome do Aluno</td>
-									<td>
-										<span class="nivel-aluno">
-											<span class="etiqueta-nivel" th:text="${aluno.nivelAtual != null ? aluno.nivelAtual : 'sem nível'}">Nível 3</span>
-											<span class="barra-nivel">
-												
-												<span class="progresso-nivel" th:style="'width: ' + ${aluno.progressoNivel} + '%'"></span>
-												
-												<span class="progresso-nivel" style="width: 0%;"></span>
-											</span>
-										</span>
-									</td>
-									<td>
-										<details class="detalhes-aluno">
-											<summary>Ver detalhes</summary>
-											<p><strong>E-mail:</strong> <span th:text="${aluno.email}">email@exemplo.com</span></p>
-											<p><strong>Telefone do responsável:</strong> <span th:text="${aluno.telefoneResponsavel != null ? aluno.telefoneResponsavel : '-'}">(16) 99204-1245</span></p>
-											<p><strong>Idade:</strong> <span th:text="${aluno.idade != null ? aluno.idade + ' anos' : '-'}">16 anos</span></p>
-										</details>
-									</td>
-								</tr>
-							</tbody>
-						</table>
-					</div>
-				</section>
-			</main>
-		</div>
+        // ---------- Dados que vieram do servidor (Thymeleaf) ----------
+        // O th:inline="javascript" faz o Thymeleaf gerar JSON válido
+        const dadosNiveis = {
+            labels:  /*[[${chartLabels}]]*/ [],
+            valores: /*[[${chartValores}]]*/ []
+        };
 
-		<footer class="rodape">
-			<p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
-		</footer>
-		
-		<div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
-		
-	</body>
+        const dadosAcertos = {
+            diag: /*[[${resumo.taxaAcertoDiagnostica}]]*/ 0,
+            gam:  /*[[${resumo.taxaAcertoGamificada}]]*/ 0
+        };
+
+        const dadosPontos = {
+            nomes: /*[[${alunos.![nome]}]]*/ [],
+            diag:  /*[[${alunos.![pontosDiagnosticos]}]]*/ [],
+            gam:   /*[[${alunos.![pontosGamificados]}]]*/ []
+        };
+
+        const dadosTop = {
+            nomes:   /*[[${topAlunos.![nome]}]]*/ [],
+            acertos: /*[[${topAlunos.![acertos]}]]*/ []
+        };
+
+        // -----------------------------------------------------
+        // Gráfico 1: Pizza de distribuição por nível
+        // -----------------------------------------------------
+        const canvasNiveis = document.getElementById('graficoNiveis');
+
+        if (canvasNiveis && dadosNiveis.valores && dadosNiveis.valores.length) {
+            const totalNiveis = dadosNiveis.valores.reduce((a, b) => a + b, 0);
+
+            if (totalNiveis === 0) {
+                canvasNiveis.style.display = 'none';
+                const aviso = document.createElement('p');
+                aviso.className = 'texto-vazio';
+                aviso.textContent = 'Nenhum aluno classificado em nível ainda. ' +
+                                    'Os alunos aparecem aqui após concluírem a avaliação diagnóstica.';
+                canvasNiveis.parentElement.appendChild(aviso);
+            } else {
+                new Chart(canvasNiveis, {
+                    type: 'pie',
+                    data: {
+                        labels: dadosNiveis.labels,
+                        datasets: [{
+                            data: dadosNiveis.valores,
+                            backgroundColor: [CORES.roxo, CORES.azul, CORES.lilas, CORES.cinza],
+                            borderColor: '#FFFFFF',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    generateLabels: (chart) => {
+                                        const dados = chart.data.datasets[0].data;
+                                        const total = dados.reduce((a, b) => a + b, 0);
+                                        return chart.data.labels.map((label, i) => ({
+                                            text: `${label} (${Math.round((dados[i] * 100) / total)}%)`,
+                                            fillStyle: chart.data.datasets[0].backgroundColor[i],
+                                            strokeStyle: '#FFFFFF',
+                                            lineWidth: 0,
+                                            hidden: !chart.getDataVisibility(i),
+                                            index: i
+                                        })).filter(item => dados[item.index] > 0);
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const total = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                        const valor = ctx.parsed;
+                                        const pct = Math.round((valor * 100) / total);
+                                        const palavra = valor === 1 ? 'aluno' : 'alunos';
+                                        return `${ctx.label}: ${valor} ${palavra} (${pct}%)`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        }
+
+        // -----------------------------------------------------
+        // Gráfico 2: Rosca de taxa de acerto
+        // -----------------------------------------------------
+        const canvasAcertos = document.getElementById('graficoAcertos');
+        if (canvasAcertos) {
+            new Chart(canvasAcertos, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Diagnóstica', 'Gamificada'],
+                    datasets: [{
+                        data: [dadosAcertos.diag || 0, dadosAcertos.gam || 0],
+                        backgroundColor: [CORES.azul, CORES.roxo],
+                        borderColor: '#FFFFFF',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => ctx.label + ': ' + ctx.parsed + '%'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // -----------------------------------------------------
+        // Gráfico 3: Pontos por aluno (barras empilhadas)
+        // -----------------------------------------------------
+        const canvasPontos = document.getElementById('graficoPontos');
+        if (canvasPontos) {
+            new Chart(canvasPontos, {
+                type: 'bar',
+                data: {
+                    labels: dadosPontos.nomes || [],
+                    datasets: [
+                        {
+                            label: 'Pontos diagnósticos',
+                            data: dadosPontos.diag || [],
+                            backgroundColor: CORES.azul
+                        },
+                        {
+                            label: 'Pontos gamificados',
+                            data: dadosPontos.gam || [],
+                            backgroundColor: CORES.roxo
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { stacked: true },
+                        y: { stacked: true, beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' }
+                    }
+                }
+            });
+        }
+
+        // -----------------------------------------------------
+        // Gráfico 4: Top 5 alunos por acertos (barras horizontais)
+        // -----------------------------------------------------
+        const canvasTop = document.getElementById('graficoTop');
+        if (canvasTop) {
+            new Chart(canvasTop, {
+                type: 'bar',
+                data: {
+                    labels: dadosTop.nomes || [],
+                    datasets: [{
+                        label: 'Acertos',
+                        data: dadosTop.acertos || [],
+                        backgroundColor: CORES.roxo,
+                        borderRadius: 8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
 </html>
