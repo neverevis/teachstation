@@ -1,0 +1,644 @@
+/*
+	Questionários gamificados
+	Usa as variáveis e as classes de styles.css (card-questao, alternativa,
+	card-feedback, botao-proxima, barra-progresso...). Aqui ficam só os
+	elementos novos: associação, preenchimento e botões de ação.
+*/
+
+.quiz {
+    max-width: 960px;
+}
+
+.quiz-aviso-tela {
+    margin: 0 0 24px;
+    padding: 40px 24px;
+    background-color: var(--cor-branco);
+    border-radius: 16px;
+    text-align: center;
+    font-size: 20px;
+    color: var(--cor-texto-secundario);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+}
+
+.quiz-erro p {
+    margin: 0 0 20px;
+    color: #8A3B00;
+}
+
+.quiz-card h3 {
+    outline: none; /* o foco é movido para o enunciado ao trocar de questão */
+}
+
+/* Etiqueta da questão e botão "Ouvir" cada um na sua linha */
+.quiz-card .numero-questao,
+.quiz-card .botao-ouvir {
+    display: flex;
+    width: fit-content;
+}
+
+.quiz-area {
+    margin-bottom: 8px;
+}
+
+.quiz .progresso-atual {
+    transition: width 0.8s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.quiz-dica {
+    min-height: 1.6em;
+    margin: 16px 0 0;
+    font-size: 16px;
+    color: var(--cor-texto-secundario);
+}
+
+.quiz-feedback .card-feedback {
+    margin-top: 16px;
+    text-align: left;
+}
+
+.quiz-explicacao {
+    margin-top: 12px !important;
+    font-size: 17px;
+}
+
+.quiz-gabarito {
+    margin: 10px 0 0;
+    padding-left: 22px;
+    font-size: 18px;
+}
+
+p.quiz-gabarito {
+    padding-left: 0;
+}
+
+/* Botões de ação: Confirmar resposta à esquerda, Avançar/Finalizar à direita */
+
+.acoes-quiz {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    margin-top: 32px;
+}
+
+.acoes-quiz-esquerda {
+    display: flex;
+    gap: 12px;
+}
+
+.botao-confirmar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 56px;
+    padding: 14px 28px;
+    border: 3px solid var(--cor-roxo);
+    border-radius: 10px;
+    background-color: var(--cor-branco);
+    color: var(--cor-azul-escuro);
+    font: inherit;
+    font-size: 18px;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.botao-confirmar:hover:not(:disabled) {
+    background-color: #F3EEFF;
+}
+
+.botao-confirmar:focus-visible {
+    outline: 4px solid var(--cor-azul-escuro);
+    outline-offset: 3px;
+}
+
+.botao-confirmar:disabled,
+.quiz .botao-proxima:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Alternativas da múltipla escolha (botões que reaproveitam o visual de .alternativa) */
+
+.alternativa-quiz {
+    width: 100%;
+    background-color: var(--cor-branco);
+    color: var(--cor-texto);
+    font-family: inherit;
+    text-align: left;
+}
+
+.alternativa-quiz:focus-visible {
+    outline: 4px solid var(--cor-azul-escuro);
+    outline-offset: 3px;
+}
+
+.alternativa-quiz.escolhida {
+    border-color: var(--cor-letra, var(--cor-roxo));
+    box-shadow: 0 0 0 4px rgba(134, 70, 218, 0.2);
+}
+
+.alternativa-quiz:disabled {
+    cursor: default;
+    color: var(--cor-texto);
+}
+
+.alternativa-quiz.incorreta {
+    border-color: #E65100;
+    background-color: #FFF3E0;
+}
+
+.alternativa-quiz.incorreta::after {
+    content: "✖ sua resposta";
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 700;
+    color: #8A3B00;
+    white-space: nowrap;
+}
+
+.alternativa-quiz.correta {
+    border-color: #2E7D32;
+    background-color: #E8F5E9;
+}
+
+/* Formato 1: conectar a frase com a palavra */
+
+.assoc {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(72px, 16%) minmax(0, 1fr);
+    align-items: start;
+    margin: 8px 0 0;
+}
+
+.assoc-coluna {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.assoc-esq {
+    grid-column: 1;
+}
+
+.assoc-dir {
+    grid-column: 3;
+}
+
+.assoc-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 76px;
+    padding: 12px 22px;
+    border: 3px solid var(--cor-borda);
+    border-radius: 14px;
+    background-color: var(--cor-branco);
+    font-size: 18px;
+    line-height: 1.4;
+    cursor: pointer;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.assoc-item:hover:not(.travado) {
+    border-color: var(--cor-roxo);
+    background-color: #FAF8FF;
+}
+
+.assoc-item.travado {
+    cursor: default;
+}
+
+.assoc-texto {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-wrap: anywhere; /* palavras longas quebram em vez de estourar a tela */
+}
+
+.assoc-dir .assoc-texto {
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.assoc-marca {
+    flex: 0 0 auto;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+/* O ponto de conexão fica sobre a borda do cartão, voltado para o espaço entre as colunas */
+
+.assoc-ponto {
+    position: absolute;
+    top: 50%;
+    z-index: 2;
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    border: 4px solid var(--cor-roxo);
+    border-radius: 50%;
+    background-color: var(--cor-branco);
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.assoc-ponto::after {
+    content: "";
+    position: absolute;
+    inset: -10px; /* área de toque maior que o desenho do ponto */
+}
+
+.assoc-item-esq .assoc-ponto {
+    right: -16px;
+}
+
+.assoc-item-dir .assoc-ponto {
+    left: -16px;
+}
+
+.assoc-ponto:focus-visible {
+    outline: 4px solid var(--cor-azul-escuro);
+    outline-offset: 3px;
+}
+
+.assoc-ponto:disabled {
+    cursor: default;
+}
+
+.assoc-item.ligado .assoc-ponto {
+    background-color: var(--cor-roxo);
+}
+
+.assoc-item.pendente {
+    border-color: var(--cor-roxo);
+    box-shadow: 0 0 0 4px rgba(134, 70, 218, 0.25);
+}
+
+.assoc-item.pendente .assoc-ponto {
+    background-color: var(--cor-lilas);
+    animation: assoc-pulso 1s ease-in-out infinite;
+}
+
+/* O pulso usa só sombra: o ponto não muda de lugar nem de tamanho, então continua fácil de tocar */
+@keyframes assoc-pulso {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(134, 70, 218, 0.55); }
+    50% { box-shadow: 0 0 0 9px rgba(134, 70, 218, 0); }
+}
+
+/* Resposta certa ou errada: cor + símbolo (✔ ✖) + traço da linha, nunca só a cor */
+
+.assoc-item.ok {
+    border-color: #2E7D32;
+    background-color: #E8F5E9;
+}
+
+.assoc-item.ok .assoc-ponto {
+    border-color: #2E7D32;
+    background-color: #2E7D32;
+}
+
+.assoc-item.erro {
+    border-color: #E65100;
+    background-color: #FFF3E0;
+}
+
+.assoc-item.erro .assoc-ponto {
+    border-color: #E65100;
+    background-color: #E65100;
+}
+
+.assoc-linhas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+    pointer-events: none; /* só a área larga de clique das linhas recebe o mouse */
+}
+
+.assoc-linha {
+    fill: none;
+    stroke: var(--cor-roxo);
+    stroke-width: 4;
+    stroke-linecap: round;
+}
+
+.assoc-linha.ok {
+    stroke: #2E7D32;
+    stroke-width: 5;
+}
+
+.assoc-linha.erro {
+    stroke: #E65100;
+    stroke-dasharray: 10 8;
+}
+
+.assoc-linha.provisoria {
+    stroke: var(--cor-lilas);
+    stroke-dasharray: 4 8;
+}
+
+.assoc-clique {
+    fill: none;
+    stroke: transparent;
+    stroke-width: 18;
+    pointer-events: stroke;
+    cursor: pointer;
+}
+
+/* Formato 2: preencha a frase */
+
+.preench-frase {
+    margin: 0 0 24px;
+    font-size: 24px;
+    line-height: 2.5;
+}
+
+.lacuna {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 130px;
+    min-height: 48px;
+    margin: 0 6px;
+    padding: 2px 16px;
+    border: 3px dashed var(--cor-roxo);
+    border-radius: 12px;
+    background-color: #F3EEFF;
+    color: var(--cor-azul-escuro);
+    font: inherit;
+    font-size: 21px;
+    font-weight: 700;
+    vertical-align: middle;
+    cursor: pointer;
+}
+
+.lacuna.preenchida {
+    border-style: solid;
+    background-color: var(--cor-branco);
+}
+
+.lacuna.ativa {
+    border-style: solid;
+    box-shadow: 0 0 0 4px rgba(134, 70, 218, 0.3);
+}
+
+.lacuna.ok {
+    border-color: #2E7D32;
+    background-color: #E8F5E9;
+    color: #1B5E20;
+}
+
+.lacuna.erro {
+    border-color: #E65100;
+    background-color: #FFF3E0;
+    color: #8A3B00;
+}
+
+.lacuna:disabled {
+    cursor: default;
+}
+
+.lacuna:focus-visible,
+.opcao-verbo:focus-visible {
+    outline: 4px solid var(--cor-azul-escuro);
+    outline-offset: 3px;
+}
+
+.preench-legenda {
+    margin: 0 0 10px;
+    font-size: 16px;
+    color: var(--cor-texto-secundario);
+}
+
+.preench-opcoes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.opcao-verbo {
+    min-height: 52px;
+    padding: 10px 24px;
+    border: 3px solid var(--cor-roxo);
+    border-radius: 999px;
+    background-color: var(--cor-branco);
+    color: var(--cor-azul-escuro);
+    font: inherit;
+    font-size: 20px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.opcao-verbo:hover:not(:disabled) {
+    background-color: #F3EEFF;
+}
+
+.opcao-verbo.usada {
+    border-style: dashed;
+    border-color: var(--cor-borda);
+    background-color: var(--cor-fundo-avaliacao);
+    color: var(--cor-texto-secundario);
+}
+
+.opcao-verbo:disabled {
+    cursor: default;
+}
+
+/* Resultado final */
+
+.quiz-resultado {
+    text-align: center;
+}
+
+.quiz-resultado h2 {
+    margin: 0 0 12px;
+    font-size: 32px;
+    color: var(--cor-azul-escuro);
+    outline: none;
+}
+
+.quiz-placar {
+    margin: 0;
+    font-size: 24px;
+}
+
+.quiz-placar strong {
+    font-size: 40px;
+    color: var(--cor-azul);
+}
+
+.quiz-pontos {
+    margin: 8px 0 24px;
+    font-size: 18px;
+    color: var(--cor-texto-secundario);
+}
+
+.quiz-resultado-lista {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+.quiz-resultado-lista li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 10px;
+    padding: 12px 16px;
+    border: 3px solid var(--cor-borda);
+    border-radius: 12px;
+    font-size: 17px;
+}
+
+.quiz-resultado-lista li.ok {
+    border-color: #66BB6A;
+    background-color: #E8F5E9;
+}
+
+.quiz-resultado-lista li.erro {
+    border-color: #FFB74D;
+    background-color: #FFF3E0;
+}
+
+.quiz-resultado-icone {
+    flex: 0 0 auto;
+    min-width: 96px;
+    font-weight: 700;
+}
+
+.quiz-resultado-texto {
+    flex: 1 1 auto;
+}
+
+.quiz-resultado-pontos {
+    flex: 0 0 auto;
+    font-weight: 700;
+}
+
+/* Telas pequenas */
+
+@media (max-width: 768px) {
+
+    .acoes-quiz {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .acoes-quiz-esquerda {
+        flex-direction: column;
+    }
+
+    .acoes-quiz-esquerda:empty {
+        display: none;
+    }
+
+    .botao-confirmar {
+        width: 100%;
+    }
+
+    .assoc {
+        grid-template-columns: minmax(0, 1fr) 56px minmax(0, 1fr);
+    }
+
+    .assoc-item {
+        min-height: 68px;
+        padding: 10px 20px 10px 12px;
+        font-size: 15px;
+    }
+
+    .assoc-item-dir {
+        padding: 10px 12px 10px 20px;
+    }
+
+    .assoc-dir .assoc-texto {
+        font-size: 16px;
+    }
+
+    .assoc-marca {
+        font-size: 16px;
+    }
+
+    .preench-frase {
+        font-size: 20px;
+    }
+
+    .lacuna {
+        min-width: 100px;
+        font-size: 18px;
+    }
+
+    .opcao-verbo {
+        font-size: 18px;
+    }
+
+    .quiz-resultado-lista li {
+        flex-wrap: wrap;
+        font-size: 15px;
+    }
+}
+
+/* Celulares estreitos: mais espaço para as duas colunas da associação */
+
+@media (max-width: 480px) {
+
+    .quiz.conteudo-avaliacao {
+        padding: 28px 12px;
+    }
+
+    .quiz .card-questao {
+        padding: 16px;
+    }
+
+    .assoc {
+        grid-template-columns: minmax(0, 1fr) 44px minmax(0, 1fr);
+    }
+
+    .assoc-coluna {
+        gap: 12px;
+    }
+
+    .assoc-item {
+        min-height: 64px;
+        padding: 8px 18px 8px 8px;
+        font-size: 14px;
+    }
+
+    .assoc-item-dir {
+        padding: 8px 8px 8px 18px;
+    }
+
+    .assoc-dir .assoc-texto {
+        font-size: 15px;
+    }
+
+    .assoc-ponto {
+        width: 24px;
+        height: 24px;
+        border-width: 3px;
+    }
+
+    .assoc-item-esq .assoc-ponto {
+        right: -14px;
+    }
+
+    .assoc-item-dir .assoc-ponto {
+        left: -14px;
+    }
+
+    .lacuna {
+        min-width: 90px;
+        margin: 0 3px;
+    }
+}
