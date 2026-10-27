@@ -53,6 +53,7 @@ body {
 }
 
 .apresentacao-login {
+    position: relative; /* referência para o botão "Voltar" */
     width: 50%;
 
     display: flex;
@@ -238,6 +239,58 @@ body {
     font-size: 26px;
 	font-weight: 700;
     color: var(--cor-branco);
+}
+
+.cabecalho-marca {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+}
+
+/* Botão "< VOLTAR" */
+
+.botao-voltar {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 6px 4px;
+    border-radius: 6px;
+
+    color: var(--cor-branco);
+
+    font-size: 16px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    text-decoration: none;
+
+    transition: opacity 0.2s;
+}
+
+.botao-voltar:hover {
+    opacity: 0.8;
+}
+
+.botao-voltar:hover .botao-voltar-seta {
+    transform: translateX(-3px);
+}
+
+.botao-voltar:focus-visible {
+    outline: 4px solid var(--cor-lilas);
+    outline-offset: 3px;
+}
+
+.botao-voltar-seta {
+    flex: 0 0 auto;
+    transition: transform 0.2s;
+}
+
+/* nas telas de cadastro o botão fica no canto do painel roxo */
+.apresentacao-login .botao-voltar {
+    position: absolute;
+    top: 24px;
+    left: 24px;
 }
 
 .botao-sair {

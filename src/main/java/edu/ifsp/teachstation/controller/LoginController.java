@@ -1,20 +1,13 @@
 
 package edu.ifsp.teachstation.controller;
 
-import java.awt.Canvas;
-import java.awt.image.BufferedImage;
 import java.util.List;
-
-import javax.swing.JFrame;
-
 import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.model.Usuario;
 import edu.ifsp.teachstation.persistence.UserRepository;
-
 import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

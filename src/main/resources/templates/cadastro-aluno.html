@@ -12,6 +12,7 @@
     <main class="pagina-login">
 
         <section class="apresentacao-login">
+            <a th:replace="~{fragments/voltar :: voltar}"></a>
             <h1>TeachStation</h1>
             <p>Aprenda no seu ritmo.</p>
         </section>
@@ -193,13 +194,6 @@
                 </button>
 
             </form>
-
-
-            <p>
-                <a th:href="@{/cadastros}">
-                    Voltar para Cadastros
-                </a>
-            </p>
 
         </section>
 

@@ -9,18 +9,6 @@
 	margin: 0 auto 40px;
 }
 
-.voltar-dashboard {
-	display: inline-block;
-	margin-bottom: 24px;
-	color: var(--cor-azul);
-	text-decoration: none;
-	font-weight: 600;
-}
-
-.voltar-dashboard:hover {
-	text-decoration: underline;
-}
-
 .cabecalho-cadastros h1 {
 	margin: 0 0 8px;
 	color: var(--cor-azul-escuro);

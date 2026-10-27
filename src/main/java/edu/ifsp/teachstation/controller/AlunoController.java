@@ -17,16 +17,16 @@ import jakarta.validation.Valid;
 @Controller
 @RequestMapping("/aluno")
 public class AlunoController {
-    
+
     @Autowired
     private AlunoRepository repo;
-    
+
     @GetMapping("/novo")
     public String iniciar(Model model) {
         model.addAttribute("aluno", new Aluno());
         return "aluno/editar";
     }
-    
+
     @PostMapping("/salvar")
     public String salvar(@Valid Aluno aluno, Errors errors) {
         if (errors.hasErrors()) {
@@ -35,35 +35,33 @@ public class AlunoController {
             }
             return "aluno/editar";
         }
-        
+
         System.out.println("AlunoController.salvar()");
         repo.save(aluno);
         return "redirect:/aluno/" + aluno.getId() + "/editar";
     }
-    
+
     @GetMapping("/{id}/editar")
     public String editar(@PathVariable(name = "id") Integer id, Model model) {
         Aluno aluno = repo.findById(id).get();
         model.addAttribute("aluno", aluno);
         return "aluno/editar";
     }
-    
+
     @GetMapping("/listar")
     public String listar(Model model) {
         Iterable<Aluno> alunos = repo.findAll();
         model.addAttribute("alunos", alunos);
         return "aluno/listar";
     }
-    
+
     @PostMapping("/{id}/excluir")
     public String excluir(
             @PathVariable(name = "id") Integer id,
             RedirectAttributes redirectAttributes
             ) {
-        
         repo.deleteById(id);
         redirectAttributes.addFlashAttribute("deleteOk", id);
-        
         return "redirect:/aluno/listar";
     }
 }

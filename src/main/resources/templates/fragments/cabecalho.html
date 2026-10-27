@@ -13,7 +13,10 @@
         na sessão (atributos `usuarioLogado` ou `alunoLogado`).
     -->
     <header th:fragment="cabecalho" class="cabecalho-avaliacao">
-        <h1>TeachStation</h1>
+        <div class="cabecalho-marca">
+            <a th:replace="~{fragments/voltar :: voltar}"></a>
+            <h1>TeachStation</h1>
+        </div>
 
         <a th:if="${session.usuarioLogado != null or session.alunoLogado != null}"
            th:href="@{/login}"
