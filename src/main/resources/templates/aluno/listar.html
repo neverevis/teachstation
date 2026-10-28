@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastros.css}">
+    <title>Gerenciar Alunos - TeachStation</title>
+</head>
+<body>
+    <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
+
+    <main class="pagina-cadastros">
+        <section class="cabecalho-cadastros">
+            <h1>Gerenciar Alunos</h1>
+            <p>Consulte, pesquise, cadastre, edite ou exclua alunos no sistema.</p>
+        </section>
+
+        <div class="conteudo-gerenciar">
+            <div th:if="${deleteOk}" class="alerta-sucesso">
+                Aluno ID <span th:text="${deleteOk}"></span> excluído com sucesso.
+            </div>
+
+            <div th:if="${mensagemSucesso}" class="alerta-sucesso" th:text="${mensagemSucesso}"></div>
+
+            <div class="barra-acoes-gerenciar">
+                <form th:action="@{/aluno/listar}" method="get" class="form-busca">
+                    <input type="search"
+                           name="busca"
+                           th:value="${busca}"
+                           class="campo-busca"
+                           placeholder="Buscar por nome, RA ou e-mail"
+                           aria-label="Buscar aluno por nome, RA ou e-mail">
+                    <button type="submit" class="botao-primario">Buscar</button>
+                    <a th:if="${busca != null and !busca.isEmpty()}"
+                       th:href="@{/aluno/listar}"
+                       class="botao-secundario">Limpar</a>
+                </form>
+
+                <a th:href="@{/aluno/novo}" class="botao-primario">+ Cadastrar Novo Aluno</a>
+            </div>
+
+            <div class="container-tabela">
+                <table class="tabela-gerenciar">
+                    <thead>
+                        <tr>
+                            <th>RA</th>
+                            <th>Nome Completo</th>
+                            <th>Nome Social</th>
+                            <th>E-mail</th>
+                            <th>Responsável</th>
+                            <th>Nível</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(alunos)}">
+                            <td colspan="7" style="text-align: center; color: var(--cor-texto-secundario); padding: 32px;">
+                                Nenhum aluno encontrado.
+                            </td>
+                        </tr>
+                        <tr th:each="aluno : ${alunos}">
+                            <td th:text="${aluno.ra}"></td>
+                            <td th:text="${aluno.nomeCompleto}"></td>
+                            <td th:text="${aluno.nomeSocial != null and !aluno.nomeSocial.isEmpty() ? aluno.nomeSocial : '-'}"></td>
+                            <td th:text="${aluno.email}"></td>
+                            <td th:text="${aluno.telefoneResponsavel != null and !aluno.telefoneResponsavel.isEmpty() ? aluno.telefoneResponsavel : '-'}"></td>
+                            <td>
+                                <span class="etiqueta-nivel-tabela"
+                                      th:text="${aluno.nivelAtual != null ? aluno.nivelAtual : 'Sem nível'}">
+                                    INICIANTE
+                                </span>
+                            </td>
+                            <td>
+                                <div class="acoes-celula">
+                                    <a th:href="@{'/aluno/' + ${aluno.id} + '/editar'}" class="botao-acao-editar">Editar</a>
+                                    <form method="post"
+                                          th:action="@{'/aluno/' + ${aluno.id} + '/excluir'}"
+                                          style="display:inline;">
+                                        <button type="submit"
+                                                class="botao-acao-excluir"
+                                                onclick="return confirm('Deseja realmente excluir este aluno?');">
+                                            Excluir
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
+
+    <div th:replace="~{fragments/toast :: toast}"></div>
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+</body>
+</html>

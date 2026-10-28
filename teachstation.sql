@@ -273,8 +273,8 @@ VALUES
 INSERT IGNORE INTO `professor`
 (`id`, `prontuario`, `telefone`, `area_atuacao`)
 VALUES
-(3, 'P000123', '(16) 99999-3333', 'Língua Portuguesa'),
-(5, 'P000124', '(16) 99999-5555', 'Língua Portuguesa');
+
+(5, 'AQ000124', '(16) 99999-5555', 'Língua Portuguesa');
 
 -- =====================================================
 -- Secretaria
@@ -283,7 +283,7 @@ VALUES
 INSERT IGNORE INTO `secretaria`
 (`id`, `codigo_funcionario`)
 VALUES
-(4, 'SEC001'),
+
 (6, 'SEC002');
 
 -- =====================================================

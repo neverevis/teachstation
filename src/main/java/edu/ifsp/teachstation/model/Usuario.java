@@ -31,6 +31,7 @@ public class Usuario {
     @NotBlank
     private String senha;
 
+    @org.springframework.format.annotation.DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date dataNascimento;
 
     private String genero;

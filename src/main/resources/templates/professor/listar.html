@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastros.css}">
+    <title>Gerenciar Professores - TeachStation</title>
+</head>
+<body>
+    <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
+
+    <main class="pagina-cadastros">
+        <section class="cabecalho-cadastros">
+            <h1>Gerenciar Professores</h1>
+            <p>Consulte, pesquise, cadastre, edite ou exclua professores no sistema.</p>
+        </section>
+
+        <div class="conteudo-gerenciar">
+            <div th:if="${deleteOk}" class="alerta-sucesso">
+                Professor ID <span th:text="${deleteOk}"></span> excluído com sucesso.
+            </div>
+
+            <div th:if="${mensagemSucesso}" class="alerta-sucesso" th:text="${mensagemSucesso}"></div>
+
+            <div class="barra-acoes-gerenciar">
+                <form th:action="@{/professor/listar}" method="get" class="form-busca">
+                    <input type="search"
+                           name="busca"
+                           th:value="${busca}"
+                           class="campo-busca"
+                           placeholder="Buscar por nome, prontuário, área ou e-mail"
+                           aria-label="Buscar professor por nome, prontuário, área ou e-mail">
+                    <button type="submit" class="botao-primario">Buscar</button>
+                    <a th:if="${busca != null and !busca.isEmpty()}"
+                       th:href="@{/professor/listar}"
+                       class="botao-secundario">Limpar</a>
+                </form>
+
+                <a th:href="@{/professor/novo}" class="botao-primario">+ Cadastrar Novo Professor</a>
+            </div>
+
+            <div class="container-tabela">
+                <table class="tabela-gerenciar">
+                    <thead>
+                        <tr>
+                            <th>Prontuário</th>
+                            <th>Nome Completo</th>
+                            <th>Nome Social</th>
+                            <th>Área de Atuação</th>
+                            <th>E-mail</th>
+                            <th>Telefone</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${#lists.isEmpty(professores)}">
+                            <td colspan="7" style="text-align: center; color: var(--cor-texto-secundario); padding: 32px;">
+                                Nenhum professor encontrado.
+                            </td>
+                        </tr>
+                        <tr th:each="professor : ${professores}">
+                            <td th:text="${professor.prontuario}"></td>
+                            <td th:text="${professor.nomeCompleto}"></td>
+                            <td th:text="${professor.nomeSocial != null and !professor.nomeSocial.isEmpty() ? professor.nomeSocial : '-'}"></td>
+                            <td th:text="${professor.areaAtuacao != null and !professor.areaAtuacao.isEmpty() ? professor.areaAtuacao : '-'}"></td>
+                            <td th:text="${professor.email}"></td>
+                            <td th:text="${professor.telefone != null and !professor.telefone.isEmpty() ? professor.telefone : '-'}"></td>
+                            <td>
+                                <div class="acoes-celula">
+                                    <a th:href="@{'/professor/' + ${professor.id} + '/editar'}" class="botao-acao-editar">Editar</a>
+                                    <form method="post"
+                                          th:action="@{'/professor/' + ${professor.id} + '/excluir'}"
+                                          style="display:inline;">
+                                        <button type="submit"
+                                                class="botao-acao-excluir"
+                                                onclick="return confirm('Deseja realmente excluir este professor?');">
+                                            Excluir
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
+
+    <div th:replace="~{fragments/toast :: toast}"></div>
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+</body>
+</html>

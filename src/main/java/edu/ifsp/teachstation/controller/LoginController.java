@@ -34,6 +34,7 @@ public class LoginController {
     @GetMapping("/login")
     public String login(
             @RequestParam(value = "error", required = false) String error,
+            @RequestParam(value = "redefinida", required = false) String redefinida,
             HttpSession session,
             Model model) {
 
@@ -47,6 +48,10 @@ public class LoginController {
             );
 
             model.addAttribute("tipoMensagem", "erro");
+        }
+        if (redefinida != null) {
+            model.addAttribute("mensagem", "Senha redefinida com sucesso! Faça login com sua nova senha.");
+            model.addAttribute("tipoMensagem", "sucesso");
         }
 
         return "login";

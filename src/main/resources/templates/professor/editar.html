@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/cadastros.css}">
+    <title th:text="${professor.id == null ? 'Novo Professor - TeachStation' : 'Editar Professor - TeachStation'}">Editar Professor - TeachStation</title>
+</head>
+<body>
+    <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
+
+    <main class="pagina-cadastros">
+        <section class="cabecalho-cadastros">
+            <h1 th:text="${professor.id == null ? 'Cadastrar Professor' : 'Editar Professor'}">Professor</h1>
+            <p>Preencha os dados cadastrais do professor.</p>
+        </section>
+
+        <div class="card-formulario">
+            <form method="post" th:action="@{/professor/salvar}" th:object="${professor}">
+                <input type="hidden" th:field="*{id}">
+                <input type="hidden" th:field="*{tipoUsuario}">
+
+                <div class="campo-formulario" th:if="${professor.id != null}">
+                    <label>ID:</label>
+                    <input type="text" disabled th:value="*{id}">
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="nomeCompleto">Nome Completo:</label>
+                    <input type="text" id="nomeCompleto" th:field="*{nomeCompleto}" required>
+                    <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('nomeCompleto')}" th:errors="*{nomeCompleto}"></span>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="campo-formulario">
+                        <label for="prontuario">Prontuário:</label>
+                        <input type="text" id="prontuario" th:field="*{prontuario}" placeholder="AQ123456" pattern="AQ[0-9]+" title="O prontuário deve começar com AQ." required>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('prontuario')}" th:errors="*{prontuario}"></span>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="dataNascimento">Data de Nascimento:</label>
+                        <input type="date" id="dataNascimento" th:field="*{dataNascimento}" required>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('dataNascimento')}" th:errors="*{dataNascimento}"></span>
+                    </div>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="campo-formulario">
+                        <label for="email">E-mail:</label>
+                        <input type="email" id="email" th:field="*{email}" required>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></span>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="telefone">Telefone:</label>
+                        <input type="tel" id="telefone" th:field="*{telefone}">
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('telefone')}" th:errors="*{telefone}"></span>
+                    </div>
+                </div>
+
+                <div class="linha-formulario">
+                    <div class="campo-formulario">
+                        <label for="areaAtuacao">Área de Atuação:</label>
+                        <input type="text" id="areaAtuacao" th:field="*{areaAtuacao}" placeholder="Ex: Língua Portuguesa, Matemática">
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('areaAtuacao')}" th:errors="*{areaAtuacao}"></span>
+                    </div>
+
+                    <div class="campo-formulario">
+                        <label for="genero">Gênero:</label>
+                        <select id="genero" th:field="*{genero}">
+                            <option value="">Selecione uma opção</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Feminino">Feminino</option>
+                            <option value="Outro">Outro</option>
+                            <option value="Não Informar">Prefiro não informar</option>
+                        </select>
+                        <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('genero')}" th:errors="*{genero}"></span>
+                    </div>
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="nomeSocial">Apelido (Nome Social):</label>
+                    <input type="text" id="nomeSocial" th:field="*{nomeSocial}">
+                    <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('nomeSocial')}" th:errors="*{nomeSocial}"></span>
+                </div>
+
+                <div class="campo-formulario">
+                    <label for="senha">Senha:</label>
+                    <input type="password" id="senha" th:field="*{senha}" th:required="${professor.id == null}">
+                    <small th:if="${professor.id != null}" style="color: var(--cor-texto-secundario); margin-top: 4px; font-size: 13px;">
+                        Deixe em branco para manter a senha atual.
+                    </small>
+                    <span class="mensagem-erro-campo" th:if="${#fields.hasErrors('senha')}" th:errors="*{senha}"></span>
+                </div>
+
+                <div class="grupo-botoes-form">
+                    <button type="submit" class="botao-primario">Salvar Professor</button>
+                    <a th:href="@{/professor/listar}" class="botao-secundario">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+
+    <footer class="rodape">
+        <p>&copy; 2026 TeachStation. Todos os direitos reservados.</p>
+    </footer>
+
+    <div th:replace="~{fragments/toast :: toast}"></div>
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+</body>
+</html>

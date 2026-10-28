@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 	<head>
 	    <meta charset="UTF-8">
 	    <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,10 +13,10 @@
 		<div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
 		<main class="pagina-cadastros">
 		    <section class="cabecalho-cadastros">
-		        <h1>Cadastros</h1>
+		        <h1>Cadastros e Gerenciamento</h1>
 	
 		        <p>
-		            Selecione o tipo de usuário que deseja cadastrar.
+		            Selecione o tipo de usuário que deseja cadastrar ou gerenciar.
 		        </p>
 		
 		    </section>
@@ -50,6 +50,40 @@
 		                <p>
 		                    Cadastre professores informando prontuário,
 		                    dados pessoais, e-mail e telefone.
+		                </p>
+		            </div>
+		
+		        </a>
+
+		        <a href="/aluno/listar" class="card-cadastro">
+		
+		            <div class="icone-cadastro">
+		                GA
+		            </div>
+		
+		            <div>
+		                <h2>Gerenciar Alunos</h2>
+		
+		                <p>
+		                    Consulte, pesquise, edite ou exclua alunos
+		                    cadastrados no sistema.
+		                </p>
+		            </div>
+		
+		        </a>
+
+		        <a href="/professor/listar" class="card-cadastro">
+		
+		            <div class="icone-cadastro">
+		                GP
+		            </div>
+		
+		            <div>
+		                <h2>Gerenciar Professores</h2>
+		
+		                <p>
+		                    Consulte, pesquise, edite ou exclua professores
+		                    cadastrados no sistema.
 		                </p>
 		            </div>
 		

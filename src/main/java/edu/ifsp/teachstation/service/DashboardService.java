@@ -74,7 +74,13 @@ public class DashboardService {
      * Lista de alunos com o progresso (para a tabela).
      */
     public List<AlunoProgresso> montarListaAlunos() {
-        List<Aluno> alunos = alunoRepository.findAll();
+        return montarListaAlunos(null);
+    }
+
+    public List<AlunoProgresso> montarListaAlunos(String busca) {
+        List<Aluno> alunos = (busca != null && !busca.trim().isEmpty())
+                ? alunoRepository.pesquisar(busca.trim())
+                : alunoRepository.findAll();
         List<AlunoProgresso> resultado = new ArrayList<>();
 
         for (Aluno aluno : alunos) {
