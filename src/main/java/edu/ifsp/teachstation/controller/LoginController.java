@@ -35,22 +35,30 @@ public class LoginController {
     public String login(
             @RequestParam(value = "error", required = false) String error,
             @RequestParam(value = "redefinida", required = false) String redefinida,
-            HttpSession session,
+            @RequestParam(value = "logout", required = false) String logout,
             Model model) {
-
-        session.invalidate();
-        SecurityContextHolder.clearContext();
 
         if (error != null) {
             model.addAttribute(
                 "mensagem",
                 "E-mail ou senha incorretos. Verifique seus dados e tente novamente."
             );
-
             model.addAttribute("tipoMensagem", "erro");
         }
+
         if (redefinida != null) {
-            model.addAttribute("mensagem", "Senha redefinida com sucesso! Faça login com sua nova senha.");
+            model.addAttribute(
+                "mensagem",
+                "Senha redefinida com sucesso! Faça login com sua nova senha."
+            );
+            model.addAttribute("tipoMensagem", "sucesso");
+        }
+
+        if (logout != null) {
+            model.addAttribute(
+                "mensagem",
+                "Você saiu da sua conta com sucesso!"
+            );
             model.addAttribute("tipoMensagem", "sucesso");
         }
 
