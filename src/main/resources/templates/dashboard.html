@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -23,6 +23,14 @@
 
                     <li th:if="${perfil == 'secretaria'}">
                         <a href="/cadastros">Cadastros</a>
+                    </li>
+
+                    <li th:if="${perfil == 'secretaria' or perfil == 'professor'}">
+                        <a href="/aluno/listar">Gerenciar Alunos</a>
+                    </li>
+
+                    <li th:if="${perfil == 'secretaria'}">
+                        <a href="/professor/listar">Gerenciar Professores</a>
                     </li>
 
                     <li><a href="#niveis">Distribuição por Nível</a></li>
@@ -54,10 +62,16 @@
                 </div>
             </header>
 
-            <!-- ============ AÇÕES DA SECRETARIA ============ -->
+            <!-- ============ AÇÕES DA SECRETARIA / PROFESSOR ============ -->
             <section class="acoes-secretaria" th:if="${perfil == 'secretaria'}">
                 <a href="/cadastro/aluno" class="botao-acao">+ Cadastrar Aluno</a>
                 <a href="/cadastro/professor" class="botao-acao">+ Cadastrar Professor</a>
+                <a href="/aluno/listar" class="botao-acao">Gerenciar Alunos</a>
+                <a href="/professor/listar" class="botao-acao">Gerenciar Professores</a>
+            </section>
+
+            <section class="acoes-secretaria" th:if="${perfil == 'professor'}">
+                <a href="/aluno/listar" class="botao-acao">Gerenciar Alunos</a>
             </section>
 
             <!-- ============ CARDS DE RESUMO ============ -->
@@ -191,11 +205,21 @@
             <section class="lista-alunos-secao" id="alunos">
                 <div class="cabecalho-secao">
                     <h3>Lista de Alunos</h3>
-                    <input type="search"
-                           id="buscaAluno"
-                           class="busca-aluno"
-                           placeholder="Buscar por nome ou RA"
-                           aria-label="Buscar aluno por nome ou RA">
+                    <form th:action="@{/dashboard#alunos}" method="get" style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <input type="search"
+                               id="buscaAluno"
+                               name="busca"
+                               th:value="${busca}"
+                               class="busca-aluno"
+                               placeholder="Buscar por nome, RA ou e-mail"
+                               aria-label="Buscar aluno por nome, RA ou e-mail">
+                        <button type="submit" class="botao-acao" style="padding: 10px 16px; border: none; cursor: pointer;">Buscar</button>
+                        <a th:if="${busca != null and !busca.isEmpty()}"
+                           th:href="@{/dashboard#alunos}"
+                           style="padding: 9px 14px; border: 2px solid var(--cor-borda); border-radius: 10px; background: var(--cor-branco); color: var(--cor-texto); text-decoration: none; font-size: 14px; font-weight: 600;">
+                            Limpar
+                        </a>
+                    </form>
                 </div>
 
                 <div class="tabela-alunos-wrapper">
@@ -216,7 +240,7 @@
                             </tr>
 
                             <tr th:each="aluno : ${alunos}"
-                                th:attr="data-busca=${aluno.ra + ' ' + aluno.nome}">
+                                th:attr="data-busca=${aluno.ra + ' ' + aluno.nome + ' ' + aluno.email}">
                                 <td th:text="${aluno.ra}">RA</td>
                                 <td th:text="${aluno.nome}">Nome</td>
                                 <td>
@@ -239,22 +263,28 @@
                                                     + ' (' + aluno.taxaAcerto + '%)'}">0/0</span>
                                 </td>
                                 <td>
-                                    <details class="detalhes-aluno">
-                                        <summary>Ver detalhes</summary>
-                                        <p><strong>E-mail:</strong>
-                                            <span th:text="${aluno.email}">email</span></p>
-                                        <p><strong>Telefone do responsável:</strong>
-                                            <span th:text="${aluno.telefoneResponsavel != null
-                                                            ? aluno.telefoneResponsavel : '-'}">-</span></p>
-                                        <p><strong>Idade:</strong>
-                                            <span th:text="${aluno.idade != null ? aluno.idade + ' anos' : '-'}">-</span></p>
-                                        <p><strong>Fez avaliação diagnóstica?</strong>
-                                            <span th:text="${aluno.fezDiagnostica ? 'Sim' : 'Não'}">Não</span></p>
-                                        <p><strong>Pontos diagnósticos:</strong>
-                                            <span th:text="${aluno.pontosDiagnosticos}">0</span></p>
-                                        <p><strong>Pontos gamificados:</strong>
-                                            <span th:text="${aluno.pontosGamificados}">0</span></p>
-                                    </details>
+                                    <div style="display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                                        <a th:href="@{'/aluno/' + ${aluno.id} + '/editar'}"
+                                           style="padding: 4px 10px; border-radius: 6px; background-color: var(--cor-lilas); color: var(--cor-azul-escuro); text-decoration: none; font-size: 13px; font-weight: 600;">
+                                            Editar
+                                        </a>
+                                        <details class="detalhes-aluno">
+                                            <summary>Ver detalhes</summary>
+                                            <p><strong>E-mail:</strong>
+                                                <span th:text="${aluno.email}">email</span></p>
+                                            <p><strong>Telefone do responsável:</strong>
+                                                <span th:text="${aluno.telefoneResponsavel != null
+                                                                ? aluno.telefoneResponsavel : '-'}">-</span></p>
+                                            <p><strong>Idade:</strong>
+                                                <span th:text="${aluno.idade != null ? aluno.idade + ' anos' : '-'}">-</span></p>
+                                            <p><strong>Fez avaliação diagnóstica?</strong>
+                                                <span th:text="${aluno.fezDiagnostica ? 'Sim' : 'Não'}">Não</span></p>
+                                            <p><strong>Pontos diagnósticos:</strong>
+                                                <span th:text="${aluno.pontosDiagnosticos}">0</span></p>
+                                            <p><strong>Pontos gamificados:</strong>
+                                                <span th:text="${aluno.pontosGamificados}">0</span></p>
+                                        </details>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>

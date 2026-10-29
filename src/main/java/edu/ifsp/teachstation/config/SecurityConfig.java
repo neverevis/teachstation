@@ -1,4 +1,3 @@
-
 package edu.ifsp.teachstation.config;
 
 import org.springframework.context.annotation.Bean;
@@ -23,27 +22,33 @@ public class SecurityConfig {
         http
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(auth -> auth
-        	    .requestMatchers(
-        	        "/",
-        	        "/login",
-        	        "/css/**",
-        	        "/js/**",
-        	        "/images/**",
-        	        "/webjars/**").permitAll()
+                .requestMatchers(
+                    "/",
+                    "/login",
+                    "/redefinir-senha",
+                    "/redefinir-senha/**",
+                    "/css/**",
+                    "/js/**",
+                    "/images/**",
+                    "/webjars/**").permitAll()
 
-        	    .requestMatchers(
-        	        "/cadastro-aluno/**",
-        	        "/cadastro-professor/**").hasAuthority("ROLE_SECRETARIA")
+                .requestMatchers(
+                    "/cadastro-aluno/**",
+                    "/cadastro-professor/**",
+                    "/cadastro/aluno/**",
+                    "/cadastro/professor/**",
+                    "/signup/**",
+                    "/professor/**").hasAuthority("ROLE_SECRETARIA")
 
-        	    .requestMatchers("/dashboard")
-        	        .hasAnyAuthority("ROLE_PROFESSOR", "ROLE_SECRETARIA")
+                .requestMatchers("/dashboard", "/aluno/**")
+                    .hasAnyAuthority("ROLE_PROFESSOR", "ROLE_SECRETARIA")
 
-        	    .requestMatchers(
-        	        "/first-test/**",
-        	        "/studyarea/**").hasAnyAuthority("ROLE_ALUNO", "ROLE_PROFESSOR", "ROLE_SECRETARIA")
+                .requestMatchers(
+                    "/first-test/**",
+                    "/studyarea/**").hasAnyAuthority("ROLE_ALUNO", "ROLE_PROFESSOR", "ROLE_SECRETARIA")
 
-        	    .anyRequest().hasAnyAuthority("ROLE_PROFESSOR", "ROLE_SECRETARIA")
-        	)
+                .anyRequest().hasAnyAuthority("ROLE_PROFESSOR", "ROLE_SECRETARIA")
+            )
             .formLogin(form -> form
                 .loginPage("/login")
                 .disable()
