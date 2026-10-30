@@ -1,5 +1,6 @@
 plugins {
 	id 'java'
+	id 'eclipse'
 	id 'org.springframework.boot' version '4.1.0'
 	id 'io.spring.dependency-management' version '1.1.7'
 }
@@ -33,4 +34,9 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+tasks.named('bootRun') {
+	environment 'PATH', "/home/aluno/bin:${System.getenv('PATH')}"
+	environment 'DOCKER_HOST', 'unix:///run/user/1001/docker.sock'
 }

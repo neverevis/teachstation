@@ -157,6 +157,51 @@ body {
     transform: translateY(-1px);
 }
 
+.input-senha-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.input-senha-wrapper input {
+    padding-right: 46px;
+}
+
+.botao-olho,
+.login-container button.botao-olho {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    padding: 4px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--cor-texto-secundario);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.botao-olho:hover,
+.login-container button.botao-olho:hover {
+    color: var(--cor-azul);
+    background-color: rgba(89, 30, 231, 0.08);
+    transform: translateY(-50%);
+    opacity: 1;
+}
+
+.botao-olho svg {
+    width: 20px;
+    height: 20px;
+    pointer-events: none;
+}
+
 .login-container > p {
     margin-top: 24px;
 
