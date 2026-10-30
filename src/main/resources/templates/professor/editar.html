@@ -88,7 +88,13 @@
 
                 <div class="campo-formulario">
                     <label for="senha">Senha:</label>
-                    <input type="password" id="senha" th:field="*{senha}" th:required="${professor.id == null}">
+                    <div class="input-senha-wrapper">
+                        <input type="password" id="senha" th:field="*{senha}" th:required="${professor.id == null}">
+                        <button type="button" id="togglePass" class="botao-olho" aria-label="Mostrar senha" title="Mostrar senha">
+                            <svg class="icone-olho-aberto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                            <svg class="icone-olho-fechado" hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                        </button>
+                    </div>
                     <small th:if="${professor.id != null}" style="color: var(--cor-texto-secundario); margin-top: 4px; font-size: 13px;">
                         Deixe em branco para manter a senha atual.
                     </small>
@@ -109,5 +115,19 @@
 
     <div th:replace="~{fragments/toast :: toast}"></div>
     <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+    <script>
+        "use strict"
+        const senha = document.getElementById("senha");
+        const togglePass = document.getElementById("togglePass");
+
+        togglePass.onclick = function () {
+            const mostrar = senha.getAttribute("type") === "password";
+            senha.setAttribute("type", mostrar ? "text" : "password");
+            togglePass.querySelector(".icone-olho-aberto").hidden = mostrar;
+            togglePass.querySelector(".icone-olho-fechado").hidden = !mostrar;
+            togglePass.setAttribute("title", mostrar ? "Esconder senha" : "Mostrar senha");
+            togglePass.setAttribute("aria-label", mostrar ? "Esconder senha" : "Mostrar senha");
+        };
+    </script>
 </body>
 </html>

@@ -1,6 +1,7 @@
 package edu.ifsp.teachstation.model;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,9 +21,11 @@ public class Questao {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(columnDefinition = "TEXT")
     private String enunciado;
 
     // Texto que o aluno lê antes de responder (coluna texto_apoio)
+    @Column(columnDefinition = "TEXT")
     private String textoApoio;
 
     // Ilustração da questão, ex.: /images/questoes/q1.svg (coluna imagem_url)

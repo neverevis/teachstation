@@ -24,10 +24,15 @@
 	                    <input type="text" id="username" name="username" required>
 	                </div>
 
-	                <div class="campo-formulario">
+	                <div class="campo-formulario">	                
 	                    <label for="password">Senha:</label>
-	                    <input type="password" id="password" name="password" required>
-	                    <button type="button" id="togglePass">Mostrar Senha</button>
+	                    <div class="input-senha-wrapper">
+	                        <input type="password" id="password" name="password" required>
+	                        <button type="button" id="togglePass" class="botao-olho" aria-label="Mostrar senha" title="Mostrar senha">
+	                            <svg class="icone-olho-aberto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+	                            <svg class="icone-olho-fechado" hidden viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+	                        </button>
+	                    </div>
 	                </div>
 
 	                <button type="submit">Entrar</button>
@@ -44,21 +49,18 @@
 		<div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
 		<script>
 			"use strict"
-			const input = document.querySelector("input");
-			const button = document.querySelector("#togglePass");
-			button.addEventListener('click', togglePass);
+			const password = document.getElementById("password");
+			const toggle = document.getElementById("togglePass");
 			
-			function togglePass(){
-			if (input.type == "password"){
-				input.type = "text";
-				button.textContent = "Esconder Senha";
-				}else{
-					input.type = "password";
-					button.textContent = "Mostrar Senha";
-				}
-			}
-
-</script>
+			toggle.onclick = function () {
+			    const mostrar = password.getAttribute("type") === "password";
+			    password.setAttribute("type", mostrar ? "text" : "password");
+			    toggle.querySelector(".icone-olho-aberto").hidden = mostrar;
+			    toggle.querySelector(".icone-olho-fechado").hidden = !mostrar;
+			    toggle.setAttribute("title", mostrar ? "Esconder senha" : "Mostrar senha");
+			    toggle.setAttribute("aria-label", mostrar ? "Esconder senha" : "Mostrar senha");
+			};
+		</script>
 		
 	</body>
 </html>

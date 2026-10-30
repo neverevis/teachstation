@@ -1,5 +1,6 @@
 package edu.ifsp.teachstation.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -22,6 +23,7 @@ public class OpcaoQuestao {
 
     private String letra;
 
+    @Column(columnDefinition = "TEXT")
     private String texto;
 
     private Boolean correta = false;
