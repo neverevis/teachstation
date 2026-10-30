@@ -3,6 +3,7 @@ package edu.ifsp.teachstation.service;
 import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.model.QuestaoGamificada;
 import edu.ifsp.teachstation.model.TentativaGamificada;
+import edu.ifsp.teachstation.persistence.AlunoRepository;
 import edu.ifsp.teachstation.persistence.QuestaoGamificadaRepository;
 import edu.ifsp.teachstation.persistence.TentativaGamificadaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,11 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * Regras dos questionários gamificados: entrega as questões sem o gabarito,
+ * valida as respostas no servidor, controla as tentativas e as rodadas.
+ * Não usa NivelamentoService nem tentativas_atividades (avaliação diagnóstica).
+ */
 @Service
 public class QuizGamificadoService {
 
@@ -40,6 +46,12 @@ public class QuizGamificadoService {
     // O mapa do overworld tem 8 fases; questões em fases acima disso ficam guardadas, sem acesso
     public static final int ULTIMA_FASE_DO_MAPA = 8;
 
+    // Níveis de dificuldade (os mesmos que a avaliação diagnóstica grava em aluno.nivel_atual)
+    public static final String INICIANTE = "INICIANTE";
+    public static final String INTERMEDIARIO = "INTERMEDIARIO";
+    public static final String AVANCADO = "AVANCADO";
+    private static final List<String> NIVEIS = List.of(INICIANTE, INTERMEDIARIO, AVANCADO);
+
     private static final Pattern LACUNA = Pattern.compile("\\{(\\d+)\\}");
 
     @Autowired
@@ -47,6 +59,9 @@ public class QuizGamificadoService {
 
     @Autowired
     private TentativaGamificadaRepository tentativaRepository;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
 
     private final JsonMapper json = JsonMapper.builder().build();
 
@@ -77,11 +92,11 @@ public class QuizGamificadoService {
                                int pontosMaximos, List<ItemResultadoDto> itens, Integer proximaFase) {
     }
 
-    // resultado interno da correção de uma resposta
+    // Resultado interno da correção de uma resposta
     private record Avaliacao(boolean acertou, Map<String, Boolean> detalhes, Map<String, Object> normalizada) {
     }
 
-    // erro de regra de negócio com o status HTTP correspondente
+    // Erro de regra de negócio com o status HTTP correspondente
     public static class QuizException extends RuntimeException {
         private final HttpStatus status;
 
@@ -97,15 +112,16 @@ public class QuizGamificadoService {
 
     // ---------- Operações públicas ----------
 
-    // carrega a fase com o estado do aluno. Com nova=true e a rodada concluída, devolve uma rodada em branco.
+    // Carrega a fase com o estado do aluno. Com nova=true e a rodada concluída, devolve uma rodada em branco.
     @Transactional(readOnly = true)
     public FaseDto obterFase(Aluno aluno, int fase, boolean nova) {
-        List<QuestaoGamificada> questoes = questoesDaFase(fase);
-        exigirFaseLiberada(aluno, fase);
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
+        String nivel = nivelDoAluno(aluno);
+        List<QuestaoGamificada> questoes = questoesDaFase(fase, nivel);
+        exigirFaseLiberada(aluno, fase, nivel);
+        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase, nivel);
 
         int rodada = Math.max(ultima, 1);
-        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase);
+        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase, nivel);
 
         if (nova && ultima > 0 && rodadaConcluida(questoes, tentativas)) {
             rodada = ultima + 1;
@@ -115,7 +131,7 @@ public class QuizGamificadoService {
         return montarFase(fase, rodada, questoes, tentativas);
     }
 
-    // valida a resposta no servidor, grava a tentativa e devolve o novo estado da questão
+    // Valida a resposta no servidor, grava a tentativa e devolve o novo estado da questão
     @Transactional
     public RespostaDto responder(Aluno aluno, Integer questaoId, Map<String, Object> resposta) {
         QuestaoGamificada questao = questaoRepository.findById(questaoId)
@@ -124,13 +140,19 @@ public class QuizGamificadoService {
             throw new QuizException(HttpStatus.BAD_REQUEST, "Resposta inválida.");
         }
 
-        int fase = questao.getFase();
-        List<QuestaoGamificada> questoes = questoesDaFase(fase);
-        exigirFaseLiberada(aluno, fase);
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
-        List<TentativaGamificada> daUltima = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase);
+        // O aluno só responde às questões do nível dele; as dos outros níveis "não existem" para ele
+        String nivel = nivelDoAluno(aluno);
+        if (!nivel.equals(questao.getNivelDificuldade())) {
+            throw new QuizException(HttpStatus.NOT_FOUND, "Questão não encontrada.");
+        }
 
-        // se a última rodada já terminou, a nova resposta inicia a rodada seguinte
+        int fase = questao.getFase();
+        List<QuestaoGamificada> questoes = questoesDaFase(fase, nivel);
+        exigirFaseLiberada(aluno, fase, nivel);
+        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase, nivel);
+        List<TentativaGamificada> daUltima = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase, nivel);
+
+        // Se a última rodada já terminou, a nova resposta inicia a rodada seguinte
         int rodada = 1;
         List<TentativaGamificada> tentativas = List.of();
         if (ultima > 0) {
@@ -162,6 +184,7 @@ public class QuizGamificadoService {
         try {
             tentativaRepository.saveAndFlush(tentativa);
         } catch (DataIntegrityViolationException e) {
+            // A chave única bloqueou uma tentativa repetida (duplo clique ou requisições simultâneas)
             throw new QuizException(HttpStatus.CONFLICT, "Esta resposta já foi registrada. Atualize a página.");
         }
 
@@ -172,26 +195,33 @@ public class QuizGamificadoService {
                 rodadaConcluida(questoes, todas));
     }
 
+    // Fases liberadas para o aluno: a primeira sempre, e cada uma das seguintes só depois de
+    // concluir a anterior (acertando ou errando). As demais aparecem bloqueadas no mapa.
     @Transactional(readOnly = true)
     public List<Integer> listarFasesLiberadas(Aluno aluno) {
-        List<Integer> existentes = fasesDoMapa();
-        List<Integer> liberadas = new ArrayList<>();
-
-        for (int i = 0; i < existentes.size(); i++) {
-            if (i > 0 && !faseConcluida(aluno, existentes.get(i - 1))) {
-                break;
-            }
-            liberadas.add(existentes.get(i));
-        }
-        return liberadas;
+        return fasesLiberadas(aluno, nivelDoAluno(aluno));
     }
 
+    // Código do endereço das questões do aluno no mapa (a, b ou c). O nível em si não aparece para o aluno.
+    public String variante(Aluno aluno) {
+        return codigoDoNivel(nivelDoAluno(aluno));
+    }
+
+    public static String codigoDoNivel(String nivel) {
+        if (INICIANTE.equals(nivel)) {
+            return "a";
+        }
+        return AVANCADO.equals(nivel) ? "c" : "b";
+    }
+
+    // Resultado da última rodada; só existe quando todas as questões foram resolvidas
     @Transactional(readOnly = true)
     public ResultadoDto obterResultado(Aluno aluno, int fase) {
-        List<QuestaoGamificada> questoes = questoesDaFase(fase);
-        exigirFaseLiberada(aluno, fase);
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
-        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase);
+        String nivel = nivelDoAluno(aluno);
+        List<QuestaoGamificada> questoes = questoesDaFase(fase, nivel);
+        exigirFaseLiberada(aluno, fase, nivel);
+        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase, nivel);
+        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase, nivel);
 
         if (ultima == 0 || !rodadaConcluida(questoes, tentativas)) {
             throw new QuizException(HttpStatus.CONFLICT, "Ainda há questões sem resolver.");
@@ -213,12 +243,13 @@ public class QuizGamificadoService {
             pontosMaximos += questao.getPontos();
         }
 
-        List<Integer> existentes = fasesDoMapa();
+        List<Integer> existentes = fasesDoMapa(nivel);
         Integer proximaFase = existentes.contains(fase + 1) ? fase + 1 : null;
 
         return new ResultadoDto(fase, ultima, questoes.size(), acertos, pontos, pontosMaximos, itens, proximaFase);
     }
 
+    // ---------- Montagem do estado ----------
 
     private FaseDto montarFase(int fase, int rodada, List<QuestaoGamificada> questoes,
                                List<TentativaGamificada> tentativas) {
@@ -237,6 +268,7 @@ public class QuizGamificadoService {
                 rodadaConcluida(questoes, tentativas), lista);
     }
 
+    // O gabarito e a explicação só saem do servidor quando a questão está resolvida
     private EstadoDto estadoDe(QuestaoGamificada questao, List<TentativaGamificada> tentativas) {
         int usadas = tentativas.size();
         int max = tentativasMax(questao.getTipo());
@@ -284,14 +316,14 @@ public class QuizGamificadoService {
         return resultado;
     }
 
-    private List<TentativaGamificada> buscarTentativas(Aluno aluno, int rodada, int fase) {
-        return tentativaRepository.findByAlunoIdAndRodadaAndQuestaoGamificadaFaseOrderByIdAsc(
-                aluno.getId(), rodada, fase);
+    private List<TentativaGamificada> buscarTentativas(Aluno aluno, int rodada, int fase, String nivel) {
+        return tentativaRepository.findDaRodada(aluno.getId(), rodada, fase, nivel);
     }
 
-    private List<Integer> fasesDoMapa() {
+    // Fases com questões que existem no mapa, em ordem crescente
+    private List<Integer> fasesDoMapa(String nivel) {
         List<Integer> fases = new ArrayList<>();
-        for (Integer fase : questaoRepository.findFasesDisponiveis()) {
+        for (Integer fase : questaoRepository.findFasesDisponiveis(nivel)) {
             if (fase != null && fase >= 1 && fase <= ULTIMA_FASE_DO_MAPA) {
                 fases.add(fase);
             }
@@ -299,26 +331,51 @@ public class QuizGamificadoService {
         return fases;
     }
 
-    private boolean faseConcluida(Aluno aluno, int fase) {
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
+    // A fase está concluída quando o aluno terminou ao menos uma rodada dela.
+    // Uma rodada nova só começa depois que a anterior terminou, então rodada > 1 já indica isso.
+    private boolean faseConcluida(Aluno aluno, int fase, String nivel) {
+        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase, nivel);
         if (ultima == 0) {
             return false;
         }
         if (ultima > 1) {
             return true;
         }
-        return rodadaConcluida(questaoRepository.findByFaseOrderByOrdemAsc(fase), buscarTentativas(aluno, 1, fase));
+        return rodadaConcluida(questaoRepository.findByFaseAndNivelDificuldadeOrderByOrdemAsc(fase, nivel),
+                buscarTentativas(aluno, 1, fase, nivel));
     }
 
-    private void exigirFaseLiberada(Aluno aluno, int fase) {
-        if (!listarFasesLiberadas(aluno).contains(fase)) {
+    private List<Integer> fasesLiberadas(Aluno aluno, String nivel) {
+        List<Integer> existentes = fasesDoMapa(nivel);
+        List<Integer> liberadas = new ArrayList<>();
+
+        for (int i = 0; i < existentes.size(); i++) {
+            if (i > 0 && !faseConcluida(aluno, existentes.get(i - 1), nivel)) {
+                break;
+            }
+            liberadas.add(existentes.get(i));
+        }
+        return liberadas;
+    }
+
+    // Nível definido na avaliação diagnóstica (imutável). Quem ainda não fez a avaliação usa o nível padrão.
+    private String nivelDoAluno(Aluno aluno) {
+        String nivel = aluno.getNivelAtual();
+        if (nivel == null) {
+            nivel = alunoRepository.findById(aluno.getId()).map(Aluno::getNivelAtual).orElse(null);
+        }
+        return nivel != null && NIVEIS.contains(nivel) ? nivel : INTERMEDIARIO;
+    }
+
+    private void exigirFaseLiberada(Aluno aluno, int fase, String nivel) {
+        if (!fasesLiberadas(aluno, nivel).contains(fase)) {
             throw new QuizException(HttpStatus.FORBIDDEN,
                     "Fase bloqueada. Conclua a fase anterior para liberar esta.");
         }
     }
 
-    private List<QuestaoGamificada> questoesDaFase(int fase) {
-        List<QuestaoGamificada> questoes = questaoRepository.findByFaseOrderByOrdemAsc(fase);
+    private List<QuestaoGamificada> questoesDaFase(int fase, String nivel) {
+        List<QuestaoGamificada> questoes = questaoRepository.findByFaseAndNivelDificuldadeOrderByOrdemAsc(fase, nivel);
         if (questoes.isEmpty()) {
             throw new QuizException(HttpStatus.NOT_FOUND, "Fase não encontrada.");
         }
@@ -329,6 +386,7 @@ public class QuizGamificadoService {
         return PREENCHIMENTO.equals(tipo) ? TENTATIVAS_PREENCHIMENTO : TENTATIVAS_UMA;
     }
 
+    // ---------- Correção ----------
 
     private Avaliacao avaliar(QuestaoGamificada questao, Map<String, Object> resposta) {
         Map<String, Object> conteudo = lerMapa(questao.getConteudoJson());
@@ -342,6 +400,7 @@ public class QuizGamificadoService {
         };
     }
 
+    // resposta: {"pares": {"<idFrase>": "<idPalavra>", ...}}
     private Avaliacao avaliarAssociacao(Map<String, Object> conteudo, Map<String, Object> gabarito,
                                         Map<String, Object> resposta) {
         Set<String> frases = ids(conteudo.get("esquerda"));
@@ -371,6 +430,7 @@ public class QuizGamificadoService {
         return new Avaliacao(acertou, detalhes, normalizada);
     }
 
+    // resposta: {"lacunas": {"<numeroDaLacuna>": "<idDaOpcao>", ...}}
     private Avaliacao avaliarPreenchimento(Map<String, Object> conteudo, Map<String, Object> gabarito,
                                            Map<String, Object> resposta) {
         Set<String> lacunas = new LinkedHashSet<>();
@@ -405,6 +465,7 @@ public class QuizGamificadoService {
         return new Avaliacao(acertou, detalhes, normalizada);
     }
 
+    // resposta: {"opcao": "A" | "B" | "C" | "D"}
     private Avaliacao avaliarMultiplaEscolha(Map<String, Object> conteudo, Map<String, Object> gabarito,
                                              Map<String, Object> resposta) {
         Set<String> opcoes = ids(conteudo.get("opcoes"));
@@ -424,12 +485,14 @@ public class QuizGamificadoService {
         return new Avaliacao(acertou, detalhes, normalizada);
     }
 
+    // ---------- Utilidades de JSON ----------
 
     private Map<String, Object> lerMapa(String texto) {
         return json.readValue(texto, new TypeReference<Map<String, Object>>() {
         });
     }
 
+    // Coleta o campo "id" de cada item de uma lista de objetos
     private Set<String> ids(Object lista) {
         Set<String> resultado = new LinkedHashSet<>();
         if (lista instanceof List<?> itens) {
@@ -442,7 +505,7 @@ public class QuizGamificadoService {
         return resultado;
     }
 
-
+    // Converte um objeto JSON {"x": "y"} em Map<String, String>, rejeitando qualquer outro formato
     private Map<String, String> textoPorTexto(Object valor) {
         if (!(valor instanceof Map<?, ?> mapa)) {
             throw new QuizException(HttpStatus.BAD_REQUEST, "Resposta inválida.");

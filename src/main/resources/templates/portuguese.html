@@ -3,72 +3,72 @@
 	<head>
 		<meta charset="UTF-8">
 		<link rel="stylesheet" th:href="@{/css/styles.css}">
-		<link rel="stylesheet" th:href="@{/css/study-map.css}">
+		<link rel="stylesheet" th:href="@{/css/study-map.css}">		
 		<link rel="stylesheet" th:href="@{/css/study-map-bloqueio.css}">
 		<title>Língua Portuguesa - Fases</title>
 	</head>
 <body>
-	<div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
-	<div class="map-container">
+	<div class="map-container">		
 		<div class="map-background"></div>
 
-		<div>
+		<div>				 
+			<!-- <a th:href="@{/studyarea/portuguese/level2}"> -->
 			<a th:href="@{#}">
-				<div id="btn1" class="map-button">
+				<div id="btn1" class="map-button">			
 				</div>
 			</a>
-
+		
 			<a th:href="@{#}">
-				<div id="btn2" class="map-button">
+				<div id="btn2" class="map-button">			
 				</div>
 			</a>
-
+			
 			<a th:href="@{#}">
-				<div id="btn3" class="map-button">
+				<div id="btn3" class="map-button">			
 				</div>
 			</a>
-
+			
 			<a th:href="@{#}">
-				<div id="btn4" class="map-button">
+				<div id="btn4" class="map-button">			
 				</div>
 			</a>
-
+			
 			<a th:href="@{#}">
-				<div id="btn5" class="map-button">
+				<div id="btn5" class="map-button">			
 				</div>
 			</a>
-
+			
 			<a th:href="@{#}">
-				<div id="btn6" class="map-button">
+				<div id="btn6" class="map-button">			
 				</div>
 			</a>
-
+			
 			<a th:href="@{#}">
-				<div id="btn7" class="map-button">
+				<div id="btn7" class="map-button">			
 				</div>
 			</a>
-
+			
 			<a th:href="@{#}">
-				<div id="btn8" class="map-button">
+				<div id="btn8" class="map-button">			
 				</div>
 			</a>
-
+			
 			<div id="game-card" class="game-card">
 				<div class="game-card-cover">
 					<span id="game-card-phase" class="game-card-phase">Fase 1</span>
 				</div>
 				<p class="game-card-title">Pronto para começar?</p>
-				<a id="game-card-link" th:href="@{#}" class="game-card-btn">INICIAR</a>
+				<a id="game-card-link" th:href="@{#}" th:data-variante="${variante}" class="game-card-btn">INICIAR</a>
 			</div>
 		</div>
 	</div>
 	<script th:src="@{/js/map.js}"></script>
 	<script>
-
+			
 		// x% = (pixelX / larguraOriginalDoMapa) * 100
 		// x% = ( 60 / 1920) * 100
 		// y% = (pixelY / alturaOriginalDoMapa) * 100
-
+		
 		let botao1 = document.getElementById("btn1");
 		let botao2 = document.getElementById("btn2");
 		let botao3 = document.getElementById("btn3");
@@ -77,14 +77,14 @@
 		let botao6 = document.getElementById("btn6");
 		let botao7 = document.getElementById("btn7");
 		let botao8 = document.getElementById("btn8");
-
-
+				
+		
 		let gameCard = document.getElementById("game-card")
 		let gameCardLink = document.getElementById("game-card-link");
 		let gameCardPhase = document.getElementById("game-card-phase");
 		let gameCardTitle = gameCard.querySelector(".game-card-title");
-
-
+		
+		
 		let levels = [
 		    { button: botao1, position: new Vector2((180 / 1920) * 100, (797 / 1080) * 100) },
 		    { button: botao2, position: new Vector2((343 / 1920) * 100, (707 / 1080) * 100) },
@@ -92,23 +92,24 @@
 			{ button: botao4, position: new Vector2((775 / 1920) * 100, (564 / 1080) * 100) },
 			{ button: botao5, position: new Vector2((1302 / 1920) * 100, (911 / 1080) * 100)  },
 			{ button: botao6, position: new Vector2((1446 / 1920) * 100, (659 / 1080) * 100) },
-			{ button: botao7, position: new Vector2((1674 / 1920) * 100, (444 / 1080) * 100) },
-			{ button: botao8, position: new Vector2((1332 / 1920) * 100, (276 / 1080) * 100) }
+			{ button: botao7, position: new Vector2((1674 / 1920) * 100, (444 / 1080) * 100) },						
+			{ button: botao8, position: new Vector2((1332 / 1920) * 100, (276 / 1080) * 100) }			
 		];
-
+		
 		/*
 			btn1:
 			btn2: (534 / 1920) * 100, (656 / 1080) * 100)
-			btn3: (694 / 1920) * 100, (518 / 1080) * 100)
+			btn3: (694 / 1920) * 100, (518 / 1080) * 100) 
 			btn4:
-			btn5:
+			btn5: 
 			btn6: (1199 / 1920) * 100, (626 / 1080) * 100)
 		 */
-
+		
 		let gameObjects = levels.map(level => new GameObject(level.button, level.position));
-
+	
 		let cardObject = new GameCard(gameCard, levels[0].position, 35 )
-
+		
+		// Fases que já têm questões. Começa só com a fase 1 e é atualizada pelo servidor (veja o fetch abaixo).
 		let fasesDisponiveis = [1];
 		let faseSelecionada = 1;
 
@@ -116,12 +117,15 @@
 			return fasesDisponiveis.includes(numero);
 		}
 
+		// Cinza + cadeado nos botões das fases sem conteúdo
 		function atualizarBloqueios() {
 			levels.forEach((level, index) => {
 				level.button.classList.toggle("map-button-bloqueado", !faseDisponivel(index + 1));
 			});
 		}
 
+		// Atualiza o cartão (título, botão e link) para a fase escolhida.
+		// Também é chamada ao abrir a página, para o INICIAR já funcionar sem precisar clicar em nenhuma fase.
 		function selecionarFase(numero, animar) {
 			const level = levels[numero - 1];
 			faseSelecionada = numero;
@@ -137,7 +141,7 @@
 				gameCard.classList.remove("game-card-bloqueada");
 				gameCardTitle.textContent = "Pronto para começar?";
 				gameCardLink.textContent = "INICIAR";
-				gameCardLink.setAttribute("href", `/studyarea/portuguese/level${numero}`);
+				gameCardLink.setAttribute("href", `/studyarea/portuguese/level${numero}/${gameCardLink.dataset.variante}`);
 				gameCardLink.removeAttribute("aria-disabled");
 			} else {
 				gameCard.classList.add("game-card-bloqueada");
@@ -175,10 +179,10 @@
 				}
 			})
 			.catch(() => { /* sem resposta do servidor: continua só com a fase 1 liberada */ });
-
+			
 	</script>
-
+	
 	<div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
-
+	
 </body>
 </html>

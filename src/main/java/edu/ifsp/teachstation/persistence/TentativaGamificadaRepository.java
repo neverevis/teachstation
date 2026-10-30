@@ -11,33 +11,17 @@ import edu.ifsp.teachstation.model.TentativaGamificada;
 @Repository
 public interface TentativaGamificadaRepository extends JpaRepository<TentativaGamificada, Integer> {
 
-    // Todas as tentativas de um aluno em uma rodada de uma fase, na ordem em que foram feitas
-    List<TentativaGamificada> findByAlunoIdAndRodadaAndQuestaoGamificadaFaseOrderByIdAsc(
-            Integer alunoId, Integer rodada, Integer fase);
+    // Todas as tentativas de um aluno em uma rodada de uma fase (no nível dele), na ordem em que foram feitas
+    @Query("SELECT t FROM TentativaGamificada t "
+            + "WHERE t.aluno.id = :alunoId AND t.rodada = :rodada AND t.questaoGamificada.fase = :fase "
+            + "AND t.questaoGamificada.nivelDificuldade = :nivel ORDER BY t.id ASC")
+    List<TentativaGamificada> findDaRodada(@Param("alunoId") Integer alunoId, @Param("rodada") Integer rodada,
+                                           @Param("fase") Integer fase, @Param("nivel") String nivel);
 
-    // Última rodada jogada pelo aluno na fase (0 se nunca jogou)
+    // Última rodada jogada pelo aluno na fase, no nível dele (0 se nunca jogou)
     @Query("SELECT COALESCE(MAX(t.rodada), 0) FROM TentativaGamificada t "
-            + "WHERE t.aluno.id = :alunoId AND t.questaoGamificada.fase = :fase")
-    Integer findUltimaRodada(@Param("alunoId") Integer alunoId, @Param("fase") Integer fase);
-    
-    // Soma total de acertos nas tentativas gamificadas de todos os alunos
-    @Query("SELECT COALESCE(SUM(CASE WHEN t.acertou = true THEN 1 ELSE 0 END), 0) " + "FROM TentativaGamificada t")
-    long countAcertosGamificados();
-
-    // Total de tentativas gamificadas registradas
-    @Query("SELECT COUNT(t) FROM TentativaGamificada t")
-    long countTentativasGamificadas();
-
-    // Total de acertos de um aluno
-    @Query("SELECT COALESCE(SUM(CASE WHEN t.acertou = true THEN 1 ELSE 0 END), 0) " + "FROM TentativaGamificada t WHERE t.aluno.id = :alunoId")
-    int countAcertosByAluno(@Param("alunoId") Integer alunoId);
-
-    // Total de tentativas de um aluno
-    long countByAlunoId(Integer alunoId);
-
-    // Soma de pontos gamificados de um aluno
-    @Query("SELECT COALESCE(SUM(t.pontosObtidos), 0) FROM TentativaGamificada t WHERE t.aluno.id = :alunoId")
-    int sumPontosByAluno(@Param("alunoId") Integer alunoId);
-    
-    
+            + "WHERE t.aluno.id = :alunoId AND t.questaoGamificada.fase = :fase "
+            + "AND t.questaoGamificada.nivelDificuldade = :nivel")
+    Integer findUltimaRodada(@Param("alunoId") Integer alunoId, @Param("fase") Integer fase,
+                             @Param("nivel") String nivel);
 }

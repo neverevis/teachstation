@@ -1,7 +1,4 @@
--- =====================================================
 -- TeachStation - Banco de Dados
--- =====================================================
-
 
 SET NAMES utf8mb4;
 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0;
@@ -235,8 +232,103 @@ DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
 
 -- =====================================================
+-- QUESTIONÁRIOS GAMIFICADOS (quizzes das fases do mapa)
+-- =====================================================
+-- Ficam em tabelas próprias de propósito: a Avaliação Diagnóstica
+-- (FirstTestController) carrega todas as questões da área 1 e usa a quantidade
+-- de linhas de `tentativas_atividades` do aluno como posição na prova. Misturar
+-- as questões ou as tentativas gamificadas nessas tabelas alteraria a avaliação.
+
+-- =====================================================
+-- Tabela: questoes_gamificadas
+-- =====================================================
+-- tipo:          ASSOCIACAO | PREENCHIMENTO | MULTIPLA_ESCOLHA
+-- nivel_dificuldade: INICIANTE | INTERMEDIARIO | AVANCADO. Cada fase tem uma questão de cada
+--                nível; o aluno só recebe as do nível definido na avaliação diagnóstica.
+-- questao_id:    questão original em `questoes`, quando houver correspondência
+--                (NULL nas questões novas, adaptadas do banco de questões).
+-- conteudo_json: parte exibida ao aluno (sem gabarito).
+-- gabarito_json: respostas corretas; fica somente no servidor até a questão ser resolvida.
+-- origem:        simulado/questão que inspirou a adaptação (rastreabilidade).
+
+CREATE TABLE IF NOT EXISTS `questoes_gamificadas` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `questao_id` INT NULL DEFAULT NULL,
+    `area_id` INT NOT NULL,
+    `fase` INT NOT NULL DEFAULT 1,
+    `ordem` INT NOT NULL,
+    `nivel_dificuldade` VARCHAR(20) NOT NULL DEFAULT 'INTERMEDIARIO',
+    `tipo` ENUM('ASSOCIACAO', 'PREENCHIMENTO', 'MULTIPLA_ESCOLHA') NOT NULL,
+    `enunciado` TEXT NOT NULL,
+    `texto_apoio` TEXT NULL DEFAULT NULL,
+    `conteudo_json` TEXT NOT NULL,
+    `gabarito_json` TEXT NOT NULL,
+    `explicacao` TEXT NULL DEFAULT NULL,
+    `pontos` INT NOT NULL DEFAULT 10,
+    `origem` VARCHAR(255) NULL DEFAULT NULL,
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_questoes_gamificadas_fase_nivel_ordem` (`fase` ASC, `nivel_dificuldade` ASC, `ordem` ASC) VISIBLE,
+    INDEX `questao_id` (`questao_id` ASC) VISIBLE,
+    INDEX `area_id` (`area_id` ASC) VISIBLE,
+
+    CONSTRAINT `questoes_gamificadas_ibfk_1`
+        FOREIGN KEY (`questao_id`)
+        REFERENCES `questoes` (`id`)
+        ON DELETE SET NULL,
+
+    CONSTRAINT `questoes_gamificadas_ibfk_2`
+        FOREIGN KEY (`area_id`)
+        REFERENCES `areas_conhecimento` (`id`)
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+-- =====================================================
+-- Tabela: tentativas_gamificadas
+-- =====================================================
+-- Uma linha por tentativa de resposta. `rodada` permite jogar a fase de novo
+-- sem apagar o histórico. A chave única impede registrar duas vezes a mesma
+-- tentativa (duplo clique ou requisições simultâneas).
+
+CREATE TABLE IF NOT EXISTS `tentativas_gamificadas` (
+    `id` INT NOT NULL AUTO_INCREMENT,
+    `aluno_id` INT NOT NULL,
+    `questao_gamificada_id` INT NOT NULL,
+    `rodada` INT NOT NULL DEFAULT 1,
+    `numero_tentativa` INT NOT NULL,
+    `resposta_json` TEXT NOT NULL,
+    `acertou` TINYINT(1) NOT NULL,
+    `pontos_obtidos` INT NOT NULL DEFAULT 0,
+    `data_tentativa` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    UNIQUE INDEX `uk_tentativas_gamificadas`
+        (`aluno_id` ASC, `questao_gamificada_id` ASC, `rodada` ASC, `numero_tentativa` ASC) VISIBLE,
+    INDEX `questao_gamificada_id` (`questao_gamificada_id` ASC) VISIBLE,
+
+    CONSTRAINT `tentativas_gamificadas_ibfk_1`
+        FOREIGN KEY (`aluno_id`)
+        REFERENCES `aluno` (`id`)
+        ON DELETE CASCADE,
+
+    CONSTRAINT `tentativas_gamificadas_ibfk_2`
+        FOREIGN KEY (`questao_gamificada_id`)
+        REFERENCES `questoes_gamificadas` (`id`)
+        ON DELETE CASCADE
+)
+ENGINE = InnoDB
+DEFAULT CHARACTER SET = utf8mb4
+COLLATE = utf8mb4_0900_ai_ci;
+
+
+
+-- =====================================================
 -- POPULAÇÃO INICIAL DO BANCO
 -- =====================================================
+
+USE `teachstation`;
 
 -- =====================================================
 -- Usuários
@@ -273,8 +365,8 @@ VALUES
 INSERT IGNORE INTO `professor`
 (`id`, `prontuario`, `telefone`, `area_atuacao`)
 VALUES
-
-(5, 'AQ000124', '(16) 99999-5555', 'Língua Portuguesa');
+(3, 'P000123', '(16) 99999-3333', 'Língua Portuguesa'),
+(5, 'P000124', '(16) 99999-5555', 'Língua Portuguesa');
 
 -- =====================================================
 -- Secretaria
@@ -283,7 +375,7 @@ VALUES
 INSERT IGNORE INTO `secretaria`
 (`id`, `codigo_funcionario`)
 VALUES
-
+(4, 'SEC001'),
 (6, 'SEC002');
 
 -- =====================================================
@@ -456,90 +548,12 @@ VALUES
 
 
 -- =====================================================
--- Tabela: questoes_gamificadas
--- =====================================================
--- tipo:          ASSOCIACAO | PREENCHIMENTO | MULTIPLA_ESCOLHA
--- questao_id:    questão original em `questoes`, quando houver correspondência
---                (NULL nas questões novas, adaptadas do banco de questões).
--- conteudo_json: parte exibida ao aluno (sem gabarito).
--- gabarito_json: respostas corretas; fica somente no servidor até a questão ser resolvida.
--- origem:        simulado/questão que inspirou a adaptação (rastreabilidade).
-
-CREATE TABLE IF NOT EXISTS `questoes_gamificadas` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `questao_id` INT NULL DEFAULT NULL,
-    `area_id` INT NOT NULL,
-    `fase` INT NOT NULL DEFAULT 1,
-    `ordem` INT NOT NULL,
-    `tipo` ENUM('ASSOCIACAO', 'PREENCHIMENTO', 'MULTIPLA_ESCOLHA') NOT NULL,
-    `enunciado` TEXT NOT NULL,
-    `texto_apoio` TEXT NULL DEFAULT NULL,
-    `conteudo_json` TEXT NOT NULL,
-    `gabarito_json` TEXT NOT NULL,
-    `explicacao` TEXT NULL DEFAULT NULL,
-    `pontos` INT NOT NULL DEFAULT 10,
-    `origem` VARCHAR(255) NULL DEFAULT NULL,
-
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `uk_questoes_gamificadas_fase_ordem` (`fase` ASC, `ordem` ASC) VISIBLE,
-    INDEX `questao_id` (`questao_id` ASC) VISIBLE,
-    INDEX `area_id` (`area_id` ASC) VISIBLE,
-
-    CONSTRAINT `questoes_gamificadas_ibfk_1`
-        FOREIGN KEY (`questao_id`)
-        REFERENCES `questoes` (`id`)
-        ON DELETE SET NULL,
-
-    CONSTRAINT `questoes_gamificadas_ibfk_2`
-        FOREIGN KEY (`area_id`)
-        REFERENCES `areas_conhecimento` (`id`)
-)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- =====================================================
--- Tabela: tentativas_gamificadas
--- =====================================================
--- Uma linha por tentativa de resposta. `rodada` permite jogar a fase de novo
--- sem apagar o histórico. A chave única impede registrar duas vezes a mesma
--- tentativa (duplo clique ou requisições simultâneas).
-
-CREATE TABLE IF NOT EXISTS `tentativas_gamificadas` (
-    `id` INT NOT NULL AUTO_INCREMENT,
-    `aluno_id` INT NOT NULL,
-    `questao_gamificada_id` INT NOT NULL,
-    `rodada` INT NOT NULL DEFAULT 1,
-    `numero_tentativa` INT NOT NULL,
-    `resposta_json` TEXT NOT NULL,
-    `acertou` TINYINT(1) NOT NULL,
-    `pontos_obtidos` INT NOT NULL DEFAULT 0,
-    `data_tentativa` DATETIME NULL DEFAULT CURRENT_TIMESTAMP,
-
-    PRIMARY KEY (`id`),
-    UNIQUE INDEX `uk_tentativas_gamificadas`
-        (`aluno_id` ASC, `questao_gamificada_id` ASC, `rodada` ASC, `numero_tentativa` ASC) VISIBLE,
-    INDEX `questao_gamificada_id` (`questao_gamificada_id` ASC) VISIBLE,
-
-    CONSTRAINT `tentativas_gamificadas_ibfk_1`
-        FOREIGN KEY (`aluno_id`)
-        REFERENCES `aluno` (`id`)
-        ON DELETE CASCADE,
-
-    CONSTRAINT `tentativas_gamificadas_ibfk_2`
-        FOREIGN KEY (`questao_gamificada_id`)
-        REFERENCES `questoes_gamificadas` (`id`)
-        ON DELETE CASCADE
-)
-ENGINE = InnoDB
-DEFAULT CHARACTER SET = utf8mb4
-COLLATE = utf8mb4_0900_ai_ci;
-
-
--- =====================================================
--- Questões gamificadas - Português: 1 questão por fase do overworld (fases 1 a 8;
--- as questões 9 e 10 ficam guardadas nas fases 9 e 10, ainda sem botão no mapa)
+-- Questões gamificadas - Português: 1 questão por fase do overworld, em 3 níveis de dificuldade.
+--   ids  1 a 10  INTERMEDIARIO  (fase = id)
+--   ids 11 a 20  INICIANTE      (fase = id - 10): mais simples e direta
+--   ids 21 a 30  AVANCADO       (fase = id - 20): um pouco mais aprofundada
+-- O mapa tem 8 fases; as fases 9 e 10 ficam guardadas, ainda sem botão no mapa.
+-- O nível do aluno vem da avaliação diagnóstica (aluno.nivel_atual) e o aluno não vê o nível.
 -- =====================================================
 -- Todas adaptadas do banco de questões (Simulados A1 e B1, 2º semestre).
 -- Nenhuma das 10 questões já cadastradas em `questoes` foi reutilizada.
@@ -551,69 +565,64 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- Gabarito (derivado do próprio texto adaptado; as fotos do banco não trazem gabarito):
 --   MC:     q1 = B | q4 = C | q7 = D | q10 = A
 --   ASSOC e PREENCH: ver gabarito_json de cada linha.
--- Colunas: id, questao_id, area_id, fase, ordem, tipo, enunciado, texto_apoio,
+-- Gabarito das 20 questões novas: ver gabarito_json de cada linha.
+-- Colunas: id, questao_id, area_id, fase, ordem, nivel_dificuldade, tipo, enunciado, texto_apoio,
 --          conteudo_json, gabarito_json, explicacao, pontos, origem
 
 INSERT IGNORE INTO `questoes_gamificadas`
-(`id`, `questao_id`, `area_id`, `fase`, `ordem`, `tipo`, `enunciado`, `texto_apoio`,
+(`id`, `questao_id`, `area_id`, `fase`, `ordem`, `nivel_dificuldade`, `tipo`, `enunciado`, `texto_apoio`,
  `conteudo_json`, `gabarito_json`, `explicacao`, `pontos`, `origem`)
 VALUES
-(1, NULL, 1, 1, 1, 'MULTIPLA_ESCOLHA', 'A visita de Clara era mais do que uma simples visita porque', 'Para Bia, foi uma novidade e tanto saber que sua prima Clara viria passar uma semana em sua casa, em Brasília. Bia ficou feliz por ter companhia no quarto.
+(1, NULL, 1, 1, 1, 'INTERMEDIARIO', 'MULTIPLA_ESCOLHA', 'A visita de Clara era mais do que uma simples visita porque', 'Para Bia, foi uma novidade e tanto saber que sua prima Clara viria passar uma semana em sua casa, em Brasília. Bia ficou feliz por ter companhia no quarto.
 Mas a viagem de Clara era mais do que uma simples visita: ela morava em São Paulo e tinha sido escolhida para representar sua escola numa viagem de crianças de todo o país. Lá, seria recebida pelo próprio presidente da República, e seria Clara quem iria discursar para ele.
 Clara tinha só dez anos, como Bia, mas já fazia coisas de gente grande!', '{"opcoes":[{"id":"A","texto":"ela morava em São Paulo e iria conhecer Brasília pela primeira vez."},{"id":"B","texto":"ela faria um discurso para o presidente da República."},{"id":"C","texto":"ela e Bia trocariam confidências e falariam dos meninos da escola."},{"id":"D","texto":"ela deixaria Bia contente por ter uma companhia no quarto."}]}', '{"correta":"B"}', 'No texto, Clara foi escolhida para discursar para o presidente da República. Isso torna a visita especial. Ter companhia no quarto é um motivo comum a qualquer visita.', 10, 'Simulado A1 q13 (Livro 1) - texto adaptado'),
-(2, NULL, 1, 2, 1, 'ASSOCIACAO', 'Conecte cada frase à palavra que ela define.', NULL, '{"esquerda":[{"id":"a","texto":"Pessoa que gasta dinheiro em excesso, sem se preocupar com o futuro."},{"id":"b","texto":"Grupo de pessoas escolhido para representar outras e agir em nome delas."},{"id":"c","texto":"Palavra muito grande e difícil de pronunciar, como “paralelepípedo”."},{"id":"d","texto":"Que chega sempre na hora certa, sem atrasos."}],"direita":[{"id":"1","texto":"palavrão"},{"id":"2","texto":"pontual"},{"id":"3","texto":"delegação"},{"id":"4","texto":"perdulário"}]}', '{"a":"4","b":"3","c":"1","d":"2"}', 'Perdulário e delegação vêm dos glossários das avaliações. Em “palavrão”, o sufixo -ão indica tamanho grande (palavra grande). Pontual descreve quem não se atrasa.', 10, 'Simulados A1 q22 e q13 (glossários), A1 q2 e B1 q15 (palavrão) - vocabulário'),
-(3, NULL, 1, 3, 1, 'PREENCHIMENTO', 'Complete a frase da receita com o verbo no tempo correto.', 'Arroz doce - modo de preparo
+(2, NULL, 1, 2, 1, 'INTERMEDIARIO', 'ASSOCIACAO', 'Conecte cada frase à palavra que ela define.', NULL, '{"esquerda":[{"id":"a","texto":"Pessoa que gasta dinheiro em excesso, sem se preocupar com o futuro."},{"id":"b","texto":"Grupo de pessoas escolhido para representar outras e agir em nome delas."},{"id":"c","texto":"Palavra muito grande e difícil de pronunciar, como “paralelepípedo”."},{"id":"d","texto":"Que chega sempre na hora certa, sem atrasos."}],"direita":[{"id":"1","texto":"palavrão"},{"id":"2","texto":"pontual"},{"id":"3","texto":"delegação"},{"id":"4","texto":"perdulário"}]}', '{"a":"4","b":"3","c":"1","d":"2"}', 'Perdulário e delegação vêm dos glossários das avaliações. Em “palavrão”, o sufixo -ão indica tamanho grande (palavra grande). Pontual descreve quem não se atrasa.', 10, 'Simulados A1 q22 e q13 (glossários), A1 q2 e B1 q15 (palavrão) - vocabulário'),
+(3, NULL, 1, 3, 1, 'INTERMEDIARIO', 'PREENCHIMENTO', 'Complete a frase da receita com o verbo no tempo correto.', 'Arroz doce - modo de preparo
 1. Coloque o arroz para cozinhar com quatro medidas de água.
 2. Complete a frase do próximo passo, logo abaixo.
 3. Desligue o fogo e acrescente o leite condensado e o creme de leite.', '{"frase":"Quando o arroz {1} bem molinho, acrescente o leite de coco e deixe ferver por mais dois minutos.","opcoes":[{"id":"o1","texto":"estava"},{"id":"o2","texto":"estiver"},{"id":"o3","texto":"estará"},{"id":"o4","texto":"estaria"}]}', '{"1":"o2"}', 'Em instruções que indicam uma condição futura, usa-se o futuro do subjuntivo depois de “quando”: “quando o arroz estiver bem molinho”.', 10, 'Simulado A1 q14 (Livro 1) - receita de arroz doce'),
-(4, NULL, 1, 4, 1, 'MULTIPLA_ESCOLHA', 'No texto, a expressão “vrrrum” representa', 'Dona Lia levou o neto à praça. De repente, uma moto passou pela rua — vrrrum! — e levantou a poeira.
+(4, NULL, 1, 4, 1, 'INTERMEDIARIO', 'MULTIPLA_ESCOLHA', 'No texto, a expressão “vrrrum” representa', 'Dona Lia levou o neto à praça. De repente, uma moto passou pela rua — vrrrum! — e levantou a poeira.
 O menino tapou o nariz e riu:
 — Vovó, a moto vai tão rápido que parece um foguete!', '{"opcoes":[{"id":"A","texto":"a voz de Dona Lia."},{"id":"B","texto":"a fala do neto."},{"id":"C","texto":"o barulho da moto."},{"id":"D","texto":"o som da praça."}]}', '{"correta":"C"}', '“Vrrrum” imita o barulho da moto passando. Esse recurso, que escreve um som, chama-se onomatopeia.', 10, 'Simulado A1 q7 e q8 (Livro 1) - onomatopeia, texto adaptado'),
-(5, NULL, 1, 5, 1, 'ASSOCIACAO', 'Conecte cada frase ao gênero textual que ela descreve.', NULL, '{"esquerda":[{"id":"a","texto":"Texto que traz ingredientes e modo de preparo para ensinar a fazer um prato."},{"id":"b","texto":"Texto que usa imagens e frases curtas para convencer o público a participar de uma campanha."},{"id":"c","texto":"Texto escrito em versos, que costuma brincar com os sons e com as emoções."},{"id":"d","texto":"Texto que informa os leitores sobre um fato recente."}],"direita":[{"id":"1","texto":"poema"},{"id":"2","texto":"notícia"},{"id":"3","texto":"receita"},{"id":"4","texto":"cartaz"}]}', '{"a":"3","b":"4","c":"1","d":"2"}', 'Cada gênero tem uma função: a receita instrui, o cartaz convence, o poema trabalha com versos e emoções, e a notícia informa sobre fatos.', 10, 'Simulados A1 q11, q14, q17, q18 e B1 q18 - gêneros textuais'),
-(6, NULL, 1, 6, 1, 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"Na semana passada, o pediatra {1} que não se deve misturar sorvete com gripe. A partir de amanhã, as crianças {2} sorvete só depois de ficarem boas.","opcoes":[{"id":"o1","texto":"explicará"},{"id":"o2","texto":"tomarão"},{"id":"o3","texto":"explicou"},{"id":"o4","texto":"tomaram"}]}', '{"1":"o3","2":"o2"}', '“Na semana passada” pede o passado (explicou). “A partir de amanhã” pede o futuro (tomarão). Os verbos também precisam concordar: o pediatra explicou; as crianças tomarão.', 10, 'Simulado A1 q10 e B1 q17 (Livro 1 e 2) - tema do sorvete, frase nova'),
-(7, NULL, 1, 7, 1, 'MULTIPLA_ESCOLHA', 'A ideia principal do texto é', 'Em 2006, os astrônomos decidiram que Plutão não é mais considerado um planeta. Eles criaram uma nova categoria, a dos “planetas-anões”, e passaram a classificar Plutão nela.
+(5, NULL, 1, 5, 1, 'INTERMEDIARIO', 'ASSOCIACAO', 'Conecte cada frase ao gênero textual que ela descreve.', NULL, '{"esquerda":[{"id":"a","texto":"Texto que traz ingredientes e modo de preparo para ensinar a fazer um prato."},{"id":"b","texto":"Texto que usa imagens e frases curtas para convencer o público a participar de uma campanha."},{"id":"c","texto":"Texto escrito em versos, que costuma brincar com os sons e com as emoções."},{"id":"d","texto":"Texto que informa os leitores sobre um fato recente."}],"direita":[{"id":"1","texto":"poema"},{"id":"2","texto":"notícia"},{"id":"3","texto":"receita"},{"id":"4","texto":"cartaz"}]}', '{"a":"3","b":"4","c":"1","d":"2"}', 'Cada gênero tem uma função: a receita instrui, o cartaz convence, o poema trabalha com versos e emoções, e a notícia informa sobre fatos.', 10, 'Simulados A1 q11, q14, q17, q18 e B1 q18 - gêneros textuais'),
+(6, NULL, 1, 6, 1, 'INTERMEDIARIO', 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"Na semana passada, o pediatra {1} que não se deve misturar sorvete com gripe. A partir de amanhã, as crianças {2} sorvete só depois de ficarem boas.","opcoes":[{"id":"o1","texto":"explicará"},{"id":"o2","texto":"tomarão"},{"id":"o3","texto":"explicou"},{"id":"o4","texto":"tomaram"}]}', '{"1":"o3","2":"o2"}', '“Na semana passada” pede o passado (explicou). “A partir de amanhã” pede o futuro (tomarão). Os verbos também precisam concordar: o pediatra explicou; as crianças tomarão.', 10, 'Simulado A1 q10 e B1 q17 (Livro 1 e 2) - tema do sorvete, frase nova'),
+(7, NULL, 1, 7, 1, 'INTERMEDIARIO', 'MULTIPLA_ESCOLHA', 'A ideia principal do texto é', 'Em 2006, os astrônomos decidiram que Plutão não é mais considerado um planeta. Eles criaram uma nova categoria, a dos “planetas-anões”, e passaram a classificar Plutão nela.
 Assim, o Sistema Solar tem oito planetas: Mercúrio, Vênus, Terra, Marte, Júpiter, Saturno, Urano e Netuno.', '{"opcoes":[{"id":"A","texto":"a descoberta de Plutão no Sistema Solar."},{"id":"B","texto":"o surgimento de um novo planeta."},{"id":"C","texto":"a classificação dos satélites naturais."},{"id":"D","texto":"a nova classificação de Plutão como planeta-anão."}]}', '{"correta":"D"}', 'O texto trata da mudança na classificação de Plutão, que deixou de ser planeta e passou a ser planeta-anão.', 10, 'Simulado B1 q7 (Livro 2) - texto adaptado'),
-(8, NULL, 1, 8, 1, 'ASSOCIACAO', 'Conecte cada descrição ao personagem do folclore brasileiro.', 'Todos os anos, criaturas fantásticas do folclore brasileiro se reúnem na floresta, à beira de um rio, para ver quantas histórias contam sobre a sua fama.', '{"esquerda":[{"id":"a","texto":"Menino travesso de uma perna só, que usa gorro vermelho."},{"id":"b","texto":"Homem que, nas noites de lua cheia, vira um animal parecido com um lobo."},{"id":"c","texto":"Menino da lenda gaúcha que ajuda a encontrar objetos perdidos."}],"direita":[{"id":"1","texto":"Negrinho do Pastoreiro"},{"id":"2","texto":"Saci-Pererê"},{"id":"3","texto":"Lobisomem"}]}', '{"a":"2","b":"3","c":"1"}', 'Saci-Pererê, Lobisomem e Negrinho do Pastoreiro são personagens do folclore brasileiro, citados no texto-base da avaliação.', 10, 'Simulado A1 q5 (Livro 1) - folclore brasileiro'),
-(9, NULL, 1, 9, 1, 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"Quando o pai de Simbad {1}, deixou-lhe uma grande riqueza. Naquela época, Simbad {2} dinheiro sem pensar no futuro.","opcoes":[{"id":"o1","texto":"morrerá"},{"id":"o2","texto":"gastava"},{"id":"o3","texto":"morreu"},{"id":"o4","texto":"gastará"}]}', '{"1":"o3","2":"o2"}', '“Deixou-lhe” indica que o pai já tinha morrido: morreu. “Naquela época” indica um hábito do passado: gastava.', 10, 'Simulado A1 q22 (Livro 1) - história de Simbad, frase nova'),
-(10, NULL, 1, 10, 1, 'MULTIPLA_ESCOLHA', 'O cartaz tem a intenção de promover a', 'LIVRE-SE DAQUELE PNEUZINHO!
+(8, NULL, 1, 8, 1, 'INTERMEDIARIO', 'ASSOCIACAO', 'Conecte cada descrição ao personagem do folclore brasileiro.', 'Todos os anos, criaturas fantásticas do folclore brasileiro se reúnem na floresta, à beira de um rio, para ver quantas histórias contam sobre a sua fama.', '{"esquerda":[{"id":"a","texto":"Menino travesso de uma perna só, que usa gorro vermelho."},{"id":"b","texto":"Homem que, nas noites de lua cheia, vira um animal parecido com um lobo."},{"id":"c","texto":"Menino da lenda gaúcha que ajuda a encontrar objetos perdidos."}],"direita":[{"id":"1","texto":"Negrinho do Pastoreiro"},{"id":"2","texto":"Saci-Pererê"},{"id":"3","texto":"Lobisomem"}]}', '{"a":"2","b":"3","c":"1"}', 'Saci-Pererê, Lobisomem e Negrinho do Pastoreiro são personagens do folclore brasileiro, citados no texto-base da avaliação.', 10, 'Simulado A1 q5 (Livro 1) - folclore brasileiro'),
+(9, NULL, 1, 9, 1, 'INTERMEDIARIO', 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"Quando o pai de Simbad {1}, deixou-lhe uma grande riqueza. Naquela época, Simbad {2} dinheiro sem pensar no futuro.","opcoes":[{"id":"o1","texto":"morrerá"},{"id":"o2","texto":"gastava"},{"id":"o3","texto":"morreu"},{"id":"o4","texto":"gastará"}]}', '{"1":"o3","2":"o2"}', '“Deixou-lhe” indica que o pai já tinha morrido: morreu. “Naquela época” indica um hábito do passado: gastava.', 10, 'Simulado A1 q22 (Livro 1) - história de Simbad, frase nova'),
+(10, NULL, 1, 10, 1, 'INTERMEDIARIO', 'MULTIPLA_ESCOLHA', 'O cartaz tem a intenção de promover a', 'LIVRE-SE DAQUELE PNEUZINHO!
 Pneus velhos guardados em casa acumulam água da chuva e viram criadouros do mosquito Aedes aegypti, que transmite a dengue.
 Coloque os pneus na calçada nos dias de recolhimento.
-SEM PNEU, SEM MOSQUITO!', '{"opcoes":[{"id":"A","texto":"prevenção contra a dengue."},{"id":"B","texto":"doação de objetos usados."},{"id":"C","texto":"perda de gordura corporal."},{"id":"D","texto":"venda de pneus em estoque."}]}', '{"correta":"A"}', 'O cartaz pede que as pessoas descartem os pneus velhos para evitar que o mosquito da dengue se reproduza.', 10, 'Simulado A1 q18 (Livro 1) - cartaz, texto adaptado');
+SEM PNEU, SEM MOSQUITO!', '{"opcoes":[{"id":"A","texto":"prevenção contra a dengue."},{"id":"B","texto":"doação de objetos usados."},{"id":"C","texto":"perda de gordura corporal."},{"id":"D","texto":"venda de pneus em estoque."}]}', '{"correta":"A"}', 'O cartaz pede que as pessoas descartem os pneus velhos para evitar que o mosquito da dengue se reproduza.', 10, 'Simulado A1 q18 (Livro 1) - cartaz, texto adaptado'),
+(11, NULL, 1, 1, 1, 'INICIANTE', 'MULTIPLA_ESCOLHA', 'Quem vai chegar à casa de Bia?', 'Bia ficou muito feliz. Sua prima Clara vai passar uma semana na casa dela, em Brasília. As duas vão dividir o quarto.', '{"opcoes":[{"id":"A","texto":"A professora de Bia."},{"id":"B","texto":"A avó de Bia."},{"id":"C","texto":"A prima Clara."},{"id":"D","texto":"Uma amiga da escola."}]}', '{"correta":"C"}', 'O texto diz: “Sua prima Clara vai passar uma semana na casa dela”.', 10, 'Simulado A1 q13 (Livro 1) - versão iniciante, texto adaptado'),
+(12, NULL, 1, 2, 1, 'INICIANTE', 'ASSOCIACAO', 'Conecte cada frase à palavra que ela define.', NULL, '{"esquerda":[{"id":"a","texto":"Palavra pequena, como “sol”."},{"id":"b","texto":"Palavra muito grande, como “paralelepípedo”."},{"id":"c","texto":"Quem chega sempre na hora certa."}],"direita":[{"id":"1","texto":"pontual"},{"id":"2","texto":"palavrão"},{"id":"3","texto":"palavrinha"}]}', '{"a":"3","b":"2","c":"1"}', 'O final -inha indica algo pequeno (palavrinha) e o final -ão indica algo grande (palavrão). Pontual é quem não se atrasa.', 10, 'Simulados A1 q2 e B1 q15 (palavrão) - versão iniciante, vocabulário'),
+(13, NULL, 1, 3, 1, 'INICIANTE', 'PREENCHIMENTO', 'Complete a frase com o verbo no tempo correto.', NULL, '{"frase":"Amanhã, a vovó {1} arroz doce para toda a família.","opcoes":[{"id":"o1","texto":"fez"},{"id":"o2","texto":"faz"},{"id":"o3","texto":"fará"}]}', '{"1":"o3"}', '“Amanhã” indica o futuro. O futuro de “fazer” é “fará”.', 10, 'Simulado A1 q14 (Livro 1) - versão iniciante, receita de arroz doce'),
+(14, NULL, 1, 4, 1, 'INICIANTE', 'MULTIPLA_ESCOLHA', 'No texto, “vrrrum” é o barulho de', 'A moto passou rápido na rua: vrrrum! O menino riu.', '{"opcoes":[{"id":"A","texto":"uma bola."},{"id":"B","texto":"uma moto."},{"id":"C","texto":"um rio."},{"id":"D","texto":"um pássaro."}]}', '{"correta":"B"}', '“Vrrrum” imita o barulho da moto passando. Palavras que imitam sons se chamam onomatopeias.', 10, 'Simulado A1 q7 e q8 (Livro 1) - versão iniciante, onomatopeia'),
+(15, NULL, 1, 5, 1, 'INICIANTE', 'ASSOCIACAO', 'Conecte cada frase ao gênero textual que ela descreve.', NULL, '{"esquerda":[{"id":"a","texto":"Mostra como fazer um bolo, passo a passo."},{"id":"b","texto":"Fica na parede da escola e convida as pessoas para uma campanha."},{"id":"c","texto":"É escrito em versos."}],"direita":[{"id":"1","texto":"poema"},{"id":"2","texto":"receita"},{"id":"3","texto":"cartaz"}]}', '{"a":"2","b":"3","c":"1"}', 'A receita ensina a fazer algo, o cartaz convida para uma campanha e o poema é escrito em versos.', 10, 'Simulados A1 q11, q14, q17, q18 e B1 q18 - versão iniciante, gêneros textuais'),
+(16, NULL, 1, 6, 1, 'INICIANTE', 'PREENCHIMENTO', 'Complete a frase com o verbo no tempo correto.', NULL, '{"frase":"Ontem, as crianças {1} sorvete de morango na praça.","opcoes":[{"id":"o1","texto":"tomam"},{"id":"o2","texto":"tomarão"},{"id":"o3","texto":"tomaram"}]}', '{"1":"o3"}', '“Ontem” indica o passado. Como o sujeito é “as crianças” (plural), o verbo fica no plural: tomaram.', 10, 'Simulado A1 q10 e B1 q17 (Livro 1 e 2) - versão iniciante, tema do sorvete'),
+(17, NULL, 1, 7, 1, 'INICIANTE', 'MULTIPLA_ESCOLHA', 'Em 2006, Plutão passou a ser chamado de', 'Plutão era chamado de planeta. Em 2006, os cientistas decidiram que ele não é mais um planeta. Hoje, Plutão é chamado de planeta-anão.', '{"opcoes":[{"id":"A","texto":"estrela."},{"id":"B","texto":"planeta-anão."},{"id":"C","texto":"satélite."},{"id":"D","texto":"cometa."}]}', '{"correta":"B"}', 'O texto diz que Plutão passou a ser chamado de planeta-anão.', 10, 'Simulado B1 q7 (Livro 2) - versão iniciante, texto adaptado'),
+(18, NULL, 1, 8, 1, 'INICIANTE', 'ASSOCIACAO', 'Conecte cada descrição ao personagem do folclore brasileiro.', NULL, '{"esquerda":[{"id":"a","texto":"Menino de uma perna só, que usa gorro vermelho."},{"id":"b","texto":"Protetor das florestas, tem os pés virados para trás."},{"id":"c","texto":"Mulher com cauda de peixe, que canta nos rios."}],"direita":[{"id":"1","texto":"Iara"},{"id":"2","texto":"Saci-Pererê"},{"id":"3","texto":"Curupira"}]}', '{"a":"2","b":"3","c":"1"}', 'Saci-Pererê tem uma perna só e gorro vermelho. O Curupira protege as matas e tem os pés virados para trás. A Iara canta nos rios.', 10, 'Simulado A1 q5 (Livro 1) - versão iniciante, folclore brasileiro'),
+(19, NULL, 1, 9, 1, 'INICIANTE', 'PREENCHIMENTO', 'Complete a frase com o verbo no tempo correto.', NULL, '{"frase":"Neste momento, Simbad {1} uma história aos amigos.","opcoes":[{"id":"o1","texto":"contou"},{"id":"o2","texto":"contará"},{"id":"o3","texto":"conta"}]}', '{"1":"o3"}', '“Neste momento” indica algo que acontece agora, então o verbo fica no presente: conta.', 10, 'Simulado A1 q22 (Livro 1) - versão iniciante, história de Simbad'),
+(20, NULL, 1, 10, 1, 'INICIANTE', 'MULTIPLA_ESCOLHA', 'O cartaz pede que as pessoas', 'CUIDADO COM A DENGUE!
+Água parada atrai o mosquito.
+Não deixe água parada em vasos e pneus.', '{"opcoes":[{"id":"A","texto":"joguem lixo na rua."},{"id":"B","texto":"comprem mais vasos."},{"id":"C","texto":"não deixem água parada em casa."},{"id":"D","texto":"tomem mais água."}]}', '{"correta":"C"}', 'O cartaz diz: “Não deixe água parada em vasos e pneus”. É um pedido para evitar o mosquito da dengue.', 10, 'Simulado A1 q18 (Livro 1) - versão iniciante, cartaz'),
+(21, NULL, 1, 1, 1, 'AVANCADO', 'MULTIPLA_ESCOLHA', 'No trecho “já fazia coisas de gente grande”, a palavra “já” indica que', 'Para Bia, foi uma novidade e tanto saber que sua prima Clara viria passar uma semana em Brasília. Clara morava em São Paulo e tinha sido escolhida, entre milhares de alunos, para representar a escola numa viagem de crianças de todo o país. Seria ela quem discursaria para o presidente da República, e a responsabilidade a deixava tensa, ainda que tentasse disfarçar.
+Clara tinha só dez anos, mas já fazia coisas de gente grande.', '{"opcoes":[{"id":"A","texto":"Clara estava com pressa de crescer."},{"id":"B","texto":"Clara costumava brincar de ser adulta."},{"id":"C","texto":"Bia achava as atitudes de Clara antipáticas."},{"id":"D","texto":"Clara assumia tarefas esperadas de pessoas mais velhas, apesar da pouca idade."}]}', '{"correta":"D"}', 'O “mas” marca o contraste com a idade: Clara tinha só dez anos, e o “já” mostra que ela fazia o que se espera de adultos, como discursar para o presidente.', 10, 'Simulado A1 q13 (Livro 1) - versão avançada, texto adaptado'),
+(22, NULL, 1, 2, 1, 'AVANCADO', 'ASSOCIACAO', 'Conecte cada frase à palavra que ela define.', NULL, '{"esquerda":[{"id":"a","texto":"Que fala com facilidade e convence quem escuta."},{"id":"b","texto":"Que dura pouco tempo."},{"id":"c","texto":"Que age com cautela, pensando nas consequências."},{"id":"d","texto":"Que faz tudo com muita atenção aos detalhes."}],"direita":[{"id":"1","texto":"efêmero"},{"id":"2","texto":"minucioso"},{"id":"3","texto":"eloquente"},{"id":"4","texto":"prudente"}]}', '{"a":"3","b":"1","c":"4","d":"2"}', 'Eloquente vem de “eloquência”, a arte de falar bem. Efêmero é o que passa depressa. Prudente é quem pensa antes de agir. Minucioso cuida de cada detalhe.', 10, 'Simulados A1 q22 e q13 (glossários) - versão avançada, vocabulário'),
+(23, NULL, 1, 3, 1, 'AVANCADO', 'PREENCHIMENTO', 'Complete as frases da receita com os verbos nos tempos corretos.', NULL, '{"frase":"Se você {1} pressa, use leite condensado. Quando o arroz {2} no ponto, desligue o fogo. Se a vovó tivesse deixado o fogo alto, o doce {3}.","opcoes":[{"id":"o1","texto":"tiver"},{"id":"o2","texto":"estiver"},{"id":"o3","texto":"queimaria"},{"id":"o4","texto":"teve"},{"id":"o5","texto":"estava"},{"id":"o6","texto":"queimou"}]}', '{"1":"o1","2":"o2","3":"o3"}', 'Depois de “se” e de “quando”, que indicam uma condição futura, usa-se o futuro do subjuntivo: “tiver” e “estiver”. Já “se tivesse deixado...” pede o futuro do pretérito: “queimaria”.', 10, 'Simulado A1 q14 (Livro 1) - versão avançada, receita de arroz doce'),
+(24, NULL, 1, 4, 1, 'AVANCADO', 'MULTIPLA_ESCOLHA', 'No texto, a expressão “vrrrum” e a comparação “parece um foguete” têm, juntas, o objetivo de', 'Dona Lia levou o neto à praça. De repente, uma moto cortou a rua — vrrrum! — e a poeira subiu como uma nuvem.
+O menino tapou o nariz e riu:
+— Vovó, a moto é tão rápida que parece um foguete!', '{"opcoes":[{"id":"A","texto":"mostrar a velocidade e o barulho da moto."},{"id":"B","texto":"explicar como funciona o motor da moto."},{"id":"C","texto":"criticar o comportamento do motociclista."},{"id":"D","texto":"descrever a poeira da praça."}]}', '{"correta":"A"}', '“Vrrrum” é uma onomatopeia, que reproduz o barulho da moto. A comparação com um foguete reforça a velocidade. Os dois recursos ajudam o leitor a imaginar a cena.', 10, 'Simulado A1 q7 e q8 (Livro 1) - versão avançada, onomatopeia e comparação'),
+(25, NULL, 1, 5, 1, 'AVANCADO', 'ASSOCIACAO', 'Conecte cada frase ao gênero textual que ela descreve.', NULL, '{"esquerda":[{"id":"a","texto":"Texto em que o jornalista faz perguntas e a pessoa entrevistada responde."},{"id":"b","texto":"Texto curto que narra um fato do dia a dia, com humor e o olhar pessoal do autor."},{"id":"c","texto":"Texto em que o leitor envia a sua opinião a um jornal ou revista."},{"id":"d","texto":"Texto que explica o significado de uma palavra, como num dicionário."}],"direita":[{"id":"1","texto":"carta do leitor"},{"id":"2","texto":"verbete"},{"id":"3","texto":"entrevista"},{"id":"4","texto":"crônica"}]}', '{"a":"3","b":"4","c":"1","d":"2"}', 'A entrevista é feita de perguntas e respostas. A crônica conta um fato cotidiano com o toque do autor. A carta do leitor traz a opinião de quem lê. O verbete explica uma palavra.', 10, 'Simulados A1 q11, q14, q17, q18 e B1 q18 - versão avançada, gêneros textuais'),
+(26, NULL, 1, 6, 1, 'AVANCADO', 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"O pediatra disse que, se as crianças {1} sorvete durante a gripe, a garganta {2} ainda mais. Por isso, na próxima consulta, ele {3} o aviso.","opcoes":[{"id":"o1","texto":"tomassem"},{"id":"o2","texto":"doeria"},{"id":"o3","texto":"repetirá"},{"id":"o4","texto":"tomaram"},{"id":"o5","texto":"dói"},{"id":"o6","texto":"repetiu"}]}', '{"1":"o1","2":"o2","3":"o3"}', 'Em “o pediatra disse que, se...”, usa-se o imperfeito do subjuntivo (tomassem) e o futuro do pretérito (doeria). “Na próxima consulta” indica o futuro: repetirá.', 10, 'Simulado A1 q10 e B1 q17 (Livro 1 e 2) - versão avançada, tema do sorvete'),
+(27, NULL, 1, 7, 1, 'AVANCADO', 'MULTIPLA_ESCOLHA', 'Segundo o texto, Plutão deixou de ser considerado planeta porque', 'Em 2006, a União Astronômica Internacional definiu o que é um planeta: ele precisa girar em torno do Sol, ter forma arredondada e dominar a região da sua órbita. Plutão cumpre as duas primeiras condições, mas divide a sua órbita com muitos outros objetos. Por isso, deixou de ser planeta e passou a ser classificado como planeta-anão.', '{"opcoes":[{"id":"A","texto":"não tem forma arredondada."},{"id":"B","texto":"não gira em torno do Sol."},{"id":"C","texto":"divide a sua órbita com muitos outros objetos."},{"id":"D","texto":"foi descoberto depois dos outros planetas."}]}', '{"correta":"C"}', 'O texto explica que Plutão gira em torno do Sol e é arredondado, mas não domina a sua órbita, que é compartilhada com muitos outros objetos.', 10, 'Simulado B1 q7 (Livro 2) - versão avançada, texto adaptado'),
+(28, NULL, 1, 8, 1, 'AVANCADO', 'ASSOCIACAO', 'Conecte cada descrição ao personagem do folclore brasileiro.', 'As lendas do folclore passam de geração em geração, contadas de boca em boca, e mudam um pouco de uma região para outra.', '{"esquerda":[{"id":"a","texto":"Cobra de fogo que protege as matas contra quem as incendeia."},{"id":"b","texto":"Mulher que, por castigo, vira uma mula e solta fogo pelo pescoço."},{"id":"c","texto":"Figura com aparência de jacaré que, segundo a cantiga, pega as crianças que não dormem."},{"id":"d","texto":"Rapaz elegante que aparece nas festas e depois some no rio."}],"direita":[{"id":"1","texto":"Boto"},{"id":"2","texto":"Cuca"},{"id":"3","texto":"Boitatá"},{"id":"4","texto":"Mula sem cabeça"}]}', '{"a":"3","b":"4","c":"2","d":"1"}', 'Boitatá é a cobra de fogo protetora das matas. A Mula sem cabeça é a mulher castigada. A Cuca aparece na cantiga de ninar. O Boto é o rapaz elegante que some no rio.', 10, 'Simulado A1 q5 (Livro 1) - versão avançada, folclore brasileiro'),
+(29, NULL, 1, 9, 1, 'AVANCADO', 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"Se Simbad {1} o conselho do pai, não teria gastado toda a herança. Hoje ele promete que, quando {2} dinheiro de novo, será mais cuidadoso. Antes da viagem, ele já {3} quase tudo.","opcoes":[{"id":"o1","texto":"tivesse seguido"},{"id":"o2","texto":"tiver"},{"id":"o3","texto":"tinha gastado"},{"id":"o4","texto":"seguiu"},{"id":"o5","texto":"teve"},{"id":"o6","texto":"gastará"}]}', '{"1":"o1","2":"o2","3":"o3"}', '“Se Simbad tivesse seguido...” pede o mais-que-perfeito do subjuntivo, combinado com “teria gastado”. Depois de “quando”, que indica o futuro, usa-se “tiver”. “Antes da viagem” indica algo anterior a outro fato passado: tinha gastado.', 10, 'Simulado A1 q22 (Livro 1) - versão avançada, história de Simbad'),
+(30, NULL, 1, 10, 1, 'AVANCADO', 'MULTIPLA_ESCOLHA', 'No título do cartaz, a palavra “pneuzinho” provoca humor porque', 'LIVRE-SE DAQUELE PNEUZINHO!
+Pneus velhos guardados em casa acumulam água da chuva e viram criadouros do mosquito Aedes aegypti, que transmite a dengue.
+Coloque os pneus na calçada nos dias de recolhimento.
+SEM PNEU, SEM MOSQUITO!', '{"opcoes":[{"id":"A","texto":"indica o tamanho pequeno dos pneus."},{"id":"B","texto":"lembra a gordura na cintura, mas o assunto são os pneus velhos."},{"id":"C","texto":"refere-se a um brinquedo infantil."},{"id":"D","texto":"é o nome de um tipo de mosquito."}]}', '{"correta":"B"}', '“Pneuzinho” também é um modo popular de chamar a gordura na cintura. O cartaz usa esse duplo sentido para chamar a atenção, mas fala de pneus velhos que acumulam água.', 10, 'Simulado A1 q18 (Livro 1) - versão avançada, cartaz e duplo sentido');
 
-
--- Correção para bancos que já executaram uma versão anterior deste script:
--- troca o cenário da questão 4 ("feira" -> "praça") para não repetir o cenário
--- da avaliação diagnóstica. É idempotente (pode ser executado várias vezes).
-UPDATE `questoes_gamificadas`
-SET `texto_apoio` = REPLACE(`texto_apoio`, 'à feira.', 'à praça.'),
-    `conteudo_json` = REPLACE(`conteudo_json`, 'o som da feira.', 'o som da praça.')
-WHERE `id` = 4;
-
--- Mesma correção para a questão 2: a palavra "inflexível" também aparece na
--- avaliação diagnóstica (trecho de Policarpo Quaresma) e foi trocada por "pontual".
-UPDATE `questoes_gamificadas`
-SET `conteudo_json` = REPLACE(REPLACE(`conteudo_json`,
-        'Que não cede nem muda de ideia, mesmo diante de pedidos.',
-        'Que chega sempre na hora certa, sem atrasos.'),
-        '"texto":"inflexível"', '"texto":"pontual"'),
-    `explicacao` = REPLACE(`explicacao`,
-        'Inflexível descreve quem não muda de ideia.',
-        'Pontual descreve quem não se atrasa.'),
-    `origem` = REPLACE(`origem`, ', B1 q14 (inflexível) - vocabulário', ' - vocabulário')
-WHERE `id` = 2;
-
-
--- Redistribuição: cada questão passa a ser a única questão da sua própria fase
--- (id N -> fase N, ordem 1). Serve para bancos que já executaram uma versão
--- anterior, em que as 10 questões estavam todas na fase 1. É idempotente.
-UPDATE `questoes_gamificadas`
-SET `fase` = `id`, `ordem` = 1
-WHERE `id` BETWEEN 1 AND 10;
-
-
--- =====================================================
--- RESTAURAÇÃO DAS VARIÁVEIS DE SESSÃO
--- =====================================================
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -77,6 +77,13 @@ public class NivelamentoService {
 
     // Finalizar a avaliação do aluno no banco
     public void finalizarAvaliacao(Aluno aluno) {
+        // O nível é definido uma única vez e nunca mais muda: se já existe, não recalcula nem grava de novo
+        Aluno atual = alunoRepository.findById(aluno.getId()).orElse(aluno);
+        if (atual.getNivelAtual() != null) {
+            aluno.setNivelAtual(atual.getNivelAtual());
+            return;
+        }
+
         List<TentativaAtividade> tentativas = tentativaRepository.findByAlunoId(aluno.getId());
         
         int totalPontos = 0;

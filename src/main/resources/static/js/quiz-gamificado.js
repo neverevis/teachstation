@@ -169,11 +169,14 @@
         palco.appendChild(el('p', {class: 'quiz-aviso-tela', role: 'status', text: mensagem || 'Carregando as questões…'}));
     }
 
-    function mostrarErro(mensagem, tentarDeNovo) {
+    // Fase bloqueada (403): não adianta tentar de novo, só voltar ao mapa
+    function mostrarErro(mensagem, tentarDeNovo, bloqueada) {
         limparPalco();
         palco.appendChild(el('div', {class: 'quiz-aviso-tela quiz-erro', role: 'alert'}, [
             el('p', {text: '😕 ' + mensagem}),
-            el('button', {type: 'button', class: 'botao-proxima', text: 'Tentar novamente', onclick: tentarDeNovo})
+            bloqueada
+                ? el('a', {class: 'botao-confirmar', href: URL_MAPA, text: 'Voltar ao mapa'})
+                : el('button', {type: 'button', class: 'botao-proxima', text: 'Tentar novamente', onclick: tentarDeNovo})
         ]));
     }
 
@@ -199,7 +202,7 @@
             .catch(function (erro) {
                 mostrarErro(erro.message, function () {
                     carregar(nova);
-                });
+                }, erro.status === 403);
             });
     }
 
@@ -239,7 +242,7 @@
             el('h2', {id: 'quizTituloResultado', tabindex: '-1', text: '🏆 Fase concluída!'}),
             el('p', {class: 'quiz-placar'}, [
                 el('strong', {text: String(resultado.acertos)}),
-                ' de ' + resultado.totalQuestoes + ' questões corretas'
+                ' de ' + resultado.totalQuestoes + (resultado.totalQuestoes === 1 ? ' questão correta' : ' questões corretas')
             ]),
             el('p', {class: 'quiz-pontos', text: 'Você fez ' + resultado.pontos + ' de ' + resultado.pontosMaximos + ' pontos.'}),
             lista,
@@ -250,7 +253,12 @@
                     onclick: function () {
                         carregar(true);
                     }
-                })
+                }),
+                resultado.proximaFase ? el('a', {
+                    class: 'botao-proxima botao-proxima-fase',
+                    href: URL_MAPA + '/level' + resultado.proximaFase,
+                    text: 'Avançar para a próxima fase →'
+                }) : null
             ])
         ]));
 
@@ -1032,5 +1040,6 @@
         document.fonts.ready.then(desenharLinhas);
     }
 
+    // Ao entrar na fase: retoma a rodada em andamento ou, se a anterior já terminou, começa uma nova na questão 1
     carregar(true);
 })();

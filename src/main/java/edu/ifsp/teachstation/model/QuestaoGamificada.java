@@ -12,13 +12,14 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "questoes_gamificadas", uniqueConstraints = @UniqueConstraint(
-        name = "uk_questoes_gamificadas_fase_ordem", columnNames = {"fase", "ordem"}))
+        name = "uk_questoes_gamificadas_fase_nivel_ordem", columnNames = {"fase", "nivel_dificuldade", "ordem"}))
 public class QuestaoGamificada {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    // Questão original em `questoes`, quando houver correspondência (pode ser nula)
     @ManyToOne
     @JoinColumn(name = "questao_id")
     private Questao questao;
@@ -31,6 +32,13 @@ public class QuestaoGamificada {
 
     private Integer ordem;
 
+    // INICIANTE, INTERMEDIARIO ou AVANCADO: a mesma fase tem uma questão de cada nível
+    // e o aluno só recebe as do nível definido na avaliação diagnóstica
+    @Column(name = "nivel_dificuldade", nullable = false, length = 20,
+            columnDefinition = "VARCHAR(20) NOT NULL DEFAULT 'INTERMEDIARIO'")
+    private String nivelDificuldade = "INTERMEDIARIO";
+
+    // ASSOCIACAO, PREENCHIMENTO ou MULTIPLA_ESCOLHA
     private String tipo;
 
     @Column(columnDefinition = "TEXT")
@@ -39,9 +47,11 @@ public class QuestaoGamificada {
     @Column(columnDefinition = "TEXT")
     private String textoApoio;
 
+    // Parte exibida ao aluno (sem gabarito)
     @Column(columnDefinition = "TEXT")
     private String conteudoJson;
 
+    // Respostas corretas: só o servidor lê até a questão ser resolvida
     @Column(columnDefinition = "TEXT")
     private String gabaritoJson;
 
@@ -90,6 +100,14 @@ public class QuestaoGamificada {
 
     public void setOrdem(Integer ordem) {
         this.ordem = ordem;
+    }
+
+    public String getNivelDificuldade() {
+        return nivelDificuldade;
+    }
+
+    public void setNivelDificuldade(String nivelDificuldade) {
+        this.nivelDificuldade = nivelDificuldade;
     }
 
     public String getTipo() {
