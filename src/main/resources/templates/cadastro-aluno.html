@@ -168,6 +168,7 @@
                             id="senha"
                             name="senha"
                             required>
+                        <button type="button" id="togglePass">Mostrar Senha</button>
 
                     </div>
 
@@ -183,6 +184,7 @@
                             id="confirmar-senha"
                             name="confirmar-senha"
                             required>
+                        <button type="button" id="togglePass">Mostrar Senha</button>
 
                     </div>
 
@@ -202,7 +204,23 @@
 	<div th:replace="~{fragments/toast :: toast}"></div>
 	
 	<div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+<script>
+	"use strict"
+	const input = document.querySelector("input");
+	const button = document.querySelector("#togglePass");
+	button.addEventListener('click', togglePass);
+	
+	function togglePass(){
+	if (input.type == "password"){
+		input.type = "text";
+		button.textContent = "Esconder Senha";
+		}else{
+			input.type = "password";
+			button.textContent = "Mostrar Senha";
+		}
+	}
 
+</script>
 </body>
 
 </html>
