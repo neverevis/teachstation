@@ -37,8 +37,8 @@ public class QuizGamificadoService {
     private static final int TENTATIVAS_UMA = 1;
     private static final int TENTATIVAS_PREENCHIMENTO = 3;
 
-    // O mapa do overworld tem 10 fases; questões em fases acima disso ficam guardadas, sem acesso
-    public static final int ULTIMA_FASE_DO_MAPA = 10;
+    // O mapa do overworld tem 8 fases; questões em fases acima disso ficam guardadas, sem acesso
+    public static final int ULTIMA_FASE_DO_MAPA = 8;
 
     private static final Pattern LACUNA = Pattern.compile("\\{(\\d+)\\}");
 
@@ -61,9 +61,8 @@ public class QuizGamificadoService {
                              Integer pontos, Map<String, Object> conteudo, EstadoDto estado) {
     }
 
-    // proximaFase é null quando não há outra fase depois desta
     public record FaseDto(int fase, int rodada, int total, int pontosMaximos, boolean concluida,
-                          List<QuestaoDto> questoes, Integer proximaFase) {
+                          List<QuestaoDto> questoes) {
     }
 
     public record RespostaDto(EstadoDto estado, boolean faseConcluida) {
@@ -179,7 +178,7 @@ public class QuizGamificadoService {
         List<Integer> liberadas = new ArrayList<>();
 
         for (int i = 0; i < existentes.size(); i++) {
-            if (i > 0 && !faseSuperada(aluno, existentes.get(i - 1))) {
+            if (i > 0 && !faseConcluida(aluno, existentes.get(i - 1))) {
                 break;
             }
             liberadas.add(existentes.get(i));
@@ -215,8 +214,7 @@ public class QuizGamificadoService {
         }
 
         List<Integer> existentes = fasesDoMapa();
-        // a próxima fase só é oferecida a quem acertou a questão desta fase
-        Integer proximaFase = existentes.contains(fase + 1) && faseSuperada(aluno, fase) ? fase + 1 : null;
+        Integer proximaFase = existentes.contains(fase + 1) ? fase + 1 : null;
 
         return new ResultadoDto(fase, ultima, questoes.size(), acertos, pontos, pontosMaximos, itens, proximaFase);
     }
@@ -235,10 +233,8 @@ public class QuizGamificadoService {
             pontosMaximos += questao.getPontos();
         }
 
-        Integer proximaFase = fasesDoMapa().contains(fase + 1) ? fase + 1 : null;
-
         return new FaseDto(fase, rodada, questoes.size(), pontosMaximos,
-                rodadaConcluida(questoes, tentativas), lista, proximaFase);
+                rodadaConcluida(questoes, tentativas), lista);
     }
 
     private EstadoDto estadoDe(QuestaoGamificada questao, List<TentativaGamificada> tentativas) {
@@ -303,10 +299,15 @@ public class QuizGamificadoService {
         return fases;
     }
 
-    // A fase só libera a seguinte depois que o aluno ACERTA a questão dela (em qualquer rodada).
-    // Quem erra pode jogar a fase de novo, mas não avança enquanto não acertar.
-    private boolean faseSuperada(Aluno aluno, int fase) {
-        return tentativaRepository.countAcertosNaFase(aluno.getId(), fase) > 0;
+    private boolean faseConcluida(Aluno aluno, int fase) {
+        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
+        if (ultima == 0) {
+            return false;
+        }
+        if (ultima > 1) {
+            return true;
+        }
+        return rodadaConcluida(questaoRepository.findByFaseOrderByOrdemAsc(fase), buscarTentativas(aluno, 1, fase));
     }
 
     private void exigirFaseLiberada(Aluno aluno, int fase) {

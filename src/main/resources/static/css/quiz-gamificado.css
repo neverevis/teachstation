@@ -86,18 +86,6 @@ p.quiz-gabarito {
     gap: 12px;
 }
 
-.acoes-quiz-direita {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: flex-end;
-    gap: 12px;
-}
-
-/* o atalho "Avançar para a próxima fase" só aparece depois de resolver a questão */
-.botao-proxima-fase[hidden] {
-    display: none;
-}
-
 .botao-confirmar {
     display: inline-flex;
     align-items: center;
@@ -496,15 +484,6 @@ p.quiz-gabarito {
     color: var(--cor-texto-secundario);
 }
 
-.quiz-aviso {
-    margin: -8px 0 24px;
-    padding: 12px 16px;
-    border-radius: 12px;
-    background: #fff8e1;
-    color: #7a5200;
-    font-weight: 600;
-}
-
 .quiz-resultado-lista {
     margin: 0;
     padding: 0;
@@ -563,10 +542,6 @@ p.quiz-gabarito {
 
     .acoes-quiz-esquerda:empty {
         display: none;
-    }
-
-    .acoes-quiz-direita {
-        flex-direction: column;
     }
 
     .botao-confirmar {

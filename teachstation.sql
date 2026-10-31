@@ -538,62 +538,78 @@ COLLATE = utf8mb4_0900_ai_ci;
 
 
 -- =====================================================
--- Questões gamificadas - Português: mapa de 10 fases, UMA questão por fase
+-- Questões gamificadas - Português: 1 questão por fase do overworld (fases 1 a 8;
+-- as questões 9 e 10 ficam guardadas nas fases 9 e 10, ainda sem botão no mapa)
 -- =====================================================
--- Fases 1 a 3  -> questões INICIANTES (uma por fase)
--- Fases 4 a 7  -> questões INTERMEDIÁRIAS (uma por fase)
--- Fases 8 a 10 -> questões AVANÇADAS (uma por fase)
--- Total: 10 questões, todas do banco de questões (Livro 1 e Livro 2); nenhuma foi criada
--- e nenhuma está na avaliação diagnóstica. Classificação: ver CLASSIFICACAO-E-FASES.md.
+-- Todas adaptadas do banco de questões (Simulados A1 e B1, 2º semestre).
+-- Nenhuma das 10 questões já cadastradas em `questoes` foi reutilizada.
+-- Seguindo o padrão do teachstation.sql, os textos de apoio são versões
+-- ADAPTADAS/ORIGINAIS, escritas para manter a habilidade avaliada.
 --
--- Seguindo o padrão das questões diagnósticas, o enunciado e as alternativas são os do
--- banco e o texto de apoio é uma versão ADAPTADA, escrita para manter a habilidade avaliada.
--- O banco original não traz gabarito: as respostas foram definidas pela equipe a
--- partir dos próprios textos (precisam de conferência do professor).
--- Pontos: 10 por questão. Id = fase, ordem = 1.
--- O script pode ser reexecutado: remove as linhas com id acima de 10 (de versões
--- anteriores, com mais de uma questão por fase) e atualiza as de id 1 a 10.
+-- Tipo de cada fase: 1 MC, 2 ASSOC, 3 PREENCH, 4 MC, 5 ASSOC,
+--                    6 PREENCH, 7 MC, 8 ASSOC, 9 PREENCH, 10 MC.
+-- Gabarito (derivado do próprio texto adaptado; as fotos do banco não trazem gabarito):
+--   MC:     q1 = B | q4 = C | q7 = D | q10 = A
+--   ASSOC e PREENCH: ver gabarito_json de cada linha.
 -- Colunas: id, questao_id, area_id, fase, ordem, tipo, enunciado, texto_apoio,
 --          conteudo_json, gabarito_json, explicacao, pontos, origem
 
-DELETE FROM `questoes_gamificadas` WHERE `id` > 10;
-
-INSERT INTO `questoes_gamificadas`
+INSERT IGNORE INTO `questoes_gamificadas`
 (`id`, `questao_id`, `area_id`, `fase`, `ordem`, `tipo`, `enunciado`, `texto_apoio`,
  `conteudo_json`, `gabarito_json`, `explicacao`, `pontos`, `origem`)
 VALUES
-(1, NULL, 1, 1, 1, 'MULTIPLA_ESCOLHA', 'A tromba do elefante tem uma parte maior, na ponta, que é parecida com', 'A tromba do elefante serve para levar comida e água até a boca, cheirar e fazer carinho em outros elefantes. Como não tem ossos, ela é musculosa e muito flexível. Na ponta, tem uma parte maior, parecida com dedos, que ajuda o elefante a pegar a comida.', '{"opcoes":[{"id":"A","texto":"alimentos."},{"id":"B","texto":"ossos."},{"id":"C","texto":"dedos."},{"id":"D","texto":"objetos."}]}', '{"correta":"C"}', 'O texto diz que a parte maior, na ponta da tromba, é parecida com dedos e ajuda a pegar comida.', 10, '[INICIANTE] Livro 1 q6 (foto 03)'),
-(2, NULL, 1, 2, 1, 'MULTIPLA_ESCOLHA', 'O que a expressão “vrruuum!” representa no texto?', 'Um caipira andava pela estrada quando um carro passou correndo: — vrruuum! — e sumiu na curva, levantando poeira. O caipira balançou a cabeça e continuou o seu caminho, sem pressa.', '{"opcoes":[{"id":"A","texto":"O som do carro."},{"id":"B","texto":"A voz do caipira."},{"id":"C","texto":"O som do cavalo."},{"id":"D","texto":"A voz do motorista."}]}', '{"correta":"A"}', '“Vrruuum” imita o barulho do carro em alta velocidade. Esse recurso, que escreve um som, chama-se onomatopeia.', 10, '[INICIANTE] Livro 1 q7 (fotos 03-04)'),
-(3, NULL, 1, 3, 1, 'MULTIPLA_ESCOLHA', 'O pato foi tocar violão de feira em feira porque queria', 'Havia um pato
-que sonhava com um sapato.
-Como vivia nadando,
-não tinha dinheiro nenhum.
-Pegou o violão
-e foi tocar de feira em feira.
-Juntou moedinhas,
-comprou o sapato
-e saiu todo faceiro.', '{"opcoes":[{"id":"A","texto":"esquecer a lagoa."},{"id":"B","texto":"comprar um sapato."},{"id":"C","texto":"comprar um pé de pato."},{"id":"D","texto":"voltar à boa vida."}]}', '{"correta":"B"}', 'O poema diz que o pato sonhava com um sapato e juntou moedinhas tocando violão para comprá-lo.', 10, '[INICIANTE] Livro 1 q17 (foto 08)'),
-(4, NULL, 1, 4, 1, 'MULTIPLA_ESCOLHA', 'O efeito de humor da tirinha está contido principalmente na', 'Tirinha em 4 quadrinhos.
-1º — Calvin: “Pena que o mundo vai acabar em breve.” O tigre: “Como é que é?”
-2º — Calvin: “O cometa Halley está chegando. Cometas são sinal do fim do mundo.”
-3º — O tigre: “Não são, não. Isso é só superstição.” Calvin: “Sério??”
-4º — Calvin: “Acho melhor eu fazer aquela redação pra escola.”', '{"opcoes":[{"id":"A","texto":"preocupação de Calvin com o fim do mundo, como mostra o primeiro quadrinho."},{"id":"B","texto":"reflexão de Calvin sobre o juízo final, como fica evidente no segundo quadrinho."},{"id":"C","texto":"decepção de Calvin porque o mundo não ia acabar e ele ia ter que fazer sua redação."},{"id":"D","texto":"alegria de Calvin quando descobre que o mundo não irá acabar, que é só superstição."}]}', '{"correta":"C"}', 'No último quadrinho, Calvin percebe que o mundo não vai acabar e que ainda terá de fazer a redação. A graça está nessa decepção.', 10, '[INTERMEDIÁRIA] Livro 1 q1 (foto 01)'),
-(5, NULL, 1, 5, 1, 'MULTIPLA_ESCOLHA', 'A opinião do pediatra em relação ao sorvete é a de que', 'As pessoas já não acham que o sorvete é só uma guloseima: ele é considerado alimento porque é feito com leite, frutas, cacau, gordura e açúcar. Mas é bom não abusar, pois comer muito sorvete engorda. Também é bom escovar os dentes depois de tomar sorvete, o que ajuda a evitar cáries. O pediatra diz que não se deve misturar sorvete com gripe: o gelado atrapalha as defesas da garganta e do nariz, e quem já está doente demora mais para se recuperar.', '{"opcoes":[{"id":"A","texto":"ele é considerado alimento porque é feito com leite, frutas e cacau."},{"id":"B","texto":"escovar os dentes depois de tomar sorvete ajuda a evitar cáries."},{"id":"C","texto":"por ter gordura e açúcar, sorvete engorda e é bom não abusar."},{"id":"D","texto":"é desaconselhável misturar sorvete com gripe, por causa do gelado."}]}', '{"correta":"D"}', 'A opinião do médico aparece na parte em que ele diz que não se deve misturar sorvete com gripe, porque o gelado atrapalha as defesas do corpo.', 10, '[INTERMEDIÁRIA] Livro 1 q10 (foto 05)'),
-(6, NULL, 1, 6, 1, 'MULTIPLA_ESCOLHA', 'O objetivo do texto é', 'Pesquisadores anunciaram a descoberta de uma nova espécie de mamífero: o olinguito. Ele vive nas florestas nubladas da Colômbia e do Equador, tem pelos de tom marrom-alaranjado e, apesar de pertencer à ordem dos carnívoros, alimenta-se principalmente de frutas. Segundo os cientistas, a descoberta mostra que o mundo ainda não foi completamente explorado.', '{"opcoes":[{"id":"A","texto":"apresentar as principais características da fauna sul-americana."},{"id":"B","texto":"refletir sobre o conhecimento limitado que o homem possui da natureza."},{"id":"C","texto":"informar o encontro de uma nova espécie e suas principais características."},{"id":"D","texto":"analisar como um animal pode reunir características atribuídas a outras espécies."}]}', '{"correta":"C"}', 'O texto noticia a descoberta de uma espécie nova e descreve onde ela vive, sua aparência e sua alimentação.', 10, '[INTERMEDIÁRIA] Livro 1 q19 (foto 10)'),
-(7, NULL, 1, 7, 1, 'MULTIPLA_ESCOLHA', 'A ideia principal do texto é', 'Em 2006, os astrônomos decidiram que Plutão não é mais considerado um planeta. Criaram uma nova categoria, a dos “planetas-anões”, e passaram a classificar Plutão nela. Assim, o Sistema Solar tem oito planetas: Mercúrio, Vênus, Terra, Marte, Júpiter, Saturno, Urano e Netuno.', '{"opcoes":[{"id":"A","texto":"o descobrimento do planeta Plutão."},{"id":"B","texto":"o surgimento de um novo planeta."},{"id":"C","texto":"uma categorização dos satélites."},{"id":"D","texto":"uma nova classificação para Plutão."}]}', '{"correta":"D"}', 'O texto trata da mudança na classificação de Plutão, que deixou de ser planeta e passou a ser planeta-anão.', 10, '[INTERMEDIÁRIA] Livro 2 q7 (foto 15)'),
-(8, NULL, 1, 8, 1, 'MULTIPLA_ESCOLHA', 'Relendo o trecho “Perdi o lugar onde morava e, curiosamente, todos os grandes amigos que gostavam de mim desapareceram junto com a fortuna”, pode-se concluir que aqueles que eram chamados de amigos, na verdade, eram', 'Meu pai era o mais rico mercador da cidade de Bagdá. Quando morreu, deixou-me uma grande riqueza. Eu era jovem e comecei a esbanjar: comia e bebia num desperdício e andava com homens perdulários, achando que aquela vida ia durar para sempre.
-Durante algum tempo, vivi sem preocupações, mas logo minha riqueza se acabou. Perdi o lugar onde morava e, curiosamente, todos os grandes amigos que gostavam de mim desapareceram junto com a fortuna.
-Perdulário: pessoa que gasta excessivamente, que esbanja.', '{"opcoes":[{"id":"A","texto":"pessoas interessadas apenas em sua fortuna, e não em sua amizade sincera."},{"id":"B","texto":"ladrões que roubaram tudo o que o pai lhe havia deixado quando morreu."},{"id":"C","texto":"negociantes que queriam comprar toda a sua fortuna e deixá-lo na miséria."},{"id":"D","texto":"seus empregados que, como não havia pagamento, não puderam ficar."}]}', '{"correta":"A"}', 'Os amigos sumiram junto com o dinheiro. Isso mostra que só estavam interessados na fortuna, não na amizade.', 10, '[AVANÇADA] Livro 1 q22 (foto 11)'),
-(9, NULL, 1, 9, 1, 'MULTIPLA_ESCOLHA', 'Os dois textos abordam o problema da seca no Brasil, diferenciando-se pela', 'Texto I — O Brasil enfrenta a maior seca das últimas sete décadas, segundo um centro de monitoramento de desastres naturais. É a primeira vez que a estiagem afeta de forma intensa uma região tão ampla, da Amazônia ao Paraná, potencializando incêndios e levando os rios a níveis muito baixos. Os números mostram uma tendência de agravamento desde os anos 1990.
-Texto II — A baixa umidade do ar pode provocar desconfortos à saúde, especialmente de crianças, idosos e pessoas com doenças crônicas: problemas alérgicos e respiratórios, ressecamento da pele, sangramento pelo nariz e irritação dos olhos. A OMS alerta que índices de umidade abaixo de 60% não são ideais para a saúde humana.', '{"opcoes":[{"id":"A","texto":"perspectiva de melhora do quadro exposto em um curto período."},{"id":"B","texto":"gravidade que atribuem ao momento de estiagem vivido pelo país."},{"id":"C","texto":"atenção dada aos efeitos desse fenômeno na saúde da população."},{"id":"D","texto":"utilização de fontes confiáveis em defesa dos argumentos expostos."}]}', '{"correta":"C"}', 'O texto I trata da extensão e da gravidade da seca; o texto II dá atenção aos efeitos da baixa umidade na saúde das pessoas.', 10, '[AVANÇADA] Livro 2 q22 (foto 24)'),
-(10, NULL, 1, 10, 1, 'MULTIPLA_ESCOLHA', 'Sobre o uso de plásticos, os autores dos textos lidos', 'Texto I — Notícias recentes atribuem ao plástico o papel de vilão do meio ambiente. Imaginemos um mundo sem plástico: do que seriam feitos os equipamentos dos hospitais e laboratórios, os utensílios e eletrodomésticos de nossos lares? O plástico faz parte da nossa vida e sua abolição não parece viável no médio prazo.
-Texto II — É inegável a importância dos plásticos em nossas vidas. No entanto, a utilização excessiva e principalmente o descarte inadequado transformam o plástico em vilão. Ele é altamente poluidor e vem se tornando um tormento para o meio ambiente: os mares e oceanos estão invadidos de material plástico.', '{"opcoes":[{"id":"A","texto":"têm a mesma opinião sobre o assunto, ou seja, que o plástico não deve ser visto como vilão ao meio ambiente."},{"id":"B","texto":"pensam igual sobre o uso do plástico, isto é, que o uso excessivo de plástico é o grande poluidor do meio ambiente."},{"id":"C","texto":"têm a mesma visão positiva sobre o plástico, mas o autor do texto I acredita que o material tem sua parcela de culpa na poluição do meio ambiente."},{"id":"D","texto":"possuem opiniões diferentes sobre o assunto: o texto I não vê o plástico como vilão ao meio ambiente, enquanto o texto II acredita que o material tem sim sua parcela de culpa."}]}', '{"correta":"D"}', 'O texto I defende que o plástico não deve ser visto como vilão; o texto II afirma que o uso excessivo e o descarte inadequado o tornam vilão. As opiniões são diferentes.', 10, '[AVANÇADA] Livro 2 q13 (foto 19)')
-ON DUPLICATE KEY UPDATE
-    `questao_id` = VALUES(`questao_id`), `area_id` = VALUES(`area_id`),
-    `fase` = VALUES(`fase`), `ordem` = VALUES(`ordem`), `tipo` = VALUES(`tipo`),
-    `enunciado` = VALUES(`enunciado`), `texto_apoio` = VALUES(`texto_apoio`),
-    `conteudo_json` = VALUES(`conteudo_json`), `gabarito_json` = VALUES(`gabarito_json`),
-    `explicacao` = VALUES(`explicacao`), `pontos` = VALUES(`pontos`), `origem` = VALUES(`origem`);
+(1, NULL, 1, 1, 1, 'MULTIPLA_ESCOLHA', 'A visita de Clara era mais do que uma simples visita porque', 'Para Bia, foi uma novidade e tanto saber que sua prima Clara viria passar uma semana em sua casa, em Brasília. Bia ficou feliz por ter companhia no quarto.
+Mas a viagem de Clara era mais do que uma simples visita: ela morava em São Paulo e tinha sido escolhida para representar sua escola numa viagem de crianças de todo o país. Lá, seria recebida pelo próprio presidente da República, e seria Clara quem iria discursar para ele.
+Clara tinha só dez anos, como Bia, mas já fazia coisas de gente grande!', '{"opcoes":[{"id":"A","texto":"ela morava em São Paulo e iria conhecer Brasília pela primeira vez."},{"id":"B","texto":"ela faria um discurso para o presidente da República."},{"id":"C","texto":"ela e Bia trocariam confidências e falariam dos meninos da escola."},{"id":"D","texto":"ela deixaria Bia contente por ter uma companhia no quarto."}]}', '{"correta":"B"}', 'No texto, Clara foi escolhida para discursar para o presidente da República. Isso torna a visita especial. Ter companhia no quarto é um motivo comum a qualquer visita.', 10, 'Simulado A1 q13 (Livro 1) - texto adaptado'),
+(2, NULL, 1, 2, 1, 'ASSOCIACAO', 'Conecte cada frase à palavra que ela define.', NULL, '{"esquerda":[{"id":"a","texto":"Pessoa que gasta dinheiro em excesso, sem se preocupar com o futuro."},{"id":"b","texto":"Grupo de pessoas escolhido para representar outras e agir em nome delas."},{"id":"c","texto":"Palavra muito grande e difícil de pronunciar, como “paralelepípedo”."},{"id":"d","texto":"Que chega sempre na hora certa, sem atrasos."}],"direita":[{"id":"1","texto":"palavrão"},{"id":"2","texto":"pontual"},{"id":"3","texto":"delegação"},{"id":"4","texto":"perdulário"}]}', '{"a":"4","b":"3","c":"1","d":"2"}', 'Perdulário e delegação vêm dos glossários das avaliações. Em “palavrão”, o sufixo -ão indica tamanho grande (palavra grande). Pontual descreve quem não se atrasa.', 10, 'Simulados A1 q22 e q13 (glossários), A1 q2 e B1 q15 (palavrão) - vocabulário'),
+(3, NULL, 1, 3, 1, 'PREENCHIMENTO', 'Complete a frase da receita com o verbo no tempo correto.', 'Arroz doce - modo de preparo
+1. Coloque o arroz para cozinhar com quatro medidas de água.
+2. Complete a frase do próximo passo, logo abaixo.
+3. Desligue o fogo e acrescente o leite condensado e o creme de leite.', '{"frase":"Quando o arroz {1} bem molinho, acrescente o leite de coco e deixe ferver por mais dois minutos.","opcoes":[{"id":"o1","texto":"estava"},{"id":"o2","texto":"estiver"},{"id":"o3","texto":"estará"},{"id":"o4","texto":"estaria"}]}', '{"1":"o2"}', 'Em instruções que indicam uma condição futura, usa-se o futuro do subjuntivo depois de “quando”: “quando o arroz estiver bem molinho”.', 10, 'Simulado A1 q14 (Livro 1) - receita de arroz doce'),
+(4, NULL, 1, 4, 1, 'MULTIPLA_ESCOLHA', 'No texto, a expressão “vrrrum” representa', 'Dona Lia levou o neto à praça. De repente, uma moto passou pela rua — vrrrum! — e levantou a poeira.
+O menino tapou o nariz e riu:
+— Vovó, a moto vai tão rápido que parece um foguete!', '{"opcoes":[{"id":"A","texto":"a voz de Dona Lia."},{"id":"B","texto":"a fala do neto."},{"id":"C","texto":"o barulho da moto."},{"id":"D","texto":"o som da praça."}]}', '{"correta":"C"}', '“Vrrrum” imita o barulho da moto passando. Esse recurso, que escreve um som, chama-se onomatopeia.', 10, 'Simulado A1 q7 e q8 (Livro 1) - onomatopeia, texto adaptado'),
+(5, NULL, 1, 5, 1, 'ASSOCIACAO', 'Conecte cada frase ao gênero textual que ela descreve.', NULL, '{"esquerda":[{"id":"a","texto":"Texto que traz ingredientes e modo de preparo para ensinar a fazer um prato."},{"id":"b","texto":"Texto que usa imagens e frases curtas para convencer o público a participar de uma campanha."},{"id":"c","texto":"Texto escrito em versos, que costuma brincar com os sons e com as emoções."},{"id":"d","texto":"Texto que informa os leitores sobre um fato recente."}],"direita":[{"id":"1","texto":"poema"},{"id":"2","texto":"notícia"},{"id":"3","texto":"receita"},{"id":"4","texto":"cartaz"}]}', '{"a":"3","b":"4","c":"1","d":"2"}', 'Cada gênero tem uma função: a receita instrui, o cartaz convence, o poema trabalha com versos e emoções, e a notícia informa sobre fatos.', 10, 'Simulados A1 q11, q14, q17, q18 e B1 q18 - gêneros textuais'),
+(6, NULL, 1, 6, 1, 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"Na semana passada, o pediatra {1} que não se deve misturar sorvete com gripe. A partir de amanhã, as crianças {2} sorvete só depois de ficarem boas.","opcoes":[{"id":"o1","texto":"explicará"},{"id":"o2","texto":"tomarão"},{"id":"o3","texto":"explicou"},{"id":"o4","texto":"tomaram"}]}', '{"1":"o3","2":"o2"}', '“Na semana passada” pede o passado (explicou). “A partir de amanhã” pede o futuro (tomarão). Os verbos também precisam concordar: o pediatra explicou; as crianças tomarão.', 10, 'Simulado A1 q10 e B1 q17 (Livro 1 e 2) - tema do sorvete, frase nova'),
+(7, NULL, 1, 7, 1, 'MULTIPLA_ESCOLHA', 'A ideia principal do texto é', 'Em 2006, os astrônomos decidiram que Plutão não é mais considerado um planeta. Eles criaram uma nova categoria, a dos “planetas-anões”, e passaram a classificar Plutão nela.
+Assim, o Sistema Solar tem oito planetas: Mercúrio, Vênus, Terra, Marte, Júpiter, Saturno, Urano e Netuno.', '{"opcoes":[{"id":"A","texto":"a descoberta de Plutão no Sistema Solar."},{"id":"B","texto":"o surgimento de um novo planeta."},{"id":"C","texto":"a classificação dos satélites naturais."},{"id":"D","texto":"a nova classificação de Plutão como planeta-anão."}]}', '{"correta":"D"}', 'O texto trata da mudança na classificação de Plutão, que deixou de ser planeta e passou a ser planeta-anão.', 10, 'Simulado B1 q7 (Livro 2) - texto adaptado'),
+(8, NULL, 1, 8, 1, 'ASSOCIACAO', 'Conecte cada descrição ao personagem do folclore brasileiro.', 'Todos os anos, criaturas fantásticas do folclore brasileiro se reúnem na floresta, à beira de um rio, para ver quantas histórias contam sobre a sua fama.', '{"esquerda":[{"id":"a","texto":"Menino travesso de uma perna só, que usa gorro vermelho."},{"id":"b","texto":"Homem que, nas noites de lua cheia, vira um animal parecido com um lobo."},{"id":"c","texto":"Menino da lenda gaúcha que ajuda a encontrar objetos perdidos."}],"direita":[{"id":"1","texto":"Negrinho do Pastoreiro"},{"id":"2","texto":"Saci-Pererê"},{"id":"3","texto":"Lobisomem"}]}', '{"a":"2","b":"3","c":"1"}', 'Saci-Pererê, Lobisomem e Negrinho do Pastoreiro são personagens do folclore brasileiro, citados no texto-base da avaliação.', 10, 'Simulado A1 q5 (Livro 1) - folclore brasileiro'),
+(9, NULL, 1, 9, 1, 'PREENCHIMENTO', 'Complete a frase com os verbos nos tempos corretos.', NULL, '{"frase":"Quando o pai de Simbad {1}, deixou-lhe uma grande riqueza. Naquela época, Simbad {2} dinheiro sem pensar no futuro.","opcoes":[{"id":"o1","texto":"morrerá"},{"id":"o2","texto":"gastava"},{"id":"o3","texto":"morreu"},{"id":"o4","texto":"gastará"}]}', '{"1":"o3","2":"o2"}', '“Deixou-lhe” indica que o pai já tinha morrido: morreu. “Naquela época” indica um hábito do passado: gastava.', 10, 'Simulado A1 q22 (Livro 1) - história de Simbad, frase nova'),
+(10, NULL, 1, 10, 1, 'MULTIPLA_ESCOLHA', 'O cartaz tem a intenção de promover a', 'LIVRE-SE DAQUELE PNEUZINHO!
+Pneus velhos guardados em casa acumulam água da chuva e viram criadouros do mosquito Aedes aegypti, que transmite a dengue.
+Coloque os pneus na calçada nos dias de recolhimento.
+SEM PNEU, SEM MOSQUITO!', '{"opcoes":[{"id":"A","texto":"prevenção contra a dengue."},{"id":"B","texto":"doação de objetos usados."},{"id":"C","texto":"perda de gordura corporal."},{"id":"D","texto":"venda de pneus em estoque."}]}', '{"correta":"A"}', 'O cartaz pede que as pessoas descartem os pneus velhos para evitar que o mosquito da dengue se reproduza.', 10, 'Simulado A1 q18 (Livro 1) - cartaz, texto adaptado');
+
+
+-- Correção para bancos que já executaram uma versão anterior deste script:
+-- troca o cenário da questão 4 ("feira" -> "praça") para não repetir o cenário
+-- da avaliação diagnóstica. É idempotente (pode ser executado várias vezes).
+UPDATE `questoes_gamificadas`
+SET `texto_apoio` = REPLACE(`texto_apoio`, 'à feira.', 'à praça.'),
+    `conteudo_json` = REPLACE(`conteudo_json`, 'o som da feira.', 'o som da praça.')
+WHERE `id` = 4;
+
+-- Mesma correção para a questão 2: a palavra "inflexível" também aparece na
+-- avaliação diagnóstica (trecho de Policarpo Quaresma) e foi trocada por "pontual".
+UPDATE `questoes_gamificadas`
+SET `conteudo_json` = REPLACE(REPLACE(`conteudo_json`,
+        'Que não cede nem muda de ideia, mesmo diante de pedidos.',
+        'Que chega sempre na hora certa, sem atrasos.'),
+        '"texto":"inflexível"', '"texto":"pontual"'),
+    `explicacao` = REPLACE(`explicacao`,
+        'Inflexível descreve quem não muda de ideia.',
+        'Pontual descreve quem não se atrasa.'),
+    `origem` = REPLACE(`origem`, ', B1 q14 (inflexível) - vocabulário', ' - vocabulário')
+WHERE `id` = 2;
+
+
+-- Redistribuição: cada questão passa a ser a única questão da sua própria fase
+-- (id N -> fase N, ordem 1). Serve para bancos que já executaram uma versão
+-- anterior, em que as 10 questões estavam todas na fase 1. É idempotente.
+UPDATE `questoes_gamificadas`
+SET `fase` = `id`, `ordem` = 1
+WHERE `id` BETWEEN 1 AND 10;
+
 
 -- =====================================================
 -- RESTAURAÇÃO DAS VARIÁVEIS DE SESSÃO

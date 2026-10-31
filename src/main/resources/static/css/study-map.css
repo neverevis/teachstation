@@ -2,25 +2,25 @@
 .map-container {
 	position: relative;
 	width: 100%;
-	max-width: 1920px;
-	min-width: 1000px;
-	aspect-ratio: 1920 / 1080;
+	max-width: 1920px; 
+	min-width: 1000px;    
+	aspect-ratio: 1920 / 1080; 
 	margin: 0 auto;
 	overflow: hidden;
 }
 .map-background {
-	position: absolute;
+	position: absolute; 
 	inset: 0;
-	background-image: url('../images/mapanovo2.png');
-	background-size: cover;
-	background-position: center;
-	z-index: -1;
+	background-image: url('../images/novooverworld.gif'); 
+	background-size: cover; 
+	background-position: center; 
+	z-index: -1; 
 }
 .map-button {
-	background-image: url('../images/button2.png');
-	z-index: 5;
+	background-image: url('../images/button2.png'); 
+	z-index: 5; 
 	position: absolute;
-	width: 3.75%;
+	width: 3.75%; 
 	aspect-ratio: 1;
 	background-size: contain;
 	background-repeat: no-repeat;
@@ -105,12 +105,4 @@
 	transform: translateY(0) scale(0.98);
 }
 
-/* O cartão fica por cima do mapa e pode cobrir botões vizinhos:
-   ele deixa o clique passar, e só o botão INICIAR continua clicável */
-.game-card {
-	pointer-events: none;
-}
 
-.game-card-btn {
-	pointer-events: auto;
-}

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/studyarea/portuguese")
 public class PortugueseController {
 	
-	@GetMapping("/level{numero:10|[1-9]}")
+	@GetMapping("/level{numero:[1-8]}")
 	public String level(@PathVariable("numero") int numero, Model model) {
 		model.addAttribute("fase", numero);
 		return "quiz-gamificado";

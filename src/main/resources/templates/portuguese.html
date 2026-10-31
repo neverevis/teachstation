@@ -2,9 +2,6 @@
 <html>
 	<head>
 		<meta charset="UTF-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-		<style>html { touch-action: pan-x pan-y; }</style>
-		<script th:src="@{/js/travar-zoom.js}"></script>
 		<link rel="stylesheet" th:href="@{/css/styles.css}">
 		<link rel="stylesheet" th:href="@{/css/study-map.css}">
 		<link rel="stylesheet" th:href="@{/css/study-map-bloqueio.css}">
@@ -56,16 +53,6 @@
 				</div>
 			</a>
 
-			<a th:href="@{#}">
-				<div id="btn9" class="map-button">
-				</div>
-			</a>
-
-			<a th:href="@{#}">
-				<div id="btn10" class="map-button">
-				</div>
-			</a>
-
 			<div id="game-card" class="game-card">
 				<div class="game-card-cover">
 					<span id="game-card-phase" class="game-card-phase">Fase 1</span>
@@ -90,8 +77,6 @@
 		let botao6 = document.getElementById("btn6");
 		let botao7 = document.getElementById("btn7");
 		let botao8 = document.getElementById("btn8");
-		let botao9 = document.getElementById("btn9");
-		let botao10 = document.getElementById("btn10");
 
 
 		let gameCard = document.getElementById("game-card")
@@ -101,16 +86,14 @@
 
 
 		let levels = [
-		    { button: botao1, position: new Vector2((221.7 / 1920) * 100, (851.7 / 1080) * 100) },
-		    { button: botao2, position: new Vector2((395.7 / 1920) * 100, (659.7 / 1080) * 100) },
-		    { button: botao3, position: new Vector2((623.7 / 1920) * 100, (743.7 / 1080) * 100) },
-		    { button: botao4, position: new Vector2((917.7 / 1920) * 100, (683.7 / 1080) * 100) },
-		    { button: botao5, position: new Vector2((1199.7 / 1920) * 100, (737.7 / 1080) * 100) },
-		    { button: botao6, position: new Vector2((1493.7 / 1920) * 100, (623.7 / 1080) * 100) },
-		    { button: botao7, position: new Vector2((1421.7 / 1920) * 100, (407.7 / 1080) * 100) },
-		    { button: botao8, position: new Vector2((1223.7 / 1920) * 100, (347.7 / 1080) * 100) },
-		    { button: botao9, position: new Vector2((1067.7 / 1920) * 100, (227.7 / 1080) * 100) },
-		    { button: botao10, position: new Vector2((989.7 / 1920) * 100, (65.7 / 1080) * 100) }
+		    { button: botao1, position: new Vector2((180 / 1920) * 100, (797 / 1080) * 100) },
+		    { button: botao2, position: new Vector2((343 / 1920) * 100, (707 / 1080) * 100) },
+		    { button: botao3, position: new Vector2((593 / 1920) * 100, (707 / 1080) * 100)  },
+			{ button: botao4, position: new Vector2((775 / 1920) * 100, (564 / 1080) * 100) },
+			{ button: botao5, position: new Vector2((1302 / 1920) * 100, (911 / 1080) * 100)  },
+			{ button: botao6, position: new Vector2((1446 / 1920) * 100, (659 / 1080) * 100) },
+			{ button: botao7, position: new Vector2((1674 / 1920) * 100, (444 / 1080) * 100) },
+			{ button: botao8, position: new Vector2((1332 / 1920) * 100, (276 / 1080) * 100) }
 		];
 
 		/*
@@ -177,72 +160,6 @@
 				event.preventDefault();
 				selecionarFase(index + 1, true);
 			});
-		});
-
-		// ---------- Navegação pelo teclado ----------
-		// Setas: movem o cartão para o botão mais próximo na direção escolhida.
-		// Enter: abre a fase selecionada, quando ela está liberada.
-		const DIRECOES = {
-			ArrowUp:    { x: 0,  y: -1 },
-			ArrowDown:  { x: 0,  y: 1 },
-			ArrowLeft:  { x: -1, y: 0 },
-			ArrowRight: { x: 1,  y: 0 }
-		};
-
-		// Posições em pixels do mapa original (1920 x 1080), para a distância não distorcer
-		function posicaoEmPixels(numero) {
-			const p = levels[numero - 1].position;
-			return { x: (p.x / 100) * 1920, y: (p.y / 100) * 1080 };
-		}
-
-		// Devolve o número da fase mais próxima na direção pedida, ou null se não houver nenhuma
-		function faseNaDirecao(numeroAtual, direcao) {
-			const origem = posicaoEmPixels(numeroAtual);
-			let melhor = null;
-			let melhorPontuacao = Infinity;
-			let melhorNoCone = false;
-
-			levels.forEach((level, index) => {
-				const numero = index + 1;
-				if (numero === numeroAtual) {
-					return;
-				}
-				const destino = posicaoEmPixels(numero);
-				const dx = destino.x - origem.x;
-				const dy = destino.y - origem.y;
-				const aolongo = dx * direcao.x + dy * direcao.y;      // quanto avança na direção
-				const lateral = Math.abs(dx * direcao.y - dy * direcao.x); // quanto desvia para o lado
-				if (aolongo <= 0) {
-					return;
-				}
-				const noCone = lateral <= aolongo * 1.2;               // até uns 50 graus de desvio
-				const pontuacao = aolongo + lateral * 2;               // prefere o mais perto e mais alinhado
-				if ((noCone && !melhorNoCone) || (noCone === melhorNoCone && pontuacao < melhorPontuacao)) {
-					melhor = numero;
-					melhorPontuacao = pontuacao;
-					melhorNoCone = noCone;
-				}
-			});
-			return melhor;
-		}
-
-		document.addEventListener("keydown", (event) => {
-			if (event.ctrlKey || event.metaKey || event.altKey) {
-				return;
-			}
-			const direcao = DIRECOES[event.key];
-			if (direcao) {
-				event.preventDefault(); // evita rolar a página com as setas
-				const destino = faseNaDirecao(faseSelecionada, direcao);
-				if (destino !== null) {
-					selecionarFase(destino, true);
-				}
-				return;
-			}
-			// Enter com o foco no corpo da página abre a fase (com o foco no INICIAR, o próprio link já cuida)
-			if (event.key === "Enter" && document.activeElement === document.body && faseDisponivel(faseSelecionada)) {
-				window.location.href = `/studyarea/portuguese/level${faseSelecionada}`;
-			}
 		});
 
 		atualizarBloqueios();

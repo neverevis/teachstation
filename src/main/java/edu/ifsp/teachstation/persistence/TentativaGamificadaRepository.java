@@ -19,11 +19,6 @@ public interface TentativaGamificadaRepository extends JpaRepository<TentativaGa
     @Query("SELECT COALESCE(MAX(t.rodada), 0) FROM TentativaGamificada t "
             + "WHERE t.aluno.id = :alunoId AND t.questaoGamificada.fase = :fase")
     Integer findUltimaRodada(@Param("alunoId") Integer alunoId, @Param("fase") Integer fase);
-
-    // Quantas respostas certas o aluno já deu na fase, em qualquer rodada (libera a fase seguinte)
-    @Query("SELECT COUNT(t) FROM TentativaGamificada t "
-            + "WHERE t.aluno.id = :alunoId AND t.questaoGamificada.fase = :fase AND t.acertou = true")
-    long countAcertosNaFase(@Param("alunoId") Integer alunoId, @Param("fase") Integer fase);
     
     // Soma total de acertos nas tentativas gamificadas de todos os alunos
     @Query("SELECT COALESCE(SUM(CASE WHEN t.acertou = true THEN 1 ELSE 0 END), 0) " + "FROM TentativaGamificada t")
