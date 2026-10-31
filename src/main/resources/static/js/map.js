@@ -107,27 +107,25 @@ class Vector2{
 class GameCard extends GameObject {
 		//o tamanho do elemento vai ser calculado com base no css 
 		
-		constructor(element, position, cardYOffsetPercent = 5){
-			const adjustedPos = new Vector2(position.x, position.y - cardYOffsetPercent);
-			super(element, adjustedPos);
+		constructor(element, position, cardYOffsetPercent = 5, buttonHeightPercent = 6.67){
+			super(element, GameCard.cardPosition(position, cardYOffsetPercent, buttonHeightPercent));
 			this.cardYOffsetPercent = cardYOffsetPercent;
+			this.buttonHeightPercent = buttonHeightPercent;
+		}
+
+		// O cartão fica acima do botão. Se não couber no mapa (botões perto do topo), fica abaixo dele.
+		static cardPosition(position, cardYOffsetPercent, buttonHeightPercent){
+			if (position.y - cardYOffsetPercent < 0){
+				return new Vector2(position.x, position.y + buttonHeightPercent + 1);
+			}
+			return new Vector2(position.x, position.y - cardYOffsetPercent);
 		}
 
 		setPosition(vector2){
-			const adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent);
-			super.setPosition(adjustedPos);
+			super.setPosition(GameCard.cardPosition(vector2, this.cardYOffsetPercent, this.buttonHeightPercent));
 		}
 
 		animateTo(vector2, duration = 400){
-			const adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent);
-			super.animateTo(adjustedPos, duration);
+			super.animateTo(GameCard.cardPosition(vector2, this.cardYOffsetPercent, this.buttonHeightPercent), duration);
 		}
-}	
-
-
-
-
-
-
-
-
+}
