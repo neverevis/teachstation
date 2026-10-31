@@ -24,7 +24,7 @@ public class NavegacaoAdvice {
             Map.entry("/studyarea/portuguese", "/studyarea")
     );
 
-    private static final Pattern FASE = Pattern.compile("^/studyarea/portuguese/level[1-8]$");
+    private static final Pattern FASE = Pattern.compile("^/studyarea/portuguese/level(10|[1-9])$");
     private static final Pattern EDITAR_ALUNO = Pattern.compile("^/aluno/\\d+/editar$");
     private static final Pattern EDITAR_PROFESSOR = Pattern.compile("^/professor/\\d+/editar$");
 
