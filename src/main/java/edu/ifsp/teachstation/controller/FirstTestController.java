@@ -53,7 +53,12 @@ public class FirstTestController {
         model.addAttribute("numeroQuestao", indiceAtual + 1);
         model.addAttribute("totalQuestoes", questoesDiagnosticas.size());
         model.addAttribute("progressoPorcentagem", (indiceAtual * 100) / questoesDiagnosticas.size());
-
+        model.addAttribute("respostaExibida", false);
+        model.addAttribute("acertou", false);
+        model.addAttribute("gabarito", null);
+        model.addAttribute("opcaoSelecionadaId", null);
+        model.addAttribute("opcaoCorretaId", null);
+        
         return "first-test";
     }
 
@@ -73,8 +78,10 @@ public class FirstTestController {
         // Montagem do gabarito para a tela
         OpcaoQuestao opcaoCorreta = questao.getOpcaoCorreta();
         String textoGabarito = "Não informado";
+        Integer opcaoCorretaId = null;
 
         if (opcaoCorreta != null) {
+            opcaoCorretaId = opcaoCorreta.getId();
             if (opcaoCorreta.getLetra() != null) {
                 textoGabarito = opcaoCorreta.getLetra() + ") " + opcaoCorreta.getTexto();
             } else {
@@ -96,6 +103,10 @@ public class FirstTestController {
         model.addAttribute("acertou", tentativa.getAcertou());
         model.addAttribute("gabarito", textoGabarito);
         model.addAttribute("respostaExibida", true);
+
+        // Usados pelo template para marcar visualmente a escolhida e a correta
+        model.addAttribute("opcaoSelecionadaId", opcaoId);
+        model.addAttribute("opcaoCorretaId", opcaoCorretaId);
 
         return "first-test";
     }

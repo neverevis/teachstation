@@ -70,14 +70,18 @@
                     <input type="hidden" name="questaoId" th:value="${questao.id}" />
 
                     <!-- Lista de alternativas vindas do banco -->
-                    <div class="alternativas">
-                        <label class="alternativa" th:each="opt : ${questao.opcoes}"
-                               th:classappend="${'alt-' + (opt.letra != null ? #strings.toLowerCase(opt.letra) : 'x') + ((respostaExibida ?: false) and opt.correta == true ? ' correta' : '')}">
-                            <input type="radio" name="opcaoId" th:value="${opt.id}" required th:disabled="${respostaExibida}">
-                            <span class="letra-alternativa" aria-hidden="true" th:if="${opt.letra != null}" th:text="${opt.letra}">A</span>
-                            <span class="texto-alternativa js-ler" th:text="${opt.texto}">Opção</span>
-                        </label>
-                    </div>
+					<div class="alternativas">
+					    <label class="alternativa"
+					           th:each="opt : ${questao.opcoes}"
+					           th:classappend="${'alt-' + (opt.letra != null ? #strings.toLowerCase(opt.letra) : 'x') + (respostaExibida and opt.correta ? ' correta' : '') + (respostaExibida and opcaoSelecionadaId != null and opt.id == opcaoSelecionadaId and !opt.correta ? ' incorreta' : '')}">
+					        <input type="radio" name="opcaoId" th:value="${opt.id}" required
+					               th:disabled="${respostaExibida}"
+					               th:checked="${respostaExibida and opt.id == opcaoSelecionadaId}">
+					        <span class="letra-alternativa" aria-hidden="true"
+					              th:if="${opt.letra != null}" th:text="${opt.letra}">A</span>
+					        <span class="texto-alternativa js-ler" th:text="${opt.texto}">Opção</span>
+					    </label>
+					</div>
 
                     <!-- Feedback exibido ao responder -->
                     <div th:if="${respostaExibida}" class="card-feedback" role="status"

@@ -576,8 +576,11 @@ body {
     background-color: #FAF8FF;
 }
 
-/* alternativa escolhida */
-.alternativa:has(input:checked) {
+/*
+ * Alternativa escolhida (ainda respondendo).
+ * A correta tem estilo próprio (verde) e fica de fora desta regra.
+ */
+.alternativa:has(input:checked):not(.correta) {
     border-color: var(--cor-letra, var(--cor-roxo));
     background-color: var(--cor-branco);
     box-shadow: 0 0 0 4px rgba(134, 70, 218, 0.2);
@@ -598,6 +601,7 @@ body {
     background-color: transparent;
 }
 
+/* a correta sempre fica verde, inclusive depois de responder */
 .alternativa.correta,
 .alternativa.correta:has(input:disabled):hover {
     border-color: #2E7D32;
@@ -610,6 +614,22 @@ body {
     font-size: 15px;
     font-weight: 700;
     color: #1B5E20;
+    white-space: nowrap;
+}
+
+/* alternativa que o aluno marcou e que está errada */
+.alternativa.incorreta,
+.alternativa.incorreta:has(input:disabled):hover {
+    border-color: #E65100;
+    background-color: #FFF3E0;
+}
+
+.alternativa.incorreta::after {
+    content: "✖ sua resposta";
+    margin-left: auto;
+    font-size: 15px;
+    font-weight: 700;
+    color: #8A3B00;
     white-space: nowrap;
 }
 
@@ -724,11 +744,11 @@ body {
         flex-direction: column;
     }
 
+    /* Deixa a faixa roxa compacta no topo, igual ao redefinir */
     .apresentacao-login {
         width: 100%;
-        min-height: 220px;
-
-        padding: 30px;
+        min-height: auto; /* Remove a altura mínima forçada */
+        padding: 40px 20px 30px; /* Topo maior, base menor */
     }
 
     .apresentacao-login h1 {
@@ -739,9 +759,24 @@ body {
         font-size: 17px;
     }
 
+    /* Traz os campos para mais perto do topo e aumenta o tamanho */
     .login-container {
         width: 100%;
-        padding: 40px 24px;
+        padding: 30px 24px 40px; /* Reduz o espaço entre o roxo e o form */
+        justify-content: flex-start; /* Alinha o conteúdo ao topo */
+    }
+
+    /* Deixa os inputs com "cara" de mobile (mais altos) */
+    .campo-formulario input {
+        padding: 18px 16px;
+        font-size: 18px;
+    }
+
+    /* Botão principal também maior */
+    .login-container > form > button {
+        padding: 18px;
+        font-size: 18px;
+        margin-top: 10px;
     }
 	
 	.linha-formulario {
@@ -814,6 +849,29 @@ body {
 	.botao-proxima {
 	    width: 100%;
 	}
+}
+
+/* Telas muito pequenas (Celulares) */
+@media (max-width: 480px) {
+    .apresentacao-login {
+        padding: 30px 20px 20px; /* Mais compacto ainda */
+    }
+    
+    .login-container {
+        padding: 20px 20px 30px; /* Cola os campos no topo */
+    }
+
+    .login-container h2,
+    .login-container > h2 {
+        font-size: 26px;
+        margin-bottom: 24px;
+        text-align: center;
+    }
+
+    .login-container > p {
+        margin-top: 20px;
+        font-size: 14px;
+    }
 }
 
 /* Quem prefere menos movimento não vê animações */
