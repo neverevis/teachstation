@@ -286,6 +286,27 @@ body {
     color: var(--cor-branco);
 }
 
+/* Logo do projeto ao lado do título do cabeçalho */
+.cabecalho-titulo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.cabecalho-logo {
+    display: block;
+    width: 44px;
+    height: 44px;
+}
+
+/* Logo centralizada acima do título na tela de login */
+.logo-login {
+    display: block;
+    width: 160px;
+    height: 160px;
+    margin: 0 auto 24px;
+}
+
 .cabecalho-marca {
     display: flex;
     align-items: center;
@@ -799,6 +820,25 @@ body {
 	.cabecalho-avaliacao h1 {
 	    font-size: 22px;
 	}
+
+	.cabecalho-marca {
+	    gap: 12px;
+	}
+
+	.cabecalho-titulo {
+	    gap: 8px;
+	}
+
+	.cabecalho-logo {
+	    width: 32px;
+	    height: 32px;
+	}
+
+	.logo-login {
+	    width: 110px;
+	    height: 110px;
+	    margin-bottom: 16px;
+	}
 	
 	.conteudo-avaliacao {
 	    padding: 40px 20px;
@@ -880,5 +920,13 @@ body {
     *, *::before, *::after {
         animation: none !important;
         transition: none !important;
+    }
+}
+
+/* Celulares muito estreitos: o cabeçalho já não tem espaço de sobra, então o logo some */
+@media (max-width: 359px) {
+
+    .cabecalho-logo {
+        display: none;
     }
 }
