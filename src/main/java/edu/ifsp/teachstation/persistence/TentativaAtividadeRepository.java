@@ -36,4 +36,7 @@ public interface TentativaAtividadeRepository extends JpaRepository<TentativaAti
 
     // Total de tentativas de um aluno específico
     long countByAlunoId(Integer alunoId);
+
+    // Histórico do aluno, da tentativa mais recente para a mais antiga
+    List<TentativaAtividade> findByAlunoIdOrderByDataTentativaDesc(Integer alunoId);
 }

@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-8">
+
     <link rel="icon" type="image/png" th:href="@{/images/logo-teachstation.png}">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
@@ -265,6 +266,10 @@
                                 </td>
                                 <td>
                                     <div style="display: flex; align-items: flex-start; gap: 12px; flex-wrap: wrap;">
+                                        <a th:href="@{'/dashboard/aluno/' + ${aluno.id}}"
+                                           style="padding: 4px 10px; border-radius: 6px; background-color: var(--cor-azul); color: var(--cor-branco); text-decoration: none; font-size: 13px; font-weight: 600;">
+                                            Progresso
+                                        </a>
                                         <a th:href="@{'/aluno/' + ${aluno.id} + '/editar'}"
                                            style="padding: 4px 10px; border-radius: 6px; background-color: var(--cor-lilas); color: var(--cor-azul-escuro); text-decoration: none; font-size: 13px; font-weight: 600;">
                                             Editar
