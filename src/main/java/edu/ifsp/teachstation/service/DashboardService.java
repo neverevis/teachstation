@@ -2,6 +2,8 @@ package edu.ifsp.teachstation.service;
 
 import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.model.AvaliacaoDiagnostica;
+import edu.ifsp.teachstation.model.TentativaAtividade;
+import edu.ifsp.teachstation.model.TentativaGamificada;
 import edu.ifsp.teachstation.persistence.*;
 import edu.ifsp.teachstation.service.dto.AlunoProgresso;
 import edu.ifsp.teachstation.service.dto.DashboardResumo;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Concentra as consultas e cálculos do dashboard.
@@ -84,43 +87,66 @@ public class DashboardService {
         List<AlunoProgresso> resultado = new ArrayList<>();
 
         for (Aluno aluno : alunos) {
-            AlunoProgresso ap = new AlunoProgresso();
-
-            ap.setId(aluno.getId());
-            ap.setRa(aluno.getRa());
-            // usa nome social quando existir
-            String nome = (aluno.getNomeSocial() != null && !aluno.getNomeSocial().isBlank())
-                    ? aluno.getNomeSocial() : aluno.getNomeCompleto();
-            ap.setNome(nome);
-            ap.setEmail(aluno.getEmail());
-            ap.setTelefoneResponsavel(aluno.getTelefoneResponsavel());
-            ap.setIdade(aluno.getIdade());
-            ap.setNivelAtual(aluno.getNivelAtual());
-            ap.setProgressoNivel(aluno.getProgressoNivel());
-
-            // Tentativas diagnósticas
-            int acertosDiag = tentativaAtividadeRepository.countAcertosByAluno(aluno.getId());
-            int tentativasDiag = (int) tentativaAtividadeRepository.countByAlunoId(aluno.getId());
-            int pontosDiag = tentativaAtividadeRepository.sumPontosByAlunoId(aluno.getId());
-
-            // Tentativas gamificadas
-            int acertosGam = tentativaGamificadaRepository.countAcertosByAluno(aluno.getId());
-            int tentativasGam = (int) tentativaGamificadaRepository.countByAlunoId(aluno.getId());
-            int pontosGam = tentativaGamificadaRepository.sumPontosByAluno(aluno.getId());
-
-            ap.setPontosDiagnosticos(pontosDiag);
-            ap.setPontosGamificados(pontosGam);
-            ap.setAcertos(acertosDiag + acertosGam);
-            ap.setTotalTentativas(tentativasDiag + tentativasGam);
-            ap.setTaxaAcerto(calcularPorcentagem(acertosDiag + acertosGam, tentativasDiag + tentativasGam));
-
-            // Marca se o aluno já tem avaliação diagnóstica registrada
-            ap.setFezDiagnostica(avaliacaoRepository.existsByAlunoId(aluno.getId()));
-
-            resultado.add(ap);
+            resultado.add(montarProgresso(aluno));
         }
 
         return resultado;
+    }
+
+    /**
+     * Monta o progresso de um aluno (usado na tabela e na tela de progresso individual).
+     */
+    public AlunoProgresso montarProgresso(Aluno aluno) {
+        AlunoProgresso ap = new AlunoProgresso();
+
+        ap.setId(aluno.getId());
+        ap.setRa(aluno.getRa());
+        // usa nome social quando existir
+        String nome = (aluno.getNomeSocial() != null && !aluno.getNomeSocial().isBlank())
+                ? aluno.getNomeSocial() : aluno.getNomeCompleto();
+        ap.setNome(nome);
+        ap.setEmail(aluno.getEmail());
+        ap.setTelefoneResponsavel(aluno.getTelefoneResponsavel());
+        ap.setIdade(aluno.getIdade());
+        ap.setNivelAtual(aluno.getNivelAtual());
+        ap.setProgressoNivel(aluno.getProgressoNivel());
+
+        // Tentativas diagnósticas
+        int acertosDiag = tentativaAtividadeRepository.countAcertosByAluno(aluno.getId());
+        int tentativasDiag = (int) tentativaAtividadeRepository.countByAlunoId(aluno.getId());
+        int pontosDiag = tentativaAtividadeRepository.sumPontosByAlunoId(aluno.getId());
+
+        // Tentativas gamificadas
+        int acertosGam = tentativaGamificadaRepository.countAcertosByAluno(aluno.getId());
+        int tentativasGam = (int) tentativaGamificadaRepository.countByAlunoId(aluno.getId());
+        int pontosGam = tentativaGamificadaRepository.sumPontosByAluno(aluno.getId());
+
+        ap.setPontosDiagnosticos(pontosDiag);
+        ap.setPontosGamificados(pontosGam);
+        ap.setAcertos(acertosDiag + acertosGam);
+        ap.setTotalTentativas(tentativasDiag + tentativasGam);
+        ap.setTaxaAcerto(calcularPorcentagem(acertosDiag + acertosGam, tentativasDiag + tentativasGam));
+
+        // Marca se o aluno já tem avaliação diagnóstica registrada
+        ap.setFezDiagnostica(avaliacaoRepository.existsByAlunoId(aluno.getId()));
+
+        return ap;
+    }
+
+    public Aluno buscarAluno(Integer id) {
+        return alunoRepository.findById(id).orElse(null);
+    }
+
+    public Optional<AvaliacaoDiagnostica> buscarAvaliacao(Integer alunoId) {
+        return avaliacaoRepository.findByAlunoId(alunoId);
+    }
+
+    public List<TentativaAtividade> historicoDiagnostico(Integer alunoId) {
+        return tentativaAtividadeRepository.findByAlunoIdOrderByDataTentativaDesc(alunoId);
+    }
+
+    public List<TentativaGamificada> historicoGamificado(Integer alunoId) {
+        return tentativaGamificadaRepository.findByAlunoIdOrderByDataTentativaDesc(alunoId);
     }
 
     /**

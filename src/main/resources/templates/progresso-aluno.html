@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/png" th:href="@{/images/logo-teachstation.png}">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <link rel="stylesheet" th:href="@{/css/dashboard.css}">
+    <title>Progresso do Aluno - TeachStation</title>
+</head>
+<body>
+    <div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
+
+    <main class="conteudo-painel">
+        <header class="cabecalho-painel">
+            <div>
+                <h1 th:text="${progresso.nome}">Nome do Aluno</h1>
+                <p>
+                    RA <span th:text="${progresso.ra}">000</span> ·
+                    <span th:text="${progresso.email}">email</span> ·
+                    <span th:text="${progresso.idade != null ? progresso.idade + ' anos' : 'idade não informada'}">-</span>
+                </p>
+            </div>
+            <a th:href="@{/dashboard#alunos}" class="botao-acao">Voltar ao dashboard</a>
+        </header>
+
+        <!-- resumo geral do aluno -->
+        <section class="resumo-turma">
+            <div class="card-resumo">
+                <span class="rotulo-card">Nível atual</span>
+                <strong class="valor-card" th:text="${progresso.nivelAtual != null ? progresso.nivelAtual : 'Sem nível'}">-</strong>
+                <span class="barra-nivel">
+                    <span class="progresso-nivel" th:style="'width: ' + ${progresso.progressoNivel} + '%'"></span>
+                </span>
+            </div>
+            <div class="card-resumo">
+                <span class="rotulo-card">Pontos</span>
+                <strong class="valor-card" th:text="${progresso.pontosDiagnosticos + progresso.pontosGamificados}">0</strong>
+            </div>
+            <div class="card-resumo">
+                <span class="rotulo-card">Acertos</span>
+                <strong class="valor-card" th:text="${progresso.acertos + '/' + progresso.totalTentativas}">0/0</strong>
+            </div>
+            <div class="card-resumo">
+                <span class="rotulo-card">Taxa de acerto</span>
+                <strong class="valor-card" th:text="${progresso.taxaAcerto + '%'}">0%</strong>
+            </div>
+        </section>
+
+        <!-- avaliação diagnóstica -->
+        <section class="card-avaliacoes">
+            <h3>Avaliação Diagnóstica</h3>
+            <p th:if="${avaliacao == null}" class="texto-vazio">O aluno ainda não fez a avaliação diagnóstica.</p>
+            <p th:if="${avaliacao != null}">
+                Nota <strong th:text="${avaliacao.notaFinal}">0</strong> ·
+                <span class="etiqueta-nivel" th:text="${avaliacao.nivelClassificado}">INICIANTE</span> ·
+                <span th:text="${#temporals.format(avaliacao.dataAvaliacao, 'dd/MM/yyyy HH:mm')}">-</span>
+            </p>
+        </section>
+
+        <!-- histórico da avaliação diagnóstica -->
+        <section class="card-avaliacoes">
+            <h3>Questões da Diagnóstica</h3>
+            <p th:if="${tentativasDiagnosticas.isEmpty()}" class="texto-vazio">Nenhuma tentativa registrada.</p>
+            <div class="tabela-avaliacoes-wrapper" th:unless="${tentativasDiagnosticas.isEmpty()}">
+                <table class="tabela-avaliacoes">
+                    <thead>
+                        <tr><th>Questão</th><th>Resultado</th><th>Pontos</th><th>Data</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${tentativasDiagnosticas}">
+                            <td th:text="${#strings.abbreviate(t.questao.enunciado, 80)}">Enunciado</td>
+                            <td th:text="${t.acertou ? 'Acertou' : 'Errou'}">Acertou</td>
+                            <td th:text="${t.pontosObtidos}">0</td>
+                            <td th:text="${#temporals.format(t.dataTentativa, 'dd/MM/yyyy HH:mm')}">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- histórico do modo gamificado -->
+        <section class="card-avaliacoes">
+            <h3>Questões Gamificadas</h3>
+            <p th:if="${tentativasGamificadas.isEmpty()}" class="texto-vazio">Nenhuma tentativa registrada.</p>
+            <div class="tabela-avaliacoes-wrapper" th:unless="${tentativasGamificadas.isEmpty()}">
+                <table class="tabela-avaliacoes">
+                    <thead>
+                        <tr><th>Fase</th><th>Questão</th><th>Rodada</th><th>Resultado</th><th>Pontos</th><th>Data</th></tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="t : ${tentativasGamificadas}">
+                            <td th:text="${t.questaoGamificada.fase}">1</td>
+                            <td th:text="${#strings.abbreviate(t.questaoGamificada.enunciado, 80)}">Enunciado</td>
+                            <td th:text="${t.rodada}">1</td>
+                            <td th:text="${t.acertou ? 'Acertou' : 'Errou'}">Acertou</td>
+                            <td th:text="${t.pontosObtidos}">0</td>
+                            <td th:text="${#temporals.format(t.dataTentativa, 'dd/MM/yyyy HH:mm')}">-</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
+</body>
+</html>

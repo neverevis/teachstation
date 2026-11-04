@@ -38,6 +38,7 @@ public interface TentativaGamificadaRepository extends JpaRepository<TentativaGa
     // Soma de pontos gamificados de um aluno
     @Query("SELECT COALESCE(SUM(t.pontosObtidos), 0) FROM TentativaGamificada t WHERE t.aluno.id = :alunoId")
     int sumPontosByAluno(@Param("alunoId") Integer alunoId);
-    
-    
+
+    // Histórico do aluno, da tentativa mais recente para a mais antiga
+    List<TentativaGamificada> findByAlunoIdOrderByDataTentativaDesc(Integer alunoId);
 }

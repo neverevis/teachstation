@@ -40,7 +40,7 @@ public class SecurityConfig {
                     "/signup/**",
                     "/professor/**").hasAuthority("ROLE_SECRETARIA")
 
-                .requestMatchers("/dashboard", "/aluno/**")
+                .requestMatchers("/dashboard", "/dashboard/**", "/aluno/**")
                     .hasAnyAuthority("ROLE_PROFESSOR", "ROLE_SECRETARIA")
 
                 .requestMatchers(
