@@ -1,12 +1,12 @@
-// representar pontos no espaço 
-// conceito importante do CSS -> Ele faz uso de um plano cartesiano cujo ponto (0,0) é no canto superior esquerdo da tela, então 
-// provavelmente só faremos uso de valores negativos de Y nos botões e positivos de X  
+// representar pontos no espaço
+// conceito importante do CSS -> Ele faz uso de um plano cartesiano cujo ponto (0,0) é no canto superior esquerdo da tela, então
+// provavelmente só faremos uso de valores negativos de Y nos botões e positivos de X
 
 let windowWidth = screen.width;
 let windowHeight = screen.height;
 
 class GameObject{
-	
+
 	constructor(element, position){
 		this.element = element;
 		this.element.style.position = "absolute";
@@ -24,50 +24,50 @@ class GameObject{
 	    this.element.style.left = `${vector2.x}%`;
 	    this.element.style.top = `${vector2.y}%`;
 	}
-	
+
 	animateTo(vector2, duration = 400){
 		if (this._animationFrame){
 			cancelAnimationFrame(this._animationFrame);
 		}
-		
+
 		const start = this.position;
 		const end = vector2;
 		const startTime = performance.now();
-		
+
 		const step = (now) => {
 			const elapsed = now - startTime; //tempo decorrido
 			const t = Math.min(elapsed / duration, 1);
 			const eased = GameObject.easeOutCubic(t);
-			
+
 			const current = Vector2.lerp(start, end, eased);
 			this._applyPosition(current);
 			this.position = current;
-			
+
 			if (t < 1){
 				this._animationFrame = requestAnimationFrame(step);
 			} else {
 				this._animationFrame = null;
 			}
 		};
-		
+
 		this._animationFrame = requestAnimationFrame(step);
 	}
 
 	static easeOutCubic(t){
 		return 1 - Math.pow(1 - t, 3);
 	}
-} 
+}
 
 class Vector2{
 	constructor(x, y){
 		this.x = x;
 		this.y = y;
 	}
-	
+
 	getX(){
 		return this.x;
 	}
-	
+
 	setX(x){
 		if (Number.isFinite(x))	{
 			this.x = x;
@@ -75,28 +75,28 @@ class Vector2{
 			return;
 		}
 	}
-	
+
 	getY(){
 			return this.y;
 	}
-		
+
 	setY(y){
 		if (Number.isFinite(y)){
-			this.y = y;	
+			this.y = y;
 		} else {
 			return;
 		}
 	}
-		 
+
 	getSpacePosition(){
 		return new Vector2(this.x, this.y);
 	}
-	
+
 	getDistance(p1, p2){
 		//d = raíz de (x2² - x1²) + (y2² - y2²)
 		return Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
 	}
-	
+
 	static lerp(posA, posB, delta){
 		const x = posA.x + (posB.x - posA.x) * delta;
 		const y = posA.y + (posB.y - posA.y) * delta;
@@ -105,29 +105,27 @@ class Vector2{
 }
 
 class GameCard extends GameObject {
-		//o tamanho do elemento vai ser calculado com base no css 
-		
-		constructor(element, position, cardYOffsetPercent = 5){
-			const adjustedPos = new Vector2(position.x, position.y - cardYOffsetPercent);
-			super(element, adjustedPos);
+		//o tamanho do elemento vai ser calculado com base no css
+
+		constructor(element, position, cardYOffsetPercent = 5, buttonHeightPercent = 6.67){
+			super(element, GameCard.cardPosition(position, cardYOffsetPercent, buttonHeightPercent));
 			this.cardYOffsetPercent = cardYOffsetPercent;
+			this.buttonHeightPercent = buttonHeightPercent;
+		}
+
+		// O cartão fica acima do botão. Se não couber no mapa (botões perto do topo), fica abaixo dele.
+		static cardPosition(position, cardYOffsetPercent, buttonHeightPercent){
+			if (position.y - cardYOffsetPercent < 0){
+				return new Vector2(position.x, position.y + buttonHeightPercent + 1);
+			}
+			return new Vector2(position.x, position.y - cardYOffsetPercent);
 		}
 
 		setPosition(vector2){
-			const adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent);
-			super.setPosition(adjustedPos);
+			super.setPosition(GameCard.cardPosition(vector2, this.cardYOffsetPercent, this.buttonHeightPercent));
 		}
 
 		animateTo(vector2, duration = 400){
-			const adjustedPos = new Vector2(vector2.x, vector2.y - this.cardYOffsetPercent);
-			super.animateTo(adjustedPos, duration);
+			super.animateTo(GameCard.cardPosition(vector2, this.cardYOffsetPercent, this.buttonHeightPercent), duration);
 		}
-}	
-
-
-
-
-
-
-
-
+}

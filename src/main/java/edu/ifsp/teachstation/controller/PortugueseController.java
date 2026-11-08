@@ -9,14 +9,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 @RequestMapping("/studyarea/portuguese")
 public class PortugueseController {
-	
-	@GetMapping("/level{numero:[1-8]}")
+
+    @GetMapping("/level{numero:10|[1-9]}")
 	public String level(@PathVariable("numero") int numero, Model model) {
 		model.addAttribute("fase", numero);
 		return "quiz-gamificado";
 	}
-	
-	
+
 	@GetMapping("")
 	public String portuguese() {
 		return "portuguese";

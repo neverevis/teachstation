@@ -38,7 +38,7 @@ public class QuizGamificadoService {
     private static final int TENTATIVAS_PREENCHIMENTO = 3;
 
     // O mapa do overworld tem 8 fases; questões em fases acima disso ficam guardadas, sem acesso
-    public static final int ULTIMA_FASE_DO_MAPA = 8;
+    public static final int ULTIMA_FASE_DO_MAPA = 10;
 
     private static final Pattern LACUNA = Pattern.compile("\\{(\\d+)\\}");
 
@@ -178,7 +178,7 @@ public class QuizGamificadoService {
         List<Integer> liberadas = new ArrayList<>();
 
         for (int i = 0; i < existentes.size(); i++) {
-            if (i > 0 && !faseConcluida(aluno, existentes.get(i - 1))) {
+            if (i > 0 && !faseSuperada(aluno, existentes.get(i - 1))) {
                 break;
             }
             liberadas.add(existentes.get(i));
@@ -214,7 +214,8 @@ public class QuizGamificadoService {
         }
 
         List<Integer> existentes = fasesDoMapa();
-        Integer proximaFase = existentes.contains(fase + 1) ? fase + 1 : null;
+        // só oferece a próxima fase se o aluno já acertou a questão desta fase
+        Integer proximaFase = existentes.contains(fase + 1) && faseSuperada(aluno, fase) ? fase + 1 : null;
 
         return new ResultadoDto(fase, ultima, questoes.size(), acertos, pontos, pontosMaximos, itens, proximaFase);
     }
@@ -299,15 +300,10 @@ public class QuizGamificadoService {
         return fases;
     }
 
-    private boolean faseConcluida(Aluno aluno, int fase) {
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
-        if (ultima == 0) {
-            return false;
-        }
-        if (ultima > 1) {
-            return true;
-        }
-        return rodadaConcluida(questaoRepository.findByFaseOrderByOrdemAsc(fase), buscarTentativas(aluno, 1, fase));
+    // A fase só é superada quando o aluno já acertou a questão dela (em qualquer rodada).
+    // Errar, ou apenas terminar a fase, não libera a seguinte.
+    private boolean faseSuperada(Aluno aluno, int fase) {
+        return tentativaRepository.countAcertosNaFase(aluno.getId(), fase) > 0;
     }
 
     private void exigirFaseLiberada(Aluno aluno, int fase) {

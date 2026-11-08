@@ -234,24 +234,37 @@
             ]));
         });
 
+        // proximaFase vem null na última fase do mapa
+        var acoes = [];
+        if (resultado.proximaFase) {
+            acoes.push(el('a', {
+                class: 'botao-confirmar', href: URL_MAPA + '/level' + resultado.proximaFase,
+                text: 'Avançar para a próxima fase →'
+            }));
+        }
+        acoes.push(el('a', {class: 'botao-confirmar', href: URL_MAPA, text: 'Voltar ao mapa'}));
+        acoes.push(el('button', {
+            type: 'button', class: 'botao-proxima', text: 'Jogar novamente ↻',
+            onclick: function () {
+                carregar(true);
+            }
+        }));
+
         palco.appendChild(barraProgresso(100));
         palco.appendChild(el('article', {class: 'card-questao quiz-resultado'}, [
-            el('h2', {id: 'quizTituloResultado', tabindex: '-1', text: '🏆 Fase concluída!'}),
+            el('h2', {id: 'quizTituloResultado', tabindex: '-1',
+                text: resultado.acertos === resultado.totalQuestoes ? '🏆 Fase concluída!' : '💪 Quase lá!'}),
             el('p', {class: 'quiz-placar'}, [
                 el('strong', {text: String(resultado.acertos)}),
-                ' de ' + resultado.totalQuestoes + ' questões corretas'
+                ' de ' + resultado.totalQuestoes + (resultado.totalQuestoes === 1 ? ' questão correta' : ' questões corretas')
             ]),
             el('p', {class: 'quiz-pontos', text: 'Você fez ' + resultado.pontos + ' de ' + resultado.pontosMaximos + ' pontos.'}),
+            resultado.acertos < resultado.totalQuestoes && !resultado.proximaFase
+                ? el('p', {class: 'quiz-aviso', role: 'status',
+                    text: 'Jogue novamente e acerte a questão para continuar.'})
+                : null,
             lista,
-            el('div', {class: 'acoes-quiz'}, [
-                el('a', {class: 'botao-confirmar', href: URL_MAPA, text: 'Voltar ao mapa'}),
-                el('button', {
-                    type: 'button', class: 'botao-proxima', text: 'Jogar novamente ↻',
-                    onclick: function () {
-                        carregar(true);
-                    }
-                })
-            ])
+            el('div', {class: 'acoes-quiz'}, acoes)
         ]));
 
         document.getElementById('quizTituloResultado').focus();
@@ -323,6 +336,14 @@
             type: 'button', class: 'botao-proxima', onclick: ehUltima ? finalizar : avancar
         });
         ui.rotuloAvancar = ehUltima ? 'Finalizar 🏁' : 'Avançar →';
+        // atalho direto para a próxima fase: só aparece depois que o aluno ACERTA a questão
+        ui.proximaFase = null;
+        if (ehUltima && dados.proximaFase) {
+            ui.proximaFase = el('a', {
+                class: 'botao-confirmar botao-proxima-fase', href: URL_MAPA + '/level' + dados.proximaFase,
+                text: 'Avançar para a próxima fase →', hidden: 'hidden'
+            });
+        }
 
         var cartao = el('article', {class: 'card-questao quiz-card'}, [
             el('span', {class: 'numero-questao', text: 'QUESTÃO ' + numero + ' · ' + ROTULOS[q.tipo]}),
@@ -336,7 +357,7 @@
             ui.feedback,
             el('div', {class: 'acoes-quiz'}, [
                 el('div', {class: 'acoes-quiz-esquerda'}, [ui.confirmar]),
-                ui.avancar
+                el('div', {class: 'acoes-quiz-direita'}, ui.proximaFase ? [ui.proximaFase, ui.avancar] : [ui.avancar])
             ])
         ]);
 
@@ -461,6 +482,9 @@
         ui.confirmar.textContent = ocupado ? 'Verificando…' : 'Confirmar resposta';
         ui.avancar.disabled = ocupado || !q.estado.resolvida;
         ui.avancar.textContent = ui.rotuloAvancar;
+        if (ui.proximaFase) {
+            ui.proximaFase.hidden = ocupado || !q.estado.acertou;
+        }
     }
 
     // ---------- Feedback depois de responder ----------
