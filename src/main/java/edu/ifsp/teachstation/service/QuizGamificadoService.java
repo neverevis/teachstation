@@ -37,8 +37,8 @@ public class QuizGamificadoService {
     private static final int TENTATIVAS_UMA = 1;
     private static final int TENTATIVAS_PREENCHIMENTO = 3;
 
-    // O mapa do overworld tem 8 fases; questões em fases acima disso ficam guardadas, sem acesso
-    public static final int ULTIMA_FASE_DO_MAPA = 8;
+    // O mapa do overworld tem 10 fases; questões em fases acima disso ficam guardadas, sem acesso
+    public static final int ULTIMA_FASE_DO_MAPA = 10;
 
     private static final Pattern LACUNA = Pattern.compile("\\{(\\d+)\\}");
 
