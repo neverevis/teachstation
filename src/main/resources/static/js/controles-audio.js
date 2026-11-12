@@ -12,7 +12,10 @@
  *
  * "1x" corresponde à velocidade que a página já usava (rate 0.85); as demais
  * opções multiplicam essa base. Se o usuário mudar algo durante a leitura, ela
- * continua do ponto onde parou já com o novo ajuste.
+ * continua a partir da próxima palavra (sem repetir a atual) já com o novo ajuste.
+ *
+ * Enquanto há leitura, aparece um botão de pausa (pause.png) que pausa e
+ * continua do ponto onde parou, e o botão "Ouvir" vira "Parar a leitura".
  */
 (function () {
     'use strict';
@@ -39,6 +42,9 @@
     // Leitura em andamento (para poder retomar do ponto atual após um ajuste)
     var leitura = null;
     var reinicioPendente = null;
+    var pausado = false;
+    var ajustePendente = false; // volume/velocidade mudou com a leitura pausada
+    var atualizacaoPendente = null;
 
     // ---------- Preferências do usuário (só conveniência; funciona sem) ----------
 
@@ -68,81 +74,144 @@
         fala.rate = Math.min(10, Math.max(0.1, fala.__velocidadeBase * ajustes.velocidade));
     }
 
-    function acompanhar(fala, inicio) {
-        var registro = {
-            fala: fala,
-            texto: fala.__textoCompleto || fala.text,
-            inicio: inicio,
-            indice: inicio
-        };
+    var cancelarOriginal = sintese.cancel.bind(sintese);
+    var pausarOriginal = sintese.pause.bind(sintese);
+    var continuarOriginal = sintese.resume.bind(sintese);
+
+    // Posição logo após a palavra que começou a ser lida
+    function fimDaPalavra(texto, inicio, comprimento) {
+        if (comprimento > 0) {
+            return inicio + comprimento;
+        }
+        var resto = texto.slice(inicio);
+        var palavra = resto.match(/^\s*\S+/);
+        return inicio + (palavra ? palavra[0].length : resto.length);
+    }
+
+    function encerrarLeitura(registro) {
+        if (leitura === registro) {
+            leitura = null;
+            pausado = false;
+            ajustePendente = false;
+        }
+        agendarAtualizacao();
+    }
+
+    /*
+     * Guarda até onde a leitura chegou. O índice salvo é o FIM da palavra que
+     * está sendo falada: assim, ao recomeçar depois de um ajuste de volume ou
+     * velocidade, a leitura segue da próxima palavra em vez de repetir a atual.
+     */
+    function acompanhar(fala, texto, inicio) {
+        var registro = {fala: fala, texto: texto, inicio: inicio, indice: inicio};
         leitura = registro;
         fala.addEventListener('boundary', function (e) {
-            if (leitura === registro && typeof e.charIndex === 'number') {
-                registro.indice = registro.inicio + e.charIndex;
-            }
+            if (leitura !== registro || typeof e.charIndex !== 'number') return;
+            if (e.name && e.name !== 'word') return;
+            registro.indice = fimDaPalavra(registro.texto, registro.inicio + e.charIndex, e.charLength || 0);
         });
-        fala.addEventListener('end', function () {
-            if (leitura === registro) {
-                leitura = null;
-            }
-        });
+        fala.addEventListener('start', agendarAtualizacao);
+        fala.addEventListener('end', function () { encerrarLeitura(registro); });
+        fala.addEventListener('error', function () { encerrarLeitura(registro); });
     }
 
     sintese.speak = function (fala) {
         if (fala instanceof window.SpeechSynthesisUtterance) {
             aplicarAjustes(fala);
             if (!fala.__retomada) {
-                acompanhar(fala, 0);
+                // Leitura nova feita pela página: começa do zero e sem pausa
+                clearTimeout(reinicioPendente);
+                pausado = false;
+                ajustePendente = false;
+                if (sintese.paused) continuarOriginal();
+                acompanhar(fala, fala.text, 0);
             }
         }
-        return falarOriginal(fala);
+        var resultado = falarOriginal(fala);
+        agendarAtualizacao();
+        return resultado;
     };
 
-    // Recomeça a leitura atual a partir da última palavra lida, com os novos ajustes
+    // Qualquer cancelamento (da página ou do botão "Parar") encerra a leitura e a pausa
+    sintese.cancel = function () {
+        clearTimeout(reinicioPendente);
+        leitura = null;
+        pausado = false;
+        ajustePendente = false;
+        cancelarOriginal();
+        if (sintese.paused) continuarOriginal(); // evita que a próxima leitura já comece pausada
+        agendarAtualizacao();
+    };
+
+    // Recomeça a leitura atual logo após a última palavra lida, com os ajustes atuais
+    function falarRestante() {
+        var anterior = leitura;
+        if (!anterior) return;
+        var deslocamento = anterior.texto.slice(anterior.indice).search(/[^\s.,;:!?]/);
+        if (deslocamento < 0) { // não sobrou nada para ler
+            sintese.cancel();
+            return;
+        }
+        var inicio = anterior.indice + deslocamento;
+        var nova = new window.SpeechSynthesisUtterance(anterior.texto.slice(inicio));
+        nova.lang = anterior.fala.lang;
+        nova.voice = anterior.fala.voice;
+        nova.pitch = anterior.fala.pitch;
+        nova.__velocidadeBase = anterior.fala.__velocidadeBase;
+        nova.__retomada = true;
+
+        clearTimeout(reinicioPendente);
+        leitura = null;
+        cancelarOriginal();
+        if (sintese.paused) continuarOriginal();
+        pausado = false;
+        ajustePendente = false;
+        acompanhar(nova, anterior.texto, inicio);
+        sintese.speak(nova);
+    }
+
+    // Volume/velocidade não mudam no meio de uma fala: é preciso recomeçar do ponto atual
     function retomarComAjustes() {
+        if (!leitura) return;
+        if (pausado) { // aplica só quando o usuário continuar
+            ajustePendente = true;
+            return;
+        }
         clearTimeout(reinicioPendente);
         reinicioPendente = setTimeout(function () {
-            if (!leitura || !sintese.speaking || sintese.paused) {
-                return;
+            if (leitura && !pausado && sintese.speaking) {
+                falarRestante();
             }
-            var anterior = leitura;
-            var restante = anterior.texto.slice(anterior.indice);
-            if (!restante.trim()) {
-                return;
-            }
-            var nova = new window.SpeechSynthesisUtterance(restante);
-            nova.lang = anterior.fala.lang;
-            nova.voice = anterior.fala.voice;
-            nova.pitch = anterior.fala.pitch;
-            nova.__velocidadeBase = anterior.fala.__velocidadeBase;
-            nova.__textoCompleto = anterior.texto;
-            nova.__retomada = true;
-
-            leitura = null;
-            sintese.cancel();
-            acompanharRetomada(nova, anterior);
-            sintese.speak(nova);
         }, 250);
     }
 
-    function acompanharRetomada(nova, anterior) {
-        var registro = {
-            fala: nova,
-            texto: anterior.texto,
-            inicio: anterior.indice,
-            indice: anterior.indice
-        };
-        leitura = registro;
-        nova.addEventListener('boundary', function (e) {
-            if (leitura === registro && typeof e.charIndex === 'number') {
-                registro.indice = registro.inicio + e.charIndex;
-            }
-        });
-        nova.addEventListener('end', function () {
-            if (leitura === registro) {
-                leitura = null;
-            }
-        });
+    function pausar() {
+        if (!leitura || pausado) return;
+        clearTimeout(reinicioPendente);
+        pausado = true;
+        pausarOriginal();
+        atualizarTodos();
+    }
+
+    function continuar() {
+        if (!leitura || !pausado) return;
+        if (ajustePendente) {
+            falarRestante(); // continua de onde parou, já com o novo ajuste
+        } else {
+            pausado = false;
+            continuarOriginal(); // continua exatamente de onde parou
+        }
+        atualizarTodos();
+    }
+
+    function estado() {
+        if (!leitura) return 'parado';
+        return pausado ? 'pausado' : 'tocando';
+    }
+
+    function agendarAtualizacao() {
+        clearTimeout(atualizacaoPendente);
+        atualizacaoPendente = setTimeout(atualizarTodos, 0);
     }
 
     // ---------- Interface ----------
@@ -246,13 +315,41 @@
         grupoVelocidade.appendChild(botaoVelocidade);
         grupoVelocidade.appendChild(menuVelocidade);
 
-        // --- Montagem: o botão original vai para dentro da caixa, sem ser alterado ---
+        // --- Pausar / continuar (só aparece enquanto há uma leitura em andamento) ---
+        var botaoPausa = document.createElement('button');
+        botaoPausa.type = 'button';
+        botaoPausa.className = 'controle-audio-botao controle-audio-pausa';
+        botaoPausa.hidden = true;
+
+        var iconePausa = document.createElement('span');
+        iconePausa.className = 'controle-audio-icone-pausa';
+        iconePausa.setAttribute('aria-hidden', 'true');
+        botaoPausa.appendChild(iconePausa);
+
+        botaoPausa.addEventListener('click', function () {
+            if (pausado) continuar(); else pausar();
+        });
+
+        // --- Montagem: o botão original vai para dentro da caixa ---
+        var textoOuvir = botaoOuvir.textContent;
         botaoOuvir.parentNode.insertBefore(caixa, botaoOuvir);
         caixa.appendChild(botaoOuvir);
+        caixa.appendChild(botaoPausa);
         caixa.appendChild(grupoVolume);
         caixa.appendChild(grupoVelocidade);
 
         // --- Comportamento ---
+
+        // Durante a leitura (tocando ou pausada) o botão "Ouvir" vira "Parar".
+        // Fase de captura na caixa: roda antes do clique original da página.
+        caixa.addEventListener('click', function (e) {
+            if (leitura && botaoOuvir.contains(e.target)) {
+                e.stopPropagation();
+                e.preventDefault();
+                sintese.cancel();
+            }
+        }, true);
+
         function abrirVolume() {
             fecharTodos(controle);
             fecharMenu(false);
@@ -325,6 +422,20 @@
                 fecharMenu(false);
             },
             atualizar: function () {
+                var situacao = estado();
+                if (situacao === 'parado' && document.activeElement === botaoPausa) {
+                    botaoOuvir.focus(); // não deixa o foco sumir junto com o botão
+                }
+                botaoPausa.hidden = situacao === 'parado';
+                botaoPausa.classList.toggle('pausado', situacao === 'pausado');
+                var rotuloPausa = situacao === 'pausado' ? 'Continuar a leitura' : 'Pausar a leitura';
+                botaoPausa.setAttribute('aria-label', rotuloPausa);
+                botaoPausa.title = rotuloPausa;
+                var textoBotao = situacao === 'parado' ? textoOuvir : '⏹ Parar a leitura';
+                if (botaoOuvir.textContent !== textoBotao) {
+                    botaoOuvir.textContent = textoBotao;
+                }
+
                 var porcento = Math.round(ajustes.volume * 100);
                 botaoVolume.classList.toggle('mudo', ajustes.volume === 0);
                 botaoVolume.setAttribute('aria-label', 'Volume da leitura: ' + porcento + '%');

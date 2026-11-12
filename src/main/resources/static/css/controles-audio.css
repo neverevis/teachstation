@@ -82,6 +82,27 @@
     transform: translate(-50%, -50%) rotate(-45deg);
 }
 
+/* Pausar / continuar: visível só durante a leitura */
+.controle-audio-pausa[hidden] {
+    display: none;
+}
+
+.controle-audio-icone-pausa {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background-color: currentColor;
+    -webkit-mask: url("../images/pause.png") center / contain no-repeat;
+    mask: url("../images/pause.png") center / contain no-repeat;
+}
+
+/* Pausado: o ícone vira um "play" para continuar */
+.controle-audio-pausa.pausado .controle-audio-icone-pausa {
+    -webkit-mask: none;
+    mask: none;
+    clip-path: polygon(22% 10%, 90% 50%, 22% 90%);
+}
+
 .controle-audio-velocidade {
     min-width: 58px;
     font-variant-numeric: tabular-nums;
