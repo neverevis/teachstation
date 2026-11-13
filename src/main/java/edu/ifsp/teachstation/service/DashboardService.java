@@ -138,7 +138,7 @@ public class DashboardService {
     }
 
     public Optional<AvaliacaoDiagnostica> buscarAvaliacao(Integer alunoId) {
-        return avaliacaoRepository.findByAlunoId(alunoId);
+        return avaliacaoRepository.findFirstByAlunoIdOrderByDataAvaliacaoDescIdDesc(alunoId);
     }
 
     public List<TentativaAtividade> historicoDiagnostico(Integer alunoId) {

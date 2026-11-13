@@ -16,8 +16,10 @@ public interface AvaliacaoDiagnosticaRepository extends JpaRepository<AvaliacaoD
 
     // Verifica se o aluno já realizou a avaliação diagnóstica
     boolean existsByAlunoId(Integer alunoId);
-    
+
     // Média das notas finais de todas as avaliações
     @Query("SELECT COALESCE(AVG(a.notaFinal), 0) FROM AvaliacaoDiagnostica a")
     double calcularMediaNotas();
+
+    Optional<AvaliacaoDiagnostica> findFirstByAlunoIdOrderByDataAvaliacaoDescIdDesc(Integer alunoId);
 }
