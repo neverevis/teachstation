@@ -4,6 +4,7 @@ import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.model.OpcaoQuestao;
 import edu.ifsp.teachstation.model.Questao;
 import edu.ifsp.teachstation.model.TentativaAtividade;
+import edu.ifsp.teachstation.persistence.AvaliacaoDiagnosticaRepository;
 import edu.ifsp.teachstation.persistence.QuestaoRepository;
 import edu.ifsp.teachstation.persistence.TentativaAtividadeRepository;
 import edu.ifsp.teachstation.service.NivelamentoService;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
@@ -28,8 +30,11 @@ public class FirstTestController {
     @Autowired
     private NivelamentoService nivelamentoService;
 
+    @Autowired
+    private AvaliacaoDiagnosticaRepository avaliacaoRepository;
+
     @GetMapping
-    public String exibirQuestaoAtual(HttpSession session, Model model) {
+    public String exibirQuestaoAtual(HttpSession session, Model model, RedirectAttributes redirectAttributes) {
         Aluno alunoLogado = (Aluno) session.getAttribute("alunoLogado");
         
         if (alunoLogado == null) {
@@ -41,9 +46,24 @@ public class FirstTestController {
 
         int indiceAtual = tentativasRealizadas.size();
 
-        if (indiceAtual >= questoesDiagnosticas.size()) 
+        if (indiceAtual >= questoesDiagnosticas.size())
         {
-            nivelamentoService.finalizarAvaliacao(alunoLogado);
+            // Só finaliza (e mostra o feedback) uma vez; se o aluno voltar aqui depois, vai direto para a área de estudo
+            if (!avaliacaoRepository.existsByAlunoId(alunoLogado.getId())) {
+                nivelamentoService.finalizarAvaliacao(alunoLogado);
+
+                int acertos = 0;
+                for (TentativaAtividade t : tentativasRealizadas) {
+                    if (Boolean.TRUE.equals(t.getAcertou())) {
+                        acertos++;
+                    }
+                }
+
+                // Flash attributes sobrevivem ao redirect e somem depois (o feedback aparece uma única vez)
+                redirectAttributes.addFlashAttribute("avaliacaoConcluida", true);
+                redirectAttributes.addFlashAttribute("acertosResultado", acertos);
+                redirectAttributes.addFlashAttribute("totalQuestoesResultado", questoesDiagnosticas.size());
+            }
             return "redirect:/studyarea";
         }
 

@@ -76,7 +76,7 @@ public class NivelamentoService {
     }
 
     // Finalizar a avaliação do aluno no banco
-    public void finalizarAvaliacao(Aluno aluno) {
+    public AvaliacaoDiagnostica finalizarAvaliacao(Aluno aluno) {
         List<TentativaAtividade> tentativas = tentativaRepository.findByAlunoId(aluno.getId());
         
         int totalPontos = 0;
@@ -93,9 +93,11 @@ public class NivelamentoService {
         avaliacao.setDataAvaliacao(LocalDateTime.now());
         avaliacao.setNotaFinal((float) totalPontos);
         avaliacao.setNivelClassificado(nivelClassificado);
-        avaliacaoRepository.save(avaliacao);
+        avaliacao = avaliacaoRepository.save(avaliacao);
 
         aluno.setNivelAtual(nivelClassificado);
         alunoRepository.save(aluno);
+
+        return avaliacao;
     }
 }

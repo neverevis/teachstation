@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
+	<meta charset="UTF-8">
+
 	<link rel="icon" type="image/png" th:href="@{/images/logo-teachstation.png}">
 	<link rel="stylesheet" th:href="@{/css/styles.css}">
 	<link rel="stylesheet" th:href="@{/css/studyarea.css}">
@@ -11,6 +12,27 @@
 <body>
 	<div th:replace="~{fragments/cabecalho :: cabecalho}"></div>
 	
+	<!-- Feedback de conclusão da avaliação diagnóstica (aparece só logo depois de terminar o teste) -->
+	<div th:if="${avaliacaoConcluida}" id="modalConclusao" class="modal-conclusao" role="dialog" aria-modal="true" aria-labelledby="tituloConclusao">
+		<div class="modal-conclusao-card">
+			<span class="modal-conclusao-emoji" aria-hidden="true">🏆</span>
+			<h2 id="tituloConclusao">Parabéns! Você concluiu a avaliação!</h2>
+			<p class="modal-conclusao-resumo">
+				Você acertou <strong th:text="${acertosResultado} + ' de ' + ${totalQuestoesResultado}">7 de 10</strong> questões.
+			</p>
+
+			<h3>E agora? Veja o que fazer:</h3>
+			<ol class="modal-conclusao-passos">
+				<li>Escolha uma <strong>área de estudo</strong> na tela que vai aparecer.</li>
+				<li>Clique em <strong>Iniciar</strong> em <strong>Português</strong>.</li>
+				<li>Siga as <strong>fases do mapa</strong> na ordem.</li>
+				<li>As áreas com cadeado <span aria-hidden="true">🔒</span> ainda estão bloqueadas.</li>
+			</ol>
+
+			<button type="button" id="botaoFecharConclusao" class="modal-conclusao-botao">Escolher minha área de estudo</button>
+		</div>
+	</div>
+
 	<main class="studyarea">
 		<div class="title-segment">
 			<h1>Escolha sua Área de Estudo</h1>
@@ -76,6 +98,22 @@
 		</footer>
 		
 		<div th:replace="~{fragments/vlibras :: widget-vlibras}"></div>
-		
+
+	<script th:if="${avaliacaoConcluida}">
+		(function () {
+			var modal = document.getElementById('modalConclusao');
+			var botao = document.getElementById('botaoFecharConclusao');
+			if (!modal || !botao) return;
+
+			function fechar() { modal.remove(); document.body.style.overflow = ''; }
+
+			document.body.style.overflow = 'hidden';
+			botao.focus();
+			botao.addEventListener('click', fechar);
+			modal.addEventListener('click', function (e) { if (e.target === modal) fechar(); });
+			document.addEventListener('keydown', function (e) { if (e.key === 'Escape') fechar(); });
+		})();
+	</script>
+
 </body>
 </html>
