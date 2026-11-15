@@ -77,6 +77,11 @@ public class NivelamentoService {
 
     // Finalizar a avaliação do aluno no banco
     public void finalizarAvaliacao(Aluno aluno) {
+        // O aluno só pode ter uma avaliação diagnóstica (findByAlunoId espera resultado único)
+        if (avaliacaoRepository.existsByAlunoId(aluno.getId())) {
+            return;
+        }
+
         List<TentativaAtividade> tentativas = tentativaRepository.findByAlunoId(aluno.getId());
         
         int totalPontos = 0;
