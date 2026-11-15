@@ -75,10 +75,12 @@ public class NivelamentoService {
         }
     }
 
-    public void finalizarAvaliacao(Aluno aluno) {
+
+    // Finalizar a avaliação do aluno no banco
+    public AvaliacaoDiagnostica finalizarAvaliacao(Aluno aluno) {
         // O aluno só pode ter uma avaliação diagnóstica (findByAlunoId espera resultado único)
         if (avaliacaoRepository.existsByAlunoId(aluno.getId())) {
-            return;
+            return avaliacaoRepository.findFirstByAlunoIdOrderByDataAvaliacaoDescIdDesc(aluno.getId()).orElse(null);
         }
 
         List<TentativaAtividade> tentativas = tentativaRepository.findByAlunoId(aluno.getId());
@@ -97,9 +99,11 @@ public class NivelamentoService {
         avaliacao.setDataAvaliacao(LocalDateTime.now());
         avaliacao.setNotaFinal((float) totalPontos);
         avaliacao.setNivelClassificado(nivelClassificado);
-        avaliacaoRepository.save(avaliacao);
+        avaliacao = avaliacaoRepository.save(avaliacao);
 
         aluno.setNivelAtual(nivelClassificado);
         alunoRepository.save(aluno);
+
+        return avaliacao;
     }
 }
