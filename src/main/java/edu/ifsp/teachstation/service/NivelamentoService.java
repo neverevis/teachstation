@@ -75,10 +75,16 @@ public class NivelamentoService {
         }
     }
 
+
     // Finalizar a avaliação do aluno no banco
     public AvaliacaoDiagnostica finalizarAvaliacao(Aluno aluno) {
+        // O aluno só pode ter uma avaliação diagnóstica (findByAlunoId espera resultado único)
+        if (avaliacaoRepository.existsByAlunoId(aluno.getId())) {
+            return avaliacaoRepository.findFirstByAlunoIdOrderByDataAvaliacaoDescIdDesc(aluno.getId()).orElse(null);
+        }
+
         List<TentativaAtividade> tentativas = tentativaRepository.findByAlunoId(aluno.getId());
-        
+
         int totalPontos = 0;
         for (TentativaAtividade tentativa : tentativas) {
             if (tentativa.getPontosObtidos() != null) {
