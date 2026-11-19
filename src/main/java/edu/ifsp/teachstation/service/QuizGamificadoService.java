@@ -3,6 +3,7 @@ package edu.ifsp.teachstation.service;
 import edu.ifsp.teachstation.model.Aluno;
 import edu.ifsp.teachstation.model.QuestaoGamificada;
 import edu.ifsp.teachstation.model.TentativaGamificada;
+import edu.ifsp.teachstation.persistence.AlunoRepository;
 import edu.ifsp.teachstation.persistence.QuestaoGamificadaRepository;
 import edu.ifsp.teachstation.persistence.TentativaGamificadaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,11 +43,19 @@ public class QuizGamificadoService {
 
     private static final Pattern LACUNA = Pattern.compile("\\{(\\d+)\\}");
 
+    // Cada aluno joga o mapa do seu nível (Aluno.nivelAtual, definido pela avaliação diagnóstica).
+    // Sem nível, ou sem questões cadastradas para ele, o aluno joga o mapa intermediário.
+    private static final Set<String> NIVEIS = Set.of("INICIANTE", "INTERMEDIARIO", "AVANCADO");
+    private static final String NIVEL_PADRAO = "INTERMEDIARIO";
+
     @Autowired
     private QuestaoGamificadaRepository questaoRepository;
 
     @Autowired
     private TentativaGamificadaRepository tentativaRepository;
+
+    @Autowired
+    private AlunoRepository alunoRepository;
 
     private final JsonMapper json = JsonMapper.builder().build();
 
@@ -100,12 +109,13 @@ public class QuizGamificadoService {
     // carrega a fase com o estado do aluno. Com nova=true e a rodada concluída, devolve uma rodada em branco.
     @Transactional(readOnly = true)
     public FaseDto obterFase(Aluno aluno, int fase, boolean nova) {
-        List<QuestaoGamificada> questoes = questoesDaFase(fase);
-        exigirFaseLiberada(aluno, fase);
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
+        String nivel = nivelDoAluno(aluno);
+        List<QuestaoGamificada> questoes = questoesDaFase(nivel, fase);
+        exigirFaseLiberada(aluno, nivel, fase);
+        int ultima = tentativaRepository.findUltimaRodadaNoNivel(aluno.getId(), nivel, fase);
 
         int rodada = Math.max(ultima, 1);
-        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase);
+        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, nivel, ultima, fase);
 
         if (nova && ultima > 0 && rodadaConcluida(questoes, tentativas)) {
             rodada = ultima + 1;
@@ -124,11 +134,17 @@ public class QuizGamificadoService {
             throw new QuizException(HttpStatus.BAD_REQUEST, "Resposta inválida.");
         }
 
+        // a questão precisa ser do mapa do nível do aluno
+        String nivel = nivelDoAluno(aluno);
+        if (!nivel.equals(questao.getNivel())) {
+            throw new QuizException(HttpStatus.FORBIDDEN, "Esta questão não faz parte do seu mapa.");
+        }
+
         int fase = questao.getFase();
-        List<QuestaoGamificada> questoes = questoesDaFase(fase);
-        exigirFaseLiberada(aluno, fase);
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
-        List<TentativaGamificada> daUltima = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase);
+        List<QuestaoGamificada> questoes = questoesDaFase(nivel, fase);
+        exigirFaseLiberada(aluno, nivel, fase);
+        int ultima = tentativaRepository.findUltimaRodadaNoNivel(aluno.getId(), nivel, fase);
+        List<TentativaGamificada> daUltima = ultima == 0 ? List.of() : buscarTentativas(aluno, nivel, ultima, fase);
 
         // se a última rodada já terminou, a nova resposta inicia a rodada seguinte
         int rodada = 1;
@@ -174,11 +190,15 @@ public class QuizGamificadoService {
 
     @Transactional(readOnly = true)
     public List<Integer> listarFasesLiberadas(Aluno aluno) {
-        List<Integer> existentes = fasesDoMapa();
+        return fasesLiberadas(aluno, nivelDoAluno(aluno));
+    }
+
+    private List<Integer> fasesLiberadas(Aluno aluno, String nivel) {
+        List<Integer> existentes = fasesDoMapa(nivel);
         List<Integer> liberadas = new ArrayList<>();
 
         for (int i = 0; i < existentes.size(); i++) {
-            if (i > 0 && !faseSuperada(aluno, existentes.get(i - 1))) {
+            if (i > 0 && !faseSuperada(aluno, nivel, existentes.get(i - 1))) {
                 break;
             }
             liberadas.add(existentes.get(i));
@@ -188,10 +208,11 @@ public class QuizGamificadoService {
 
     @Transactional(readOnly = true)
     public ResultadoDto obterResultado(Aluno aluno, int fase) {
-        List<QuestaoGamificada> questoes = questoesDaFase(fase);
-        exigirFaseLiberada(aluno, fase);
-        int ultima = tentativaRepository.findUltimaRodada(aluno.getId(), fase);
-        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, ultima, fase);
+        String nivel = nivelDoAluno(aluno);
+        List<QuestaoGamificada> questoes = questoesDaFase(nivel, fase);
+        exigirFaseLiberada(aluno, nivel, fase);
+        int ultima = tentativaRepository.findUltimaRodadaNoNivel(aluno.getId(), nivel, fase);
+        List<TentativaGamificada> tentativas = ultima == 0 ? List.of() : buscarTentativas(aluno, nivel, ultima, fase);
 
         if (ultima == 0 || !rodadaConcluida(questoes, tentativas)) {
             throw new QuizException(HttpStatus.CONFLICT, "Ainda há questões sem resolver.");
@@ -213,9 +234,9 @@ public class QuizGamificadoService {
             pontosMaximos += questao.getPontos();
         }
 
-        List<Integer> existentes = fasesDoMapa();
+        List<Integer> existentes = fasesDoMapa(nivel);
         // só oferece a próxima fase se o aluno já acertou a questão desta fase
-        Integer proximaFase = existentes.contains(fase + 1) && faseSuperada(aluno, fase) ? fase + 1 : null;
+        Integer proximaFase = existentes.contains(fase + 1) && faseSuperada(aluno, nivel, fase) ? fase + 1 : null;
 
         return new ResultadoDto(fase, ultima, questoes.size(), acertos, pontos, pontosMaximos, itens, proximaFase);
     }
@@ -285,14 +306,26 @@ public class QuizGamificadoService {
         return resultado;
     }
 
-    private List<TentativaGamificada> buscarTentativas(Aluno aluno, int rodada, int fase) {
-        return tentativaRepository.findByAlunoIdAndRodadaAndQuestaoGamificadaFaseOrderByIdAsc(
-                aluno.getId(), rodada, fase);
+    // Nível cujo mapa o aluno joga. Lido do banco a cada requisição, porque a secretaria pode
+    // alterar o nível depois do login. Sem nível válido, ou sem questões para ele, usa o padrão.
+    private String nivelDoAluno(Aluno aluno) {
+        String nivel = alunoRepository.findById(aluno.getId())
+                .map(Aluno::getNivelAtual)
+                .orElse(aluno.getNivelAtual());
+        if (nivel == null || !NIVEIS.contains(nivel) || !questaoRepository.existsByNivel(nivel)) {
+            return NIVEL_PADRAO;
+        }
+        return nivel;
     }
 
-    private List<Integer> fasesDoMapa() {
+    private List<TentativaGamificada> buscarTentativas(Aluno aluno, String nivel, int rodada, int fase) {
+        return tentativaRepository.findByAlunoIdAndRodadaAndQuestaoGamificadaNivelAndQuestaoGamificadaFaseOrderByIdAsc(
+                aluno.getId(), rodada, nivel, fase);
+    }
+
+    private List<Integer> fasesDoMapa(String nivel) {
         List<Integer> fases = new ArrayList<>();
-        for (Integer fase : questaoRepository.findFasesDisponiveis()) {
+        for (Integer fase : questaoRepository.findFasesDisponiveisPorNivel(nivel)) {
             if (fase != null && fase >= 1 && fase <= ULTIMA_FASE_DO_MAPA) {
                 fases.add(fase);
             }
@@ -302,19 +335,19 @@ public class QuizGamificadoService {
 
     // A fase só é superada quando o aluno já acertou a questão dela (em qualquer rodada).
     // Errar, ou apenas terminar a fase, não libera a seguinte.
-    private boolean faseSuperada(Aluno aluno, int fase) {
-        return tentativaRepository.countAcertosNaFase(aluno.getId(), fase) > 0;
+    private boolean faseSuperada(Aluno aluno, String nivel, int fase) {
+        return tentativaRepository.countAcertosNaFaseDoNivel(aluno.getId(), nivel, fase) > 0;
     }
 
-    private void exigirFaseLiberada(Aluno aluno, int fase) {
-        if (!listarFasesLiberadas(aluno).contains(fase)) {
+    private void exigirFaseLiberada(Aluno aluno, String nivel, int fase) {
+        if (!fasesLiberadas(aluno, nivel).contains(fase)) {
             throw new QuizException(HttpStatus.FORBIDDEN,
                     "Fase bloqueada. Conclua a fase anterior para liberar esta.");
         }
     }
 
-    private List<QuestaoGamificada> questoesDaFase(int fase) {
-        List<QuestaoGamificada> questoes = questaoRepository.findByFaseOrderByOrdemAsc(fase);
+    private List<QuestaoGamificada> questoesDaFase(String nivel, int fase) {
+        List<QuestaoGamificada> questoes = questaoRepository.findByNivelAndFaseOrderByOrdemAsc(nivel, fase);
         if (questoes.isEmpty()) {
             throw new QuizException(HttpStatus.NOT_FOUND, "Fase não encontrada.");
         }
