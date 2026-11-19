@@ -12,7 +12,7 @@ import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "questoes_gamificadas", uniqueConstraints = @UniqueConstraint(
-        name = "uk_questoes_gamificadas_fase_ordem", columnNames = {"fase", "ordem"}))
+        name = "uk_questoes_gamificadas_nivel_fase_ordem", columnNames = {"nivel", "fase", "ordem"}))
 public class QuestaoGamificada {
 
     @Id
@@ -26,6 +26,11 @@ public class QuestaoGamificada {
     @ManyToOne
     @JoinColumn(name = "area_id", nullable = false)
     private AreaConhecimento materia;
+
+    // INICIANTE, INTERMEDIARIO ou AVANCADO: cada aluno joga o mapa do seu nível.
+    // Mesma definição do teachstation.sql (as questões antigas ficam como INTERMEDIARIO).
+    @Column(columnDefinition = "ENUM('INICIANTE', 'INTERMEDIARIO', 'AVANCADO') NOT NULL DEFAULT 'INTERMEDIARIO'")
+    private String nivel;
 
     private Integer fase;
 
@@ -74,6 +79,14 @@ public class QuestaoGamificada {
 
     public void setMateria(AreaConhecimento materia) {
         this.materia = materia;
+    }
+
+    public String getNivel() {
+        return nivel;
+    }
+
+    public void setNivel(String nivel) {
+        this.nivel = nivel;
     }
 
     public Integer getFase() {

@@ -43,6 +43,21 @@ public interface TentativaGamificadaRepository extends JpaRepository<TentativaGa
             + "WHERE t.aluno.id = :alunoId AND t.questaoGamificada.fase = :fase AND t.acertou = true")
     long countAcertosNaFase(@Param("alunoId") Integer alunoId, @Param("fase") Integer fase);
 
+    // ---- Versões por nível (o progresso no mapa é separado por nível) ----
+
+    List<TentativaGamificada> findByAlunoIdAndRodadaAndQuestaoGamificadaNivelAndQuestaoGamificadaFaseOrderByIdAsc(
+            Integer alunoId, Integer rodada, String nivel, Integer fase);
+
+    @Query("SELECT COALESCE(MAX(t.rodada), 0) FROM TentativaGamificada t "
+            + "WHERE t.aluno.id = :alunoId AND t.questaoGamificada.nivel = :nivel AND t.questaoGamificada.fase = :fase")
+    Integer findUltimaRodadaNoNivel(@Param("alunoId") Integer alunoId, @Param("nivel") String nivel,
+                                    @Param("fase") Integer fase);
+
+    @Query("SELECT COUNT(t) FROM TentativaGamificada t WHERE t.aluno.id = :alunoId "
+            + "AND t.questaoGamificada.nivel = :nivel AND t.questaoGamificada.fase = :fase AND t.acertou = true")
+    long countAcertosNaFaseDoNivel(@Param("alunoId") Integer alunoId, @Param("nivel") String nivel,
+                                   @Param("fase") Integer fase);
+
     // Histórico do aluno, da tentativa mais recente para a mais antiga
     List<TentativaGamificada> findByAlunoIdOrderByDataTentativaDesc(Integer alunoId);
 }

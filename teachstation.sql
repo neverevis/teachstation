@@ -464,11 +464,14 @@ VALUES
 -- conteudo_json: parte exibida ao aluno (sem gabarito).
 -- gabarito_json: respostas corretas; fica somente no servidor até a questão ser resolvida.
 -- origem:        simulado/questão que inspirou a adaptação (rastreabilidade).
+-- nivel:         INICIANTE | INTERMEDIARIO | AVANCADO. Cada aluno joga o mapa do
+--                seu nível (aluno.nivel_atual, definido pela avaliação diagnóstica).
 
 CREATE TABLE IF NOT EXISTS `questoes_gamificadas` (
     `id` INT NOT NULL AUTO_INCREMENT,
     `questao_id` INT NULL DEFAULT NULL,
     `area_id` INT NOT NULL,
+    `nivel` ENUM('INICIANTE', 'INTERMEDIARIO', 'AVANCADO') NOT NULL DEFAULT 'INTERMEDIARIO',
     `fase` INT NOT NULL DEFAULT 1,
     `ordem` INT NOT NULL,
     `tipo` ENUM('ASSOCIACAO', 'PREENCHIMENTO', 'MULTIPLA_ESCOLHA') NOT NULL,
@@ -481,7 +484,7 @@ CREATE TABLE IF NOT EXISTS `questoes_gamificadas` (
     `origem` VARCHAR(255) NULL DEFAULT NULL,
 
     PRIMARY KEY (`id`),
-    UNIQUE INDEX `uk_questoes_gamificadas_fase_ordem` (`fase` ASC, `ordem` ASC) VISIBLE,
+    UNIQUE INDEX `uk_questoes_gamificadas_nivel_fase_ordem` (`nivel` ASC, `fase` ASC, `ordem` ASC) VISIBLE,
     INDEX `questao_id` (`questao_id` ASC) VISIBLE,
     INDEX `area_id` (`area_id` ASC) VISIBLE,
 
@@ -497,6 +500,41 @@ CREATE TABLE IF NOT EXISTS `questoes_gamificadas` (
 ENGINE = InnoDB
 DEFAULT CHARACTER SET = utf8mb4
 COLLATE = utf8mb4_0900_ai_ci;
+
+-- Atualização de bancos criados antes da coluna `nivel` (o CREATE TABLE acima não
+-- altera uma tabela que já existe). Cada passo só roda se for necessário, então o
+-- script continua podendo ser reexecutado:
+--   1. cria a coluna `nivel` (as questões existentes ficam como INTERMEDIARIO);
+--   2. remove a chave única antiga (fase, ordem), que impediria ter a mesma fase
+--      em mais de um nível;
+--   3. cria a chave única nova (nivel, fase, ordem).
+
+SET @ts_existe := (SELECT COUNT(*) FROM information_schema.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'questoes_gamificadas' AND COLUMN_NAME = 'nivel');
+SET @ts_sql := IF(@ts_existe = 0,
+    'ALTER TABLE `questoes_gamificadas` ADD COLUMN `nivel` ENUM(''INICIANTE'', ''INTERMEDIARIO'', ''AVANCADO'') NOT NULL DEFAULT ''INTERMEDIARIO'' AFTER `area_id`',
+    'DO 0');
+PREPARE ts_stmt FROM @ts_sql;
+EXECUTE ts_stmt;
+DEALLOCATE PREPARE ts_stmt;
+
+SET @ts_existe := (SELECT COUNT(*) FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'questoes_gamificadas' AND INDEX_NAME = 'uk_questoes_gamificadas_fase_ordem');
+SET @ts_sql := IF(@ts_existe > 0,
+    'ALTER TABLE `questoes_gamificadas` DROP INDEX `uk_questoes_gamificadas_fase_ordem`',
+    'DO 0');
+PREPARE ts_stmt FROM @ts_sql;
+EXECUTE ts_stmt;
+DEALLOCATE PREPARE ts_stmt;
+
+SET @ts_existe := (SELECT COUNT(*) FROM information_schema.STATISTICS
+    WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = 'questoes_gamificadas' AND INDEX_NAME = 'uk_questoes_gamificadas_nivel_fase_ordem');
+SET @ts_sql := IF(@ts_existe = 0,
+    'ALTER TABLE `questoes_gamificadas` ADD UNIQUE INDEX `uk_questoes_gamificadas_nivel_fase_ordem` (`nivel`, `fase`, `ordem`)',
+    'DO 0');
+PREPARE ts_stmt FROM @ts_sql;
+EXECUTE ts_stmt;
+DEALLOCATE PREPARE ts_stmt;
 
 
 -- =====================================================
@@ -553,12 +591,16 @@ COLLATE = utf8mb4_0900_ai_ci;
 -- O banco original não traz gabarito: as respostas foram definidas pela equipe a
 -- partir dos próprios textos (precisam de conferência do professor).
 -- Pontos: 10 por questão. Id = fase, ordem = 1.
--- O script pode ser reexecutado: remove as linhas com id acima de 10 (de versões
--- anteriores, com mais de uma questão por fase) e atualiza as de id 1 a 10.
+-- O script pode ser reexecutado: remove as linhas com id acima de 30 (de versões
+-- anteriores, com mais de uma questão por fase) e atualiza as de id 1 a 30.
 -- Colunas: id, questao_id, area_id, fase, ordem, tipo, enunciado, texto_apoio,
 --          conteudo_json, gabarito_json, explicacao, pontos, origem
+--
+-- NÍVEIS: as questões de id 1 a 10 (logo abaixo) são as INTERMEDIÁRIAS. As de id 11 a 20
+-- (INICIANTE, Livro 1) e 21 a 30 (AVANCADO, Livro 2) estão no INSERT seguinte e seguem a
+-- mesma ordem de tipos por fase.
 
-DELETE FROM `questoes_gamificadas` WHERE `id` > 10;
+DELETE FROM `questoes_gamificadas` WHERE `id` > 30;
 
 INSERT INTO `questoes_gamificadas`
 (`id`, `questao_id`, `area_id`, `fase`, `ordem`, `tipo`, `enunciado`, `texto_apoio`,
@@ -584,6 +626,88 @@ VALUES
 Texto II — É inegável a importância dos plásticos em nossas vidas. No entanto, a utilização excessiva e principalmente o descarte inadequado transformam o plástico em vilão. Ele é altamente poluidor e vem se tornando um tormento para o meio ambiente: os mares e oceanos estão invadidos de material plástico.', '{"opcoes":[{"id":"A","texto":"têm a mesma opinião sobre o assunto, ou seja, que o plástico não deve ser visto como vilão ao meio ambiente."},{"id":"B","texto":"pensam igual sobre o uso do plástico, isto é, que o uso excessivo de plástico é o grande poluidor do meio ambiente."},{"id":"C","texto":"têm a mesma visão positiva sobre o plástico, mas o autor do texto I acredita que o material tem sua parcela de culpa na poluição do meio ambiente."},{"id":"D","texto":"possuem opiniões diferentes sobre o assunto: o texto I não vê o plástico como vilão ao meio ambiente, enquanto o texto II acredita que o material tem sim sua parcela de culpa."}]}', '{"correta":"D"}', 'O texto I defende que o plástico não deve ser visto como vilão; o texto II afirma que o uso excessivo e o descarte inadequado o tornam vilão. As opiniões são diferentes.', 10, '[AVANÇADA] Livro 2 q13 (foto 19)')
 ON DUPLICATE KEY UPDATE
     `questao_id` = VALUES(`questao_id`), `area_id` = VALUES(`area_id`),
+    `fase` = VALUES(`fase`), `ordem` = VALUES(`ordem`), `tipo` = VALUES(`tipo`),
+    `enunciado` = VALUES(`enunciado`), `texto_apoio` = VALUES(`texto_apoio`),
+    `conteudo_json` = VALUES(`conteudo_json`), `gabarito_json` = VALUES(`gabarito_json`),
+    `explicacao` = VALUES(`explicacao`), `pontos` = VALUES(`pontos`), `origem` = VALUES(`origem`);
+
+-- As 10 questões acima são as do nível INTERMEDIÁRIO (garante o nível mesmo em bancos antigos).
+UPDATE `questoes_gamificadas` SET `nivel` = 'INTERMEDIARIO' WHERE `id` BETWEEN 1 AND 10;
+
+
+-- =====================================================
+-- Questões gamificadas - níveis INICIANTE (id 11 a 20) e AVANCADO (id 21 a 30)
+-- =====================================================
+-- Mesma ordem de tipos do nível intermediário (1, 4, 7, 10 MC; 2, 5, 8 ASSOCIACAO;
+-- 3, 6, 9 PREENCHIMENTO). Iniciante vem do Livro 1 e Avançado do Livro 2 do banco de
+-- questões, sem repetir as questões nem os textos já usados no nível intermediário.
+-- As de múltipla escolha mantêm texto e alternativas da prova. Nas de preenchimento,
+-- o próprio texto da prova é a frase, com lacunas no lugar dos verbos (sem texto de
+-- apoio separado, para não entregar a resposta). Gabarito do Livro 2: oficial (resolução
+-- comentada). Livro 1: definido pela equipe (precisa de conferência do professor).
+-- Id = fase + 10 (iniciante) ou fase + 20 (avançado), ordem = 1. Pontos: 10 por questão.
+
+INSERT INTO `questoes_gamificadas`
+(`id`, `questao_id`, `area_id`, `nivel`, `fase`, `ordem`, `tipo`, `enunciado`, `texto_apoio`,
+ `conteudo_json`, `gabarito_json`, `explicacao`, `pontos`, `origem`)
+VALUES
+(11, NULL, 1, 'INICIANTE', 1, 1, 'MULTIPLA_ESCOLHA', 'O que a expressão “vrruuum!” representa no texto?', 'Texto do caipira
+O caipira andava ao longo da estrada seguido de dez cavalos. Nisso, veio um automóvel e o motorista gritou para o caipira:
+– Você tem dez. Mas eu tenho duzentos e cinquenta cavalos! – E – vrruuum! – saiu em disparada!
+O caipira continuou seu passo. E lá na frente estava o carro virado dentro do rio, ao lado da ponte.
+Aí, o caipira falou pro motorista:
+– Oi, cumpadre! Dando água pra tropa, é?', '{"opcoes":[{"id":"A","texto":"O som do carro."},{"id":"B","texto":"A voz do caipira."},{"id":"C","texto":"O som do cavalo."},{"id":"D","texto":"A voz do motorista."}]}', '{"correta":"A"}', '“Vrruuum!” imita o barulho do motor do automóvel quando o motorista sai em disparada. Palavras que imitam sons são chamadas de onomatopeias.', 10, '[INICIANTE] Livro 1 q7 (fotos 03-04)'),
+(12, NULL, 1, 'INICIANTE', 2, 1, 'ASSOCIACAO', 'Conecte cada sinal de pontuação ao que ele mostra no texto.', 'A espada
+O pai ajuda o filho a guardar os presentes que ganhou dos amigos. Nota que o filho está quieto e sério, mas pensa: “É o cansaço.” Afinal ele passou o dia correndo de um lado para o outro, comendo cachorro-quente e sorvete, brincando com os convidados por dentro e por fora da casa. Tem que estar cansado.
+– Quanto presente, hein, filho?
+– É.
+– E esta espada. Mas que beleza. Esta eu não tinha visto.
+– Pai...
+– E como pesa! Parece uma espada de verdade. É de metal mesmo. Quem foi que deu?
+– Era sobre isso que eu queria falar com você.', '{"esquerda":[{"id":"a","texto":"O ponto de exclamação, em “E como pesa!”"},{"id":"b","texto":"O ponto de interrogação, em “Quem foi que deu?”"},{"id":"c","texto":"As reticências, em “– Pai...”"},{"id":"d","texto":"O travessão (–), no começo de cada fala"}],"direita":[{"id":"1","texto":"indica a fala de cada personagem"},{"id":"2","texto":"mostra a surpresa do pai"},{"id":"3","texto":"faz uma pergunta"},{"id":"4","texto":"mostra hesitação, a frase fica no ar"}]}', '{"a":"2","b":"3","c":"4","d":"1"}', 'O ponto de exclamação em “E como pesa!” mostra a surpresa do pai ao perceber o peso da espada. O ponto de interrogação marca a pergunta, as reticências mostram a hesitação do filho e o travessão indica a fala de cada personagem.', 10, '[INICIANTE] Livro 1 q8 (foto 04) - adaptada para associação'),
+(13, NULL, 1, 'INICIANTE', 3, 1, 'PREENCHIMENTO', 'Complete o texto com os verbos corretos.', NULL, '{"frase":"Depois do jantar, o príncipe {1} Narizinho à casa da melhor costureira do reino. Era uma aranha de Paris, que sabia fazer vestidos lindos, lindos até não poder mais! – Dona Aranha – disse o príncipe – quero que faça para esta ilustre dama o vestido mais bonito do mundo. Vou {2} uma grande festa em sua honra e quero vê-la deslumbrar a corte.","opcoes":[{"id":"o1","texto":"levar"},{"id":"o2","texto":"deu"},{"id":"o3","texto":"levou"},{"id":"o4","texto":"dar"}]}', '{"1":"o3","2":"o4"}', 'O texto conta fatos que já aconteceram: “Depois do jantar, o príncipe levou Narizinho”. Depois de “vou”, o verbo fica no infinitivo: “Vou dar uma grande festa”. É por causa dessa festa que o príncipe quer o vestido mais bonito do mundo para Narizinho.', 10, '[INICIANTE] Livro 1 q4 (foto 02) - adaptada para preenchimento'),
+(14, NULL, 1, 'INICIANTE', 4, 1, 'MULTIPLA_ESCOLHA', 'O tema dos versos desse poema é', 'Um substantivo invisível que existe de verdade
+Não aparece para ninguém ver, o seu nome é saudade
+Só não acredita nela quem não a sentiu
+Muitas dores tem causado, muitos peitos ela feriu.
+[...]', '{"opcoes":[{"id":"A","texto":"os substantivos abstratos."},{"id":"B","texto":"o sentimento de saudade."},{"id":"C","texto":"as doenças que atingem o coração."},{"id":"D","texto":"os machucados no corpo ao longo da vida."}]}', '{"correta":"B"}', 'O poema apresenta a saudade como um “substantivo invisível”: ninguém a vê, mas quem a sentiu sabe o quanto ela pode doer.', 10, '[INICIANTE] Livro 1 q16 (foto 08)'),
+(15, NULL, 1, 'INICIANTE', 5, 1, 'ASSOCIACAO', 'Conecte cada ação a quem a pratica ou a quem ela se refere no trecho.', 'A brisa leve, que passava pelo campo, agitou as pétalas da florzinha. Por um instante, ela pensou que ia voar como o delicado colibri. Quis seguir com a brisa, mas sua haste estava presa ao solo.', '{"esquerda":[{"id":"a","texto":"Passava pelo campo e agitou as pétalas."},{"id":"b","texto":"Quis seguir com a brisa, mas estava presa ao solo."},{"id":"c","texto":"Foram agitadas pela brisa."},{"id":"d","texto":"É delicado e sabe voar."}],"direita":[{"id":"1","texto":"o colibri"},{"id":"2","texto":"a brisa"},{"id":"3","texto":"as pétalas"},{"id":"4","texto":"a florzinha"}]}', '{"a":"2","b":"4","c":"3","d":"1"}', 'Quem “quis seguir com a brisa” foi a florzinha, a única que estava presa ao solo pela haste. A brisa é quem passava pelo campo, as pétalas foram agitadas e o colibri é o delicado animal que voa.', 10, '[INICIANTE] Livro 1 q20 (foto 10; = Livro 2 q9) - adaptada para associação'),
+(16, NULL, 1, 'INICIANTE', 6, 1, 'PREENCHIMENTO', 'Complete o texto com os verbos corretos.', NULL, '{"frase":"O matuto chegou na rodoviária e {1} para o moço do guichê: – Moço, me {2} uma passagem pra Florisbela. – Não tem estação com esse nome! – Mas tem minha filha!","opcoes":[{"id":"o1","texto":"falaram"},{"id":"o2","texto":"dá"},{"id":"o3","texto":"falou"},{"id":"o4","texto":"dão"}]}', '{"1":"o3","2":"o2"}', '“O matuto” é uma pessoa só, por isso o verbo fica no singular: “falou”. Ele pede a uma pessoa só, o moço: “me dá uma passagem”. A graça da anedota está no mal-entendido: o moço pensou que Florisbela fosse o nome de uma estação, mas é o nome da filha do matuto.', 10, '[INICIANTE] Livro 1 q9 (foto 04; = Livro 2 q16) - adaptada para preenchimento'),
+(17, NULL, 1, 'INICIANTE', 7, 1, 'MULTIPLA_ESCOLHA', 'Que sentido tem a expressão “— Esse é forte e dá sustança!”, usada por Dona Carmelita?', 'O saber da vovó
+Na noite chuvosa, Dona Carmelita se preocupava com Maurinho: febre alta, diarreia, boca seca, suores frios. O médico estava longe daquele sertão e remédios não havia em casa.
+O que fazer? — pensou Dona Carmelita.
+Logo ela se lembrou de como sua avó fazia quando ela era criança. Preparava um remedinho fácil: água, açúcar, sal, limão e amido de milho misturadinhos, e oferecia-lhe em bons goles. E assim foi feito...
+Amanheceu. Maurinho dormia tranquilo e Dona Carmelita preparava, no fogão a lenha, um bom mingau de fubá e dizia:
+— Esse é forte e dá sustança!', '{"opcoes":[{"id":"A","texto":"Certeza do efeito do alimento para fortalecer seu filho."},{"id":"B","texto":"Dúvida de que o mingau recuperaria o menino."},{"id":"C","texto":"Incerteza do valor nutritivo do fubá."},{"id":"D","texto":"Satisfação em atender à vontade de Maurinho."}]}', '{"correta":"A"}', 'Dona Carmelita fala com confiança: o filho já dorme tranquilo e ela tem certeza de que o mingau de fubá, forte e nutritivo, vai fortalecê-lo.', 10, '[INICIANTE] Livro 1 q3 (foto 02)'),
+(18, NULL, 1, 'INICIANTE', 8, 1, 'ASSOCIACAO', 'Conecte cada texto ao tipo de linguagem que ele usa.', NULL, '{"esquerda":[{"id":"a","texto":"“O gato é um animal mamífero e carnívoro, da família dos felídeos. Pesa, em média, 3 quilos e mede de 40 a 60 centímetros.”"},{"id":"b","texto":"“O elefante é o bicho de mais sorte que conheço. Já nasceu com um canudinho para tomar refresco. Ele não é caminhão, mas de vez em quando dá uma trombada.”"},{"id":"c","texto":"“Na asa do vento, voa meu cavalo azul. E as nuvens brancas, brancas, dançam de alegria, brincando com meu cavalinho.”"},{"id":"d","texto":"“Reformamos e fabricamos estofados finos sob medida. Aproveitem nossa grande promoção para o Dia das Mães. Parcelamos em até 5 vezes. Contato: 3486-8928.”"}],"direita":[{"id":"1","texto":"poética"},{"id":"2","texto":"científica"},{"id":"3","texto":"de propaganda"},{"id":"4","texto":"humorística"}]}', '{"a":"2","b":"4","c":"1","d":"3"}', 'A linguagem científica usa termos técnicos e dados exatos (“mamífero”, “felídeos”, “3 quilos”). A poética usa imagens e emoção, a de propaganda tenta vender (preço, promoção, contato) e a humorística brinca com as palavras (“dá uma trombada”).', 10, '[INICIANTE] Livro 1 q15 (foto 07) - adaptada para associação'),
+(19, NULL, 1, 'INICIANTE', 9, 1, 'PREENCHIMENTO', 'Complete o texto com os verbos corretos.', NULL, '{"frase":"O jornal científico “Zookeys”, publicado nesta quinta-feira (15 de agosto de 2013), traz um artigo que demonstra a descoberta de uma nova espécie animal: o olinguito. Apesar de novos insetos e anfíbios serem descobertos com certa frequência, este {1} o primeiro mamífero carnívoro descoberto em 35 anos no Hemisfério Ocidental. Seus pelos {2} um tom marrom alaranjado e, apesar de ser de ordem carnívora, sua principal fonte de alimento são frutas.","opcoes":[{"id":"o1","texto":"são"},{"id":"o2","texto":"tem"},{"id":"o3","texto":"é"},{"id":"o4","texto":"têm"}]}', '{"1":"o3","2":"o4"}', '“Este” (o olinguito) é um só: “este é o primeiro mamífero carnívoro”. “Seus pelos” está no plural: “seus pelos têm”, com acento. O texto é uma notícia: informa a descoberta de uma nova espécie e suas características.', 10, '[INICIANTE] Livro 1 q19 (foto 10; = Livro 2 q8) - adaptada para preenchimento'),
+(20, NULL, 1, 'INICIANTE', 10, 1, 'MULTIPLA_ESCOLHA', 'O trecho que mostra a opinião do autor do texto é:', 'O Dia da Terra é mais importante do que nunca
+22 de abril é o Dia da Terra. [...]
+A primeira vez que o Dia da Terra foi celebrado foi em 1970. Vinte milhões de pessoas, indignadas com o derramamento de óleo, a poluição atmosférica e dos rios, foram às ruas protestar contra o que reconheceram ser uma crise ambiental. Além desses resultados práticos, o evento demonstrou a força das pessoas quando se unem e demandam ações. [...]
+Assim como no primeiro Dia da Terra, há 50 anos, agora é hora de demonstrarmos solidariedade, agindo e enviando uma mensagem clara para as lideranças mundiais pela ação contra a mudança climática, detendo a perda da biodiversidade e dos hábitats e garantindo que a proteção ambiental seja uma das bases para nos reconstruirmos melhor. [...]', '{"opcoes":[{"id":"A","texto":"“A primeira vez que o Dia da Terra foi celebrado foi em 1970.”"},{"id":"B","texto":"“Vinte milhões de pessoas [...] foram às ruas protestar”"},{"id":"C","texto":"“agora é hora de demonstrarmos solidariedade”"},{"id":"D","texto":"“22 de abril é o Dia da Terra.”"}]}', '{"correta":"C"}', 'A, B e D são fatos: uma data, um número de pessoas e um dia comemorativo. Só a C mostra o ponto de vista do autor, que diz o que, na opinião dele, devemos fazer agora.', 10, '[INICIANTE] Livro 1 q12 (foto 06; = Livro 2 q10)'),
+(21, NULL, 1, 'AVANCADO', 1, 1, 'MULTIPLA_ESCOLHA', 'Em sua crônica, Monteiro Lobato faz uma crítica direta sobre um problema ecológico brasileiro, acusando', 'Preocupa à nossa gente civilizada conhecer em quanto fica na Europa por dia, em francos e cêntimos, um soldado em guerra; mas ninguém cuida de calcular os prejuízos de toda sorte advindos de uma assombrosa queima destas. As velhas camadas de humus destruídas; os sais preciosos que, breve, as enxurradas deitarão fora, rio abaixo, via oceano; o rejuvenescimento florestal do solo paralizado e retrogradado; a destruição das aves silvestres e o possível advento de pragas insetiformes; a alteração para piora do clima com a agravação crescente das secas; os vedos e aramados perdidos; o gado morto ou depreciado pela falta de pastos.', '{"opcoes":[{"id":"A","texto":"os desastres causados pelo contexto da guerra."},{"id":"B","texto":"a inoperância do poder público diante de desastres."},{"id":"C","texto":"o desconhecimento das riquezas naturais do país."},{"id":"D","texto":"o desinteresse com relação a problemas que assolam o país."}]}', '{"correta":"D"}', 'O texto contrapõe o interesse pelos custos das guerras europeias ao desinteresse pelo impacto das queimadas no próprio país, e lista toda a destruição que elas causam.', 10, '[AVANCADO] Livro 2 q23 (foto 25)'),
+(22, NULL, 1, 'AVANCADO', 2, 1, 'ASSOCIACAO', 'O poema é engraçado porque brinca com os diferentes significados das palavras. Conecte cada palavra do poema ao outro sentido que ela tem no dia a dia.', 'Ninguém coça as costas da cadeira.
+Ninguém chupa a manga da camisa.
+O piano jamais abana a cauda.
+Tem asa, porém não voa, a xícara.', '{"esquerda":[{"id":"a","texto":"costas, em “as costas da cadeira”"},{"id":"b","texto":"manga, em “a manga da camisa”"},{"id":"c","texto":"cauda, em “a cauda do piano”"},{"id":"d","texto":"asa, em “a asa da xícara”"}],"direita":[{"id":"1","texto":"parte do corpo de uma ave"},{"id":"2","texto":"uma fruta"},{"id":"3","texto":"parte do corpo humano"},{"id":"4","texto":"o rabo de um animal"}]}', '{"a":"3","b":"2","c":"4","d":"1"}', 'O humor vem do duplo sentido: “costas” (corpo e encosto), “manga” (fruta e parte da roupa), “cauda” (rabo e parte do piano) e “asa” (ave e alça da xícara). Os objetos ganham “partes” que, em outro sentido, pertencem a pessoas, frutas e animais.', 10, '[AVANCADO] Livro 2 q3 (foto 13) - adaptada para associação'),
+(23, NULL, 1, 'AVANCADO', 3, 1, 'PREENCHIMENTO', 'Complete o texto com os verbos corretos.', NULL, '{"frase":"“Passamos mais de 15 anos {1} por água, luz e esgoto, {2} manifestações na prefeitura e esse ano o Ministério Público {3} a Sabesp. Não é que eles são bonzinhos, é que o Ministério Público reconhece que somos moradores há mais de 20 anos no mesmo local, sem saneamento básico”, diz Alessandra Moja Cunha, líder comunitária da favela.","opcoes":[{"id":"o1","texto":"lutamos"},{"id":"o2","texto":"notificou"},{"id":"o3","texto":"fizeram"},{"id":"o4","texto":"lutando"},{"id":"o5","texto":"notificaram"},{"id":"o6","texto":"fizemos"}]}', '{"1":"o4","2":"o6","3":"o2"}', 'Depois de “passamos mais de 15 anos”, usa-se o gerúndio: “lutando”. Quem fala é o grupo de moradores (nós), então “fizemos manifestações”. “O Ministério Público” é singular: “notificou”. O texto mostra que o poder público só agiu depois da pressão dos moradores, e não de forma espontânea.', 10, '[AVANCADO] Livro 2 q2 (fotos 12-13) - adaptada para preenchimento'),
+(24, NULL, 1, 'AVANCADO', 4, 1, 'MULTIPLA_ESCOLHA', 'Ao organizar os verbos destacados (rogou, instou, chorou) de tal maneira, o autor do texto teve a intenção de', 'O macaco rogou, instou, chorou; mas a onça parecia inflexível. Simão então lembrou que a demanda fosse resolvida pelo juiz de direito. Foram a ele, o macaco sempre agarrado pela onça. É juiz de direito, entre os animais, o jabuti, cujas audiências são dadas à borda dos rios, colocando-se ele em cima de uma pedra.', '{"opcoes":[{"id":"A","texto":"criar uma repetição de ideia a fim de deixar o leitor confuso quanto às ações e aos sentimentos do macaco."},{"id":"B","texto":"fazer uma oposição de ideias para mostrar ao leitor como o macaco estava confuso em relação aos seus atos."},{"id":"C","texto":"reduzir os sentimentos do macaco para demonstrar ao leitor que a personagem já tinha desistido de se explicar perante a onça."},{"id":"D","texto":"destacar a gradação de ideias relacionadas a esses verbos a fim de demonstrar as ações e os sentimentos do macaco perante a onça."}]}', '{"correta":"D"}', 'Os verbos se intensificam: pedir com humildade, insistir e, por fim, chorar. Essa gradação mostra as ações e os sentimentos do macaco diante da onça.', 10, '[AVANCADO] Livro 2 q14 (foto 20)'),
+(25, NULL, 1, 'AVANCADO', 5, 1, 'ASSOCIACAO', 'Conecte cada expressão da fala de João Grilo ao efeito que ela cria entre as ideias.', 'Trecho da peça “Auto da compadecida”, de Ariano Suassuna.
+JOÃO GRILO: – E você deixe de conversa. Nunca vi homem mais mole do que você, Chicó. O padeiro mandou você arranjar o padre para benzer o cachorro e eu arranjei sem ter sido mandado. Que é que você quer mais?
+CHICÓ: – Ih, olha como isso está pegado com o patrão! Faz gosto um empregado dessa qualidade.
+JOÃO GRILO: – Muito pelo contrário, ainda hei de me vingar do que ele e a mulher me fizeram quando estive doente. Três dias passei em cima da cama para morrer e nem um copo dágua me mandara. Mas fiz esse trabalho com gosto, somente porque se trata de enganar o padre. Não vou com aquela cara.', '{"esquerda":[{"id":"a","texto":"“Muito pelo contrário” e “Mas”"},{"id":"b","texto":"“e”, em “[...] para morrer e nem um copo dágua me mandara”"},{"id":"c","texto":"“porque”, em “somente porque se trata de enganar o padre”"}],"direita":[{"id":"1","texto":"adição (soma ideias)"},{"id":"2","texto":"explicação (dá o motivo)"},{"id":"3","texto":"oposição (contrasta ideias)"}]}', '{"a":"3","b":"1","c":"2"}', '“Muito pelo contrário” e “Mas” contrastam ideias: João Grilo discorda de Chicó e depois afirma que fez o trabalho com gosto, apesar do que passou. O “e” soma uma ideia à outra, e o “porque” explica o motivo de ele ter feito o trabalho.', 10, '[AVANCADO] Livro 2 q4 (foto 13) - adaptada para associação'),
+(26, NULL, 1, 'AVANCADO', 6, 1, 'PREENCHIMENTO', 'Complete o texto com os verbos corretos.', NULL, '{"frase":"– Assaltaremos a casa – prosseguiu o onço – e mataremos todos os seus moradores. A assembleia dissolveu-se, indo cada qual para sua toca sem que nenhuma daquelas feras {1} em caça naquele dia. Estavam a preparar uma fome especial para o almoço de carne humana que iam ter no dia seguinte. Os besouros espiões tudo {2} do seu galinho e lá se foram, a zumbir, dar parte à Emília dos grandes acontecimentos.","opcoes":[{"id":"o1","texto":"pensou"},{"id":"o2","texto":"ouviram"},{"id":"o3","texto":"pensasse"},{"id":"o4","texto":"ouviu"}]}', '{"1":"o3","2":"o2"}', 'Depois de “sem que”, o verbo vai para o subjuntivo: “sem que nenhuma daquelas feras pensasse em caça”. “Os besouros espiões” está no plural: “tudo ouviram”. Foram os besouros que espionaram a reunião das feras e avisaram a Emília.', 10, '[AVANCADO] Livro 2 q11 (foto 17) - adaptada para preenchimento'),
+(27, NULL, 1, 'AVANCADO', 7, 1, 'MULTIPLA_ESCOLHA', 'Os dois textos abordam o problema da seca no Brasil, diferenciando-se pela', 'Texto I
+O Brasil está enfrentando a maior seca das últimas sete décadas, segundo dados do Centro Nacional de Monitoramento de Desastres Naturais (Cemaden), ligado ao Ministério da Ciência e Tecnologia. É a primeira vez que a estiagem afeta de forma intensa uma região tão ampla do País, da Amazônia até o Paraná, potencializando incêndios e levando à baixa recorde dos rios. A situação ainda tende a se agravar até novembro. A série histórica da seca do Cemaden remonta a 1950. Os números dos últimos 74 anos revelam uma tendência de agravamento dos períodos de estiagem a partir do início dos anos 1990, quando esses eventos passaram a ser muito mais frequentes.
+Texto II
+A baixa umidade do ar pode provocar uma série de desconfortos à saúde, especialmente para crianças, idosos e pessoas com doenças crônicas. As complicações mais comuns incluem problemas alérgicos, respiratórios, ressecamento da pele e das mucosas, sangramento pelo nariz e irritação dos olhos. Na cidade de São Paulo e no interior do estado, a previsão é de que o tempo seco e o calor persistam durante esta semana. A temperatura pode chegar a 29 °C, com umidade relativa variando próximo a 30%, segundo o Inmet (Instituto Nacional de Meteorologia), o que aumenta os riscos à saúde [...]. A OMS (Organização Mundial da Saúde) alerta que índices de umidade relativa do ar abaixo de 60% não são ideais para a saúde humana.', '{"opcoes":[{"id":"A","texto":"perspectiva de melhora do quadro exposto em um curto período."},{"id":"B","texto":"gravidade que atribuem ao momento de estiagem vivido pelo país."},{"id":"C","texto":"atenção dada aos efeitos desse fenômeno na saúde da população."},{"id":"D","texto":"utilização de fontes confiáveis em defesa dos argumentos expostos."}]}', '{"correta":"C"}', 'Os dois textos tratam a estiagem com gravidade e citam fontes confiáveis (Cemaden, Inmet, OMS). A diferença está no foco: o Texto II dá atenção aos efeitos da baixa umidade na saúde da população.', 10, '[AVANCADO] Livro 2 q22 (foto 24)'),
+(28, NULL, 1, 'AVANCADO', 8, 1, 'ASSOCIACAO', 'Conecte cada explicação à palavra do trecho da crítica.', 'Embora “inspirado em fatos reais”, o filme “A Mulher Rei” claramente não está amarrado a eles, usando a história subjacente de guerreiras do século 19 em um reino africano como o ponto de partida para uma ação empolgante, aumentada em vários níveis com muito melodrama.', '{"esquerda":[{"id":"a","texto":"Reforça a certeza do autor sobre o que ele afirma."},{"id":"b","texto":"Introduz um fato contrário ao que é dito depois (concessão)."},{"id":"c","texto":"Adjetivo que mostra a opinião do autor sobre a ação do filme."},{"id":"d","texto":"Adjetivo que descreve a história que está “por baixo” do filme, sem expressar opinião."}],"direita":[{"id":"1","texto":"embora"},{"id":"2","texto":"aumentada"},{"id":"3","texto":"claramente"},{"id":"4","texto":"subjacente"}]}', '{"a":"3","b":"1","c":"2","d":"4"}', '“Claramente” é um modalizador que reforça a certeza do autor. “Embora” é uma conjunção concessiva e “aumentada” expressa a opinião do autor, sem reforçar a certeza dele. “Subjacente” apenas descreve a história de base do filme.', 10, '[AVANCADO] Livro 2 q20 (foto 23) - adaptada para associação'),
+(29, NULL, 1, 'AVANCADO', 9, 1, 'PREENCHIMENTO', 'Complete o texto com os verbos corretos.', NULL, '{"frase":"O problema de mobilidade urbana é crônico e não se {1} até o momento porque todos querem iniciar seus planos do zero. Querem implantar os seus modelos e não {2} sequência aos projetos que se iniciaram na gestão anterior. E não existe solução de quatro ou oito anos para um problema que {3} aí desde pelo menos 1911.","opcoes":[{"id":"o1","texto":"resolveram"},{"id":"o2","texto":"está"},{"id":"o3","texto":"dá"},{"id":"o4","texto":"resolveu"},{"id":"o5","texto":"estão"},{"id":"o6","texto":"dão"}]}', '{"1":"o4","2":"o6","3":"o2"}', '“O problema” é singular: “não se resolveu”. Quem não dá sequência aos projetos são “todos”, no plural: “não dão sequência”. “Um problema que está aí desde 1911” volta ao singular. Para o autor, a mobilidade urbana exige continuidade e constância nos projetos, e não planos que sempre recomeçam do zero.', 10, '[AVANCADO] Livro 2 q21 (foto 23) - adaptada para preenchimento'),
+(30, NULL, 1, 'AVANCADO', 10, 1, 'MULTIPLA_ESCOLHA', 'No final do texto, o autor faz uso de duas possibilidades de construção de um mesmo enunciado, de acordo com a norma culta, a fim de ilustrar a opinião de que', 'Como se pode ver, é preferência individual usar ou não a vírgula antes do etc. e não uma questão de contrariedade à norma culta. Como não há definição por parte dos doutos da língua, que são meros compiladores do uso que aqueles que bem empregam a língua fazem dela, fica a critério do usuário a sua opção.
+O que não é normal é alguém achar que só uma forma tem de ser a correta e tentar cercear o uso que outros fazem da segunda possibilidade. A ninguém é dado esse direito, pois ninguém pode se julgar o dono da língua, que é necessariamente uma entidade coletiva.
+Em outras palavras, sempre que houver duas possibilidades de uso, que é o que ocorre em frases como “A maioria dos usuários da língua prefere essa segunda forma” ou “A maioria dos usuários da língua preferem essa segunda forma”, cabe ao autor do texto fazer sua opção e não “autoridade da verdade absoluta”.', '{"opcoes":[{"id":"A","texto":"a forma correta depende das circunstâncias em que a língua é usada."},{"id":"B","texto":"as preferências individuais são uma questão de observação à norma."},{"id":"C","texto":"o direito de cercear o uso da língua, por parte dos doutos, é indevido."},{"id":"D","texto":"o usuário escolhe a opção que melhor lhe convém para se comunicar."}]}', '{"correta":"D"}', 'Com “a maioria … prefere” e “a maioria … preferem”, o autor mostra um caso em que as duas construções são aceitas. Nesse caso, o usuário escolhe a opção que melhor lhe convém para se comunicar.', 10, '[AVANCADO] Livro 2 q1 (foto 12)')
+ON DUPLICATE KEY UPDATE
+    `questao_id` = VALUES(`questao_id`), `area_id` = VALUES(`area_id`), `nivel` = VALUES(`nivel`),
     `fase` = VALUES(`fase`), `ordem` = VALUES(`ordem`), `tipo` = VALUES(`tipo`),
     `enunciado` = VALUES(`enunciado`), `texto_apoio` = VALUES(`texto_apoio`),
     `conteudo_json` = VALUES(`conteudo_json`), `gabarito_json` = VALUES(`gabarito_json`),
